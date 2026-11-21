@@ -39,12 +39,13 @@ export const COURSES: CourseMeta[] = [
 export const byId = (id?: string) => COURSES.find((c) => c.id === id);
 
 /** Lazy loaders: every course (data, engine, shell, CSS) is its own chunk, fetched only when opened. */
-export const loaders: Record<CourseId, () => Promise<{ D: unknown; mount: (D: unknown, api: unknown) => () => void; shell: string; css: string }>> = {
+export const loaders: Record<CourseId, () => Promise<{ D: unknown; mount: (D: unknown, api: unknown) => () => void; shell: string; css: string; api?: Record<string, unknown>; dispose?: () => void }>> = {
   algo: async () => {
     const [D, e, shell, css] = await Promise.all([
       import('./algo/data.json'), import('./algo/engine.js'), import('./algo/shell.html?raw'), import('./algo/style.css?inline'),
     ]);
-    return { D: D.default, mount: e.default, shell: shell.default, css: css.default };
+    const demos = await import('./algo/demos'); // React demo components (binary search, sorting, BFS/DFS, UCS)
+    return { D: D.default, mount: e.default, shell: shell.default, css: css.default, api: { mountDemos: demos.mountDemos }, dispose: demos.disposeDemos };
   },
   bpas: async () => {
     const [D, e, shell, css] = await Promise.all([

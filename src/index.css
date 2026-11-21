@@ -1,4 +1,6 @@
 /* Tailwind (no preflight: the original course CSS owns its own resets). Used for the hub and the course wrapper. */
+/* Legacy course CSS is injected inside @layer legacy so Tailwind utilities (padding, margin...) can override its `*{padding:0}` reset. */
+@layer legacy, theme, utilities;
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities);
 @import './styles/animations.css';
@@ -24,6 +26,7 @@
   --color-ink: var(--text);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
+  --color-ok: var(--green);
   --color-card-accent: var(--card-accent, var(--accent));
   --font-sans: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace;

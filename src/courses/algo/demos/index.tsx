@@ -1,0 +1,35 @@
+import { createRoot, type Root } from 'react-dom/client';
+import BinarySearch from './BinarySearch';
+import SortCompare from './SortCompare';
+import GraphSearch from './GraphSearch';
+import UniformCost from './UniformCost';
+
+const DEMOS: Record<string, () => React.JSX.Element> = {
+  bsearch: BinarySearch,
+  sort: SortCompare,
+  graph: GraphSearch,
+  ucs: UniformCost,
+};
+
+const roots = new Map<Element, Root>();
+const later = (fn: () => void) => setTimeout(fn, 0); // never unmount synchronously from inside another React commit
+
+/** Called by the ALGO engine after each chapter renders: mounts a React root into every new `.demo-slot`, drops roots whose slot is gone. */
+export function mountDemos(hosts: Element[]) {
+  for (const [el, root] of roots) {
+    if (!el.isConnected) { roots.delete(el); later(() => root.unmount()); }
+  }
+  for (const host of hosts) {
+    if (roots.has(host)) continue;
+    const Demo = DEMOS[(host as HTMLElement).dataset.demo ?? ''];
+    if (!Demo) continue;
+    const root = createRoot(host);
+    roots.set(host, root);
+    root.render(<Demo />);
+  }
+}
+
+export function disposeDemos() {
+  for (const root of roots.values()) later(() => root.unmount());
+  roots.clear();
+}

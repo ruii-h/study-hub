@@ -30,16 +30,19 @@ export default function CourseApp() {
     if (!meta || !ready) return;
     const style = document.createElement('style');
     style.dataset.course = meta.id;
-    style.textContent = ready.css + '\n' + extraCss;
+    // legacy CSS lives in a low-priority layer so Tailwind utilities used inside the guide (e.g. the ALGO demos) can win
+    style.textContent = '@layer legacy {\n' + ready.css + '\n}\n' + extraCss;
     document.head.appendChild(style);
     document.documentElement.dataset.course = meta.id;
     const prevTitle = document.title;
     document.title = `${meta.short} Study Guide — ${meta.title}`;
     const unmount = ready.mount(ready.D, {
       loadMermaid: () => import('mermaid').then((m) => m.default),
+      ...ready.api,
     });
     return () => {
       unmount();
+      ready.dispose?.();
       style.remove();
       delete document.documentElement.dataset.course;
       delete document.documentElement.dataset.theme;
