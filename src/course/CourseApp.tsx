@@ -28,6 +28,7 @@ export default function CourseApp() {
   // CSS first (layout effect => before paint), then the engine once the shell markup is in the DOM.
   useLayoutEffect(() => {
     if (!meta || !ready) return;
+    document.querySelectorAll('style[data-course]').forEach((e) => e.remove()); // never let two guides' CSS coexist
     const style = document.createElement('style');
     style.dataset.course = meta.id;
     // legacy CSS lives in a low-priority layer so Tailwind utilities used inside the guide (e.g. the ALGO demos) can win
@@ -44,6 +45,7 @@ export default function CourseApp() {
       unmount();
       ready.dispose?.();
       style.remove();
+      document.querySelectorAll('style[data-course]').forEach((e) => e.remove());
       delete document.documentElement.dataset.course;
       delete document.documentElement.dataset.theme;
       document.documentElement.style.removeProperty('--vvh');
