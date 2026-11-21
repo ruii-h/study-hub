@@ -42,22 +42,21 @@ export default function Hub() {
           <div className="text-lg font-bold tracking-tight">
             Study<span className="text-accent">Hub</span>
           </div>
-          <span className="hidden rounded-full border border-line px-2 py-0.5 text-xs text-muted sm:inline">3 COURSES</span>
           <button
             onClick={toggle}
-            className="ml-auto rounded-lg border border-line bg-surface2 px-3 py-1.5 text-sm transition hover:border-accent active:animate-press-pop"
+            className="ml-auto rounded-lg border border-line bg-surface2 px-3 py-1.5 text-sm transition hover:border-accent "
             aria-label="Switch between light and dark mode"
           >
-            {theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
+            {theme === 'dark' ? 'Light mode' : 'Dark mode'}
           </button>
         </div>
       </header>
 
       <main className="mx-auto max-w-5xl px-4 pb-16 pt-10">
         <section className="animate-hero-in">
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Pick a course</h1>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Choose a course to study</h1>
           <p className="mt-2 max-w-2xl text-muted">
-            Notes, chapter quizzes, flashcards, cheat-sheets and exams. Your progress is saved in this browser and shared with nothing.
+            Read the notes, take chapter quizzes, drill flashcards and sit practice exams. Progress is saved only in this browser.
           </p>
         </section>
 
@@ -68,12 +67,12 @@ export default function Hub() {
               <li key={c.id} className="animate-tab-in" style={{ animationDelay: `${i * 80}ms`, ['--card-accent' as string]: theme === 'dark' ? c.accent[0] : c.accent[1] }}>
                 <Link
                   to={`/${c.id}`}
-                  className="group relative flex h-full flex-col overflow-hidden rounded-2xl no-underline text-ink border border-line bg-surface p-5 transition duration-200 hover:-translate-y-1 hover:border-card-accent hover:shadow-[0_0_24px_color-mix(in_srgb,var(--card-accent)_22%,transparent)] active:animate-press-pop focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-card-accent"
+                  className="group relative flex h-full flex-col overflow-hidden rounded-xl no-underline text-ink border border-line bg-surface p-5 transition duration-200 hover:-translate-y-1 hover:border-card-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-card-accent"
                 >
                   <span aria-hidden className="absolute inset-x-0 top-0 h-1 bg-card-accent" />
                   <div className="flex items-center justify-between">
                     <span className="rounded-md bg-surface2 px-2 py-0.5 font-mono text-xs text-muted">{c.code}</span>
-                    <span className="text-card-accent transition group-hover:animate-arrow" aria-hidden>→</span>
+                    <span className="text-muted transition group-hover:text-card-accent group-hover:translate-x-0.5" aria-hidden>→</span>
                   </div>
                   <div className="mt-4 text-3xl font-extrabold tracking-tight text-card-accent">{c.short}</div>
                   <h2 className="mt-1 text-base font-semibold">{c.title}</h2>

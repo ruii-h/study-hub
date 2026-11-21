@@ -1519,3 +1519,20 @@ figure.diagram figcaption{font-size:12.5px;color:var(--muted);margin-top:8px;lin
 .exr-q{display:flex;gap:10px;align-items:flex-start;line-height:1.65}
 .exr-n{flex:none;min-width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:rgba(103,212,245,.15);color:var(--cy)}
 .exr details.model{margin-top:8px}
+
+/* ---- result / action buttons: one primary, one secondary, the rest quiet text links ---- */
+.btn{border-radius:8px;box-shadow:none;background-image:none;letter-spacing:0;min-height:40px;padding:8px 18px;font-weight:650}
+.btn:hover{filter:none;box-shadow:none}
+.btn:active,.pills button:active,.opt:active{transform:scale(.985)}
+.btn.main{background:var(--accent)!important;background-image:none!important;color:#06121f!important;border-color:transparent!important}
+html[data-theme=light] .btn.main{color:#fff!important}
+.btn.main:hover{background:color-mix(in srgb,var(--accent) 86%,#fff)!important}
+.btn.ghost,.btn.go{box-shadow:none!important}
+.btn.ghost{background:var(--surface2)!important;border:1px solid var(--border)!important}
+.btn.ghost:hover{border-color:var(--accent)!important}
+.btn.lnk{background:none!important;border:0!important;color:var(--muted)!important;padding:8px 6px;min-height:40px;font-weight:550;text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--muted) 45%,transparent);text-underline-offset:3px}
+.btn.lnk:hover{color:var(--text)!important;text-decoration-color:currentColor}
+.resultcard .row{align-items:center;gap:6px 12px;margin-top:16px}
+.resultcard .row .btn.lnk{margin-left:0}
+.resultcard .rt{max-width:62ch}
+.resultcard .sub{line-height:1.6}
