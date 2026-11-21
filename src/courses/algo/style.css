@@ -1495,8 +1495,6 @@ p,li,td,.cc,.t-callout,.cf-row p,.qt,.eo,.opt,.verdict,.exp{text-wrap:pretty}
 @media(max-width:640px){th{letter-spacing:.02em!important;padding-left:8px!important;padding-right:8px!important}.t-mini-table td,.glance td{padding:9px 10px!important}}
 
 /* ALGO layer: additions on top of the benchmark system */
-.srcline{margin:-4px 0 10px;font-size:12px;line-height:1.4}
-.srcline .chip{opacity:.8}
 a.xref{color:var(--accent);text-decoration:none;font-weight:600;border-bottom:1px dotted var(--accent);cursor:pointer}
 a.xref:hover,a.xref:focus-visible{background:rgba(88,166,255,.15)}
 .t-code{font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace}
