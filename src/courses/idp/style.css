@@ -1520,8 +1520,8 @@ button.theory-item .tq,button.theory-item .sc{min-width:38px;padding:2px 6px}
 /* ---- result / action buttons: one primary, one secondary, the rest quiet text links ---- */
 .btn.main{color:#06121f}
 html[data-theme=light] .btn.main{color:#fff}
-.btn.lnk{background:none!important;border:0!important;color:var(--muted)!important;padding:8px 6px;min-height:40px;font-weight:550;text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--muted) 45%,transparent);text-underline-offset:3px}
-.btn.lnk:hover{color:var(--text)!important;text-decoration-color:currentColor}
+.btn.lnk{background:none!important;background-image:none!important;box-shadow:none!important;filter:none!important;border-radius:4px;transform:none!important;border:0!important;color:var(--muted)!important;padding:8px 6px;min-height:40px;font-weight:550;text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--muted) 45%,transparent);text-underline-offset:3px}
+.btn.lnk:hover{background:none!important;box-shadow:none!important;filter:none!important;color:var(--text)!important;text-decoration-color:currentColor}
 .resultcard .row{align-items:center;gap:6px 12px;margin-top:16px}
 .resultcard .row .btn.lnk{margin-left:0}
 .resultcard .rt{max-width:62ch}
