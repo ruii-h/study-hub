@@ -1,0 +1,8 @@
+/* Additions around the original guide CSS: back-to-hub button + per-course accent colour. */
+.hubback{display:inline-flex;align-items:center;justify-content:center;flex:none;width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);text-decoration:none;font-size:17px;line-height:1;transition:border-color .15s,transform .15s}
+.hubback:hover{border-color:var(--accent);transform:translateY(-1px)}
+.hubback:active{animation:pressSoft .48s ease-out}
+:root[data-course=bpas][data-theme=dark]{--accent:#3fb950}
+:root[data-course=bpas][data-theme=light]{--accent:#1a7f37}
+:root[data-course=idp][data-theme=dark]{--accent:#bc8cff}
+:root[data-course=idp][data-theme=light]{--accent:#8250df}

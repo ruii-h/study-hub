@@ -1,0 +1,33 @@
+
+<a class="skip" href="#main">Skip to content</a>
+<header class="top"><div class="topbar">
+ <button id="menu" aria-label="Open menu" aria-expanded="false" onclick="toggleNav()">☰</button>
+ <a class="hubback" href="#/" aria-label="Back to all courses" title="All courses">⌂</a><div class="logo">IDP<span>Study</span></div><div class="badge">23 CHAPTERS</div><div class="course">IS211 Interaction Design &amp; Prototyping</div>
+ <div class="searchbox"><input id="q" type="search" placeholder="Search all notes…  ( / )" aria-label="Search all notes" autocomplete="off" aria-controls="sr"><div id="sr" role="listbox" hidden></div></div>
+ <div class="topbar-right"><button id="theme" onclick="toggleTheme()" aria-label="Switch between light and dark mode"></button><button id="helpbtn" aria-label="Help and keyboard shortcuts" onclick="openHelp()">?</button><div class="status-dot" aria-hidden="true"></div><div class="status-text" id="stat" aria-live="polite"></div></div>
+</div>
+<div id="pbar" role="progressbar" aria-label="Chapters read" aria-valuemin="0" aria-valuemax="23" aria-valuenow="0"><i></i></div></header>
+<nav class="tab-bar" aria-label="Study sections"><div class="tablist" role="tablist">
+ <button class="tab active" role="tab" aria-selected="true" data-t="theory" onclick="switchTab('theory')"><span class="ti">📖</span><span class="tl">Theory</span></button>
+ <button class="tab" role="tab" aria-selected="false" data-t="practice" onclick="switchTab('practice')"><span class="ti">🧠</span><span class="tl">Practice<span class="x"> Questions</span></span></button>
+ <button class="tab" role="tab" aria-selected="false" data-t="cards" onclick="switchTab('cards')"><span class="ti">🃏</span><span class="tl">Flashcards</span></button>
+ <button class="tab" role="tab" aria-selected="false" data-t="cheat" onclick="switchTab('cheat')"><span class="ti">📌</span><span class="tl">Cheat<span class="x">-sheet</span></span></button>
+ <button class="tab" role="tab" aria-selected="false" data-t="past" onclick="switchTab('past')"><span class="ti">📝</span><span class="tl">Past<span class="x"> Exam</span></span></button>
+ <button class="tab" role="tab" aria-selected="false" data-t="exam" onclick="switchTab('exam')"><span class="ti">🎯</span><span class="tl">Final<span class="x"> Exam</span></span></button>
+</div></nav>
+<main id="main"><div id="content">
+<div class="tab-view active" id="tab-theory" role="tabpanel"><div class="theory-nav" id="nav" tabindex="0" aria-label="Chapter list"></div><div id="theory-content" class="theory-content" tabindex="0" aria-label="Chapter content"></div></div>
+<div class="tab-view" id="tab-practice" role="tabpanel"><div class="pq"><div class="pq-list" id="pql" tabindex="0" aria-label="Chapter quizzes"></div><div class="pane" id="pqm" tabindex="0"></div></div></div>
+<div class="tab-view" id="tab-cards" role="tabpanel"><div class="pane" id="cardsm" tabindex="0"></div></div>
+<div class="tab-view" id="tab-cheat" role="tabpanel"><div class="pane" id="cheatm" tabindex="0"></div></div>
+<div class="tab-view" id="tab-past" role="tabpanel"><div class="pane" id="pastm" tabindex="0"></div></div>
+<div class="tab-view" id="tab-exam" role="tabpanel"><div class="pane" id="examm" tabindex="0"></div></div>
+</div></main>
+<div class="theory-nav" id="mnav" role="navigation" tabindex="0" aria-label="Menu"></div><div id="scrim" onclick="toggleNav(false)"></div>
+<dialog id="help" aria-labelledby="helph"><h2 id="helph">Help &amp; shortcuts</h2>
+<table class="keys"><tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>Previous / next chapter</td></tr><tr><td><kbd>/</kbd></td><td>Search all notes</td></tr><tr><td><kbd>t</kbd></td><td>Switch light / dark mode</td></tr><tr><td><kbd>1</kbd>–<kbd>6</kbd></td><td>Jump to a tab (Theory … Final Exam)</td></tr><tr><td><kbd>?</kbd></td><td>Open this help</td></tr><tr><td><kbd>Esc</kbd></td><td>Close search or this window</td></tr></table>
+<p class="hk">Key terms are shown in <b class="k-c">one colour</b> throughout, so bold coloured text always means “remember this term”.</p>
+<p class="hk">Your progress, scores and settings are saved in this browser only.</p>
+<div class="row"><button class="btn ghost" id="resetbtn" onclick="resetAll()">Reset my progress</button><button class="btn" onclick="document.getElementById('help').close()">Close</button></div></dialog>
+
+<!--SCRIPT-->
