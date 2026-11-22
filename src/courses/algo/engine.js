@@ -81,7 +81,7 @@ function renderPQ(sel){pqSel=sel;ST.pq=sel;ST.pqm=pqMode;buildNav();let h=`<div 
  if(pqMode=='warm'){runQuiz(`Chapter ${sel} — ${l.title} (warm-up)`,D.quiz[sel],'w'+sel,$('#pqm'),pills);return}
  runMulti(`Chapter ${sel} — ${l.title}`,(D.hard[sel]||[]).map((q,i)=>({...q,id:'h'+sel+'-'+i,ch:sel})),sel,$('#pqm'),pills)}
 function goQuiz(n){pqMode='hard';switchTab('practice');renderPQ(n)}
-function goBack(){const b=BACK;if(!b)return;if(b.tab=='theory'){const c=$('#theory-content');if(+b.sel==cur){BACK=b.up||null;wlBar(BACK);c.scrollTo({top:b.y,behavior:'smooth'})}else{loadTheory(+b.sel,{back:b.up||undefined,focus:false});$('#theory-content').scrollTop=b.y}return}if(b.tab=='practice'&&b.sel=='exam'){switchTab('exam')}else if(b.tab=='practice'){switchTab('practice');renderPQ(b.sel=='mx'?'mx':+b.sel)}else if(b.tab=='past'){switchTab('past');renderPast(b.sec);setTimeout(()=>{const e=document.getElementById('pq'+b.q);if(e)e.scrollIntoView({block:'start'})},60)}else if(b.tab=='exam'){switchTab('exam')}}
+function goBack(){const b=BACK;if(!b)return;if(b.tab=='cheat'||b.tab=='cards'){switchTab(b.tab);return}if(b.tab=='theory'){const c=$('#theory-content');if(+b.sel==cur){BACK=b.up||null;wlBar(BACK);c.scrollTo({top:b.y,behavior:'smooth'})}else{loadTheory(+b.sel,{back:b.up||undefined,focus:false});$('#theory-content').scrollTop=b.y}return}if(b.tab=='practice'&&b.sel=='exam'){switchTab('exam')}else if(b.tab=='practice'){switchTab('practice');renderPQ(b.sel=='mx'?'mx':+b.sel)}else if(b.tab=='past'){switchTab('past');renderPast(b.sec);setTimeout(()=>{const e=document.getElementById('pq'+b.q);if(e)e.scrollIntoView({block:'start'})},60)}else if(b.tab=='exam'){switchTab('exam')}}
 function nextOf(n){const i=D.lessons.findIndex(x=>x.n==n);return D.lessons[i+1]}
 
 const STOP=new Set('the a an and or of to in is are was were be been it its that this these those for on with as by at from not no do does did can could should would will which what who how why when where than then so if but into out up down over under more most such only same too very just also may might must have has had their there they them he she his her we you your our i me my one two all any each few other some both either neither true false statement because'.split(' '));
@@ -173,7 +173,7 @@ function startExam(fresh){const get=id=>{const m=/^h(\d+)-(\d+)$/.exec(id);const
 // ---------- cards
 let shuf=false;
 function renderCards(){buildNav();const m=$('#cardsm');m.innerHTML=`<h1 class="t-h1" style="font-size:26px">Flashcards</h1><div class="sub">Say the definition aloud, then tap, click or press Enter to flip. Mark what you know — it is saved.</div><div class="fc-filter"><label class="sr" for="fq">Search terms</label><input id="fq" type="search" placeholder="Search terms…" oninput="drawCards()"><label class="sr" for="fs">Filter cards</label><select id="fs" onchange="drawCards()"><option value="all">All</option><option value="todo">Not yet known</option><option value="known">Known</option></select>${chSel()}<button class="btn ghost" onclick="shuf=!shuf;drawCards()">Shuffle</button><span id="fcount" class="sub" role="status"></span></div><div class="fc-grid" id="fg"></div>`;drawCards()}
-const cardFront=c=>`<div class="bp-card-header"><div class="bp-card-header-title">${c.t}</div><span class="bp-flip-badge">Term · §${c.f.replace(/^§/,'')}</span></div><div class="fc-b" style="color:var(--muted);font-style:italic">Tap to reveal the definition…</div>`;
+const cardFront=c=>`<div class="bp-card-header"><div class="bp-card-header-title">${c.t}</div><span class="bp-flip-badge">Term · ${esc(wlRefLabel(c.f))}</span></div><div class="fc-b" style="color:var(--muted);font-style:italic">Tap to reveal the definition…</div>`;
 function drawCards(){const q=($('#fq').value||'').toLowerCase(),f=$('#fs').value;let cs=D.cards.map((c,i)=>({...c,i}));if(shuf)cs=shuffle(cs);
  cs=cs.filter(c=>(!q||(c.t+c.d).toLowerCase().includes(q))&&(f=='all'||(f=='known')==!!K[c.i])&&(!CCH||cardChap(c)==CCH));
  $('#fcount').textContent=`${cs.length} cards · ${Object.values(K).filter(Boolean).length} of ${D.cards.length} known`;
@@ -183,7 +183,7 @@ function flip(i){const el=$('#c'+i),c=D.cards[i];if(!el||el.dataset.busy)return;
  el.classList.remove('flipping');el.removeAttribute('data-busy')},180)}
 function mark(i){K[i]=K[i]?0:1;sv();const el=$('#c'+i);el.classList.toggle('known',!!K[i]);const b=el.querySelector('button');if(b)b.textContent=K[i]?'✓ Known (undo)':'Mark as known';$('#fcount').textContent=`${$$('.bp-card').length} cards · ${Object.values(K).filter(Boolean).length} of ${D.cards.length} known`}
 function chSel(){return `<label class="sr" for="fch">Chapter</label><select id="fch" class="chsel" onchange="setCCH(this.value)"><option value="0">All chapters</option>${D.lessons.filter(l=>D.cards.some(c=>cardChap(c)==l.n)).map(l=>`<option value="${l.n}" ${CCH==l.n?'selected':''}>${l.n}. ${esc(l.title)}</option>`).join('')}</select>`}
-function renderCheat(){buildNav();const cs=D.cards.filter(c=>!CCH||cardChap(c)==CCH);$('#cheatm').innerHTML=`<h1 class="t-h1" style="font-size:26px">Cheat-sheet</h1><div class="sub">${cs.length} key terms${CCH?' from chapter '+CCH:''} with the section where each lives.</div><div class="fc-filter">${chSel()}</div><div class="t-table-wrap" tabindex="0"><table class="ch"><thead><tr><th>Term</th><th>Definition</th><th>From</th></tr></thead><tbody>${cs.map(c=>`<tr><td>${c.t}</td><td>${c.d}</td><td>${c.f}</td></tr>`).join('')}</tbody></table></div>`}
+function renderCheat(){buildNav();const cs=D.cards.filter(c=>!CCH||cardChap(c)==CCH);$('#cheatm').innerHTML=`<h1 class="t-h1" style="font-size:26px">Cheat-sheet</h1><div class="sub">${cs.length} key terms${CCH?' from chapter '+CCH:''} with the section where each lives.</div><div class="fc-filter">${chSel()}</div><div class="t-table-wrap" tabindex="0"><table class="ch"><thead><tr><th>Term</th><th>Definition</th><th>From</th></tr></thead><tbody>${cs.map(c=>`<tr><td>${c.t}</td><td>${c.d}</td><td>${wlRefHTML(c.f)}</td></tr>`).join('')}</tbody></table></div>`}
 // ---------- past exam
 let pastSec='A';const SECS={A:[1,23,'Section A · Q1–23 (Counting)'],B:[24,33,'Section B · Q24–33 (Big-O)'],C:[34,41,'Section C · Q34–41 (Trees)'],D:[42,52,'Section D · Q42–52 (Searching and sorting)'],E:[53,60,'Section E · Q53–60 (Stacks and queues)'],F:[61,82,'Section F · Q61–82 (Mock exam)']};
 function pastTally(){const a=Object.keys(P).length,c=Object.values(P).filter(v=>v).length;return `${a} of ${D.exam.mcq.length} answered · ${c} correct`}
@@ -207,7 +207,7 @@ function buildIdx(){if(IDX)return;IDX=[];const t=document.createElement('div');
  D.lessons.forEach(l=>{t.innerHTML=clean(l.html);t.querySelectorAll('.t-section,.case-file').forEach(s=>{if(s.classList.contains('t-section')&&/Real-life case files/.test((s.querySelector('.t-h2')||{}).textContent||''))return;
   const h=s.querySelector('.t-h2,h3,.gt');const nm=s.querySelector('.t-num');let title=(h?h.textContent:'').replace(/\s+/g,' ').trim();if(nm)title=title.replace(nm.textContent,'').trim();
   const text=s.textContent.replace(/\s+/g,' ').trim();if(!title)title='Overview';
-  IDX.push({n:l.n,ch:l.title,id:s.id||'',title:(nm?nm.textContent+' ':'')+title,text})})});
+  IDX.push({n:l.n,ch:l.title,id:s.id||'',title:(nm?nm.textContent+' ':'')+title,text,lead:((s.querySelector(':scope>p')||{}).textContent||'').replace(/\s+/g,' ').trim()})})});
  D.cards.forEach(c=>{const m=/(\d+)\./.exec(c.f);IDX.push({n:m?+m[1]:1,ch:'Key term',id:'',title:c.t,text:c.d,term:1})})}
 function doSearch(){const v=$('#q').value.trim().toLowerCase();const box=$('#sr');if(v.length<2){box.hidden=true;return}
  buildIdx();const terms=v.split(/\s+/);const res=[];
@@ -299,21 +299,50 @@ function initDemos(){__api.mountDemos([...document.querySelectorAll('.demo-slot'
    keep.sort((a,b)=>b.a.length-a.a.length);
    WLRE=keep.length?new RegExp("(?<![\\w\u2019'-])("+keep.map(x=>wlRx(x.a)).join('|')+")(?![\\w-])",'gi'):null}
   function wlLookup(t){const k=wlNorm(t);if(k in WLMAP)return WLMAP[k];const k2=k.replace(/s$/,'');return k2 in WLMAP?WLMAP[k2]:-1}
-  function autoref(c,n){const ids=new Set(IDX.filter(e=>!e.term&&e.id).map(e=>e.id));
-   const RE=/§\s?(\d+)(?:\.(\d+))?|\b(?:Chapter|Lecture)\s+(\d+)\b/g;
+  function wlChap(l){return l.title.replace(/\s*\(.*$/,'').trim()}
+  function wlRefInfo(f){buildIdx();const m=/(\d+)(?:\.(\d+))?/.exec(f||'');if(!m)return null;const n=+m[1];const l=D.lessons.find(x=>x.n==n);if(!l)return null;
+   const id=m[2]?'s'+n+'-'+m[2]:'';const sec=id?IDX.find(e=>!e.term&&e.id===id):null;
+   if(!sec)return {n,id:'',title:wlChap(l),chapter:wlChap(l),excerpt:(l.goal||'').replace(/<[^>]+>/g,'')};
+   const title=sec.title.replace(/^[^A-Za-z]+/,'').replace(/\s*[(:—–?].*$/,'').trim()||wlChap(l);
+   const body=sec.text.replace(/^\s*[\d.]+\s*/,'').slice(sec.title.replace(/^[\d.]+\s*/,'').length).replace(/^[\s:—–-]+/,'');
+   const src=sec.lead&&sec.lead.length>50?sec.lead:body;const clean=src.replace(/§\s?(\d+)(?:\.(\d+))?/g,(m,a,b)=>{const q=IDX.find(e=>!e.term&&e.id===(b?'s'+a+'-'+b:''));const ll=D.lessons.find(x=>x.n==+a);return q?q.title.replace(/^[^A-Za-z]+/,'').replace(/\s*[(:—–?].*$/,''):(ll?wlChap(ll):'')});
+   return {n,id,title,chapter:wlChap(l),excerpt:clean.slice(0,170).replace(/\s+\S*$/,'')+'…'}}
+  function wlAnchor(info,text){const a=document.createElement('a');a.className='wl wl-ref';a.href='#'+(info.id||'ch'+info.n);a.dataset.n=info.n;a.dataset.id=info.id;a.textContent=text;return a}
+  function wlRefHTML(f){const i=wlRefInfo(f);if(!i)return esc(f||'');return '<a class="wl wl-ref" href="#'+(i.id||'ch'+i.n)+'" data-n="'+i.n+'" data-id="'+i.id+'">'+esc(i.title)+'</a>'}
+  function wlRefLabel(f){const i=wlRefInfo(f);return i?i.title:(f||'')}
+  function autoref(c,n){buildIdx();
+   const RE=/(\(\s*)?(?:§\s?(\d+)(?:\.(\d+))?|\b(?:Chapter|Lecture)\s+(\d+)\b)(\s*\))?/g;
    const SKIP='a,button,h1,h2,h3,h4,h5,h6,.t-h1,.t-h2,.t-h3,.t-num,.gt,th,summary,pre,code,svg,.mermaid,.demo,.demo-slot,input,select,textarea,label,script,style,.backbar,.t-nav-footer,.endrow,.toc,.chip,.meta,.t-tag,.t-subtitle';
    const w=document.createTreeWalker(c,NodeFilter.SHOW_TEXT,{acceptNode:t=>{if(!/§|Chapter|Lecture/.test(t.nodeValue))return NodeFilter.FILTER_REJECT;const p=t.parentElement;return p&&!p.closest(SKIP)?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT}});
    const nodes=[];while(w.nextNode())nodes.push(w.currentNode);
    nodes.forEach(t=>{const txt=t.nodeValue;RE.lastIndex=0;let m,last=0,frag=null;
-    while((m=RE.exec(txt))){const cn=+(m[1]||m[3]),sub=m[2];const l=D.lessons.find(x=>x.n==cn);if(!l)continue;
-     if(/flex|grid/.test(getComputedStyle(t.parentElement).display))continue;const id=sub&&ids.has('s'+cn+'-'+sub)?'s'+cn+'-'+sub:'';
-     const sid=(t.parentElement.closest('.t-section[id]')||{}).id||'';
-     if(cn==n&&(!id||id==sid))continue;
+    while((m=RE.exec(txt))){const open=m[1],cn=+(m[2]||m[4]),sub=m[3],close=m[5];
+     const info=wlRefInfo(sub?cn+'.'+sub:''+cn);if(!info)continue;
+          const sid=(t.parentElement.closest('.t-section[id]')||{}).id||'';
+     const plain=(info.n==n&&(!info.id||info.id==sid))||/flex|grid/.test(getComputedStyle(t.parentElement).display);const mk=(i,tx)=>plain?document.createTextNode(tx):wlAnchor(i,tx);
      frag=frag||document.createDocumentFragment();
-     if(m.index>last)frag.appendChild(document.createTextNode(txt.slice(last,m.index)));
-     const a=document.createElement('a');a.className='wl wl-ref';a.href='#'+(id||'ch'+cn);a.dataset.n=cn;a.dataset.id=id;a.dataset.tt=l.title;a.dataset.f=m[1]?'§'+m[1]+(sub?'.'+sub:''):'Chapter '+cn;a.textContent=m[0];frag.appendChild(a);last=m.index+m[0].length}
+     let before=txt.slice(last,m.index),end=m.index+m[0].length;
+     // a following range such as "§7.3–7.4": link the second title too
+     let second=null;const rg=/^\s*[–-]\s*(?:(\d+)\.)?(\d+)/.exec(txt.slice(end));
+     if(rg&&!open){const i2=wlRefInfo(rg[1]?rg[1]+'.'+rg[2]:(sub?cn+'.'+rg[2]:''+rg[2]));if(i2){second=i2;end+=rg[0].length}}
+     if(open&&close&&!second){
+       // "Visual Design (§11)": the words in front already name the target, so link them and drop the number
+       const tl=info.title.toLowerCase(),bl=before.toLowerCase().replace(/\s+$/,'');
+       if(bl.endsWith(tl)){const cut=bl.length-tl.length;const ws=before.length-bl.length;
+         if(cut>0)frag.appendChild(document.createTextNode(before.slice(0,cut)));
+         frag.appendChild(mk(info,before.slice(cut,before.length-ws)));
+         last=end;RE.lastIndex=end;continue}
+       if(before)frag.appendChild(document.createTextNode(before));
+       frag.appendChild(document.createTextNode('('));frag.appendChild(mk(info,info.title));frag.appendChild(document.createTextNode(')'));
+       last=end;RE.lastIndex=end;continue}
+     if(before)frag.appendChild(document.createTextNode(before));
+     if(open)frag.appendChild(document.createTextNode(open));
+     frag.appendChild(mk(info,info.title));
+     if(second){frag.appendChild(document.createTextNode(' and '));frag.appendChild(mk(second,second.title))}
+     if(close)frag.appendChild(document.createTextNode(close));
+     last=end;RE.lastIndex=end}
     if(frag){if(last<txt.length)frag.appendChild(document.createTextNode(txt.slice(last)));t.parentNode.replaceChild(frag,t)}})}
-  /* cards that would leave an empty grid cell next to them stretch to fill the row */
+    /* cards that would leave an empty grid cell next to them stretch to fill the row */
   function fillRows(root){const cont=root||$('#theory-content');if(!cont)return;
    cont.querySelectorAll('.t-section,.teach').forEach(s=>{const kids=[...s.children].filter(k=>k.offsetHeight>0&&getComputedStyle(k).position!=='absolute');
     kids.forEach(k=>k.style.removeProperty('grid-column'));
@@ -337,8 +366,11 @@ function initDemos(){__api.mountDemos([...document.querySelectorAll('.demo-slot'
      const a=document.createElement('a');a.className='wl';a.href='#'+(it.id||'ch'+it.n);a.dataset.ci=ti;a.dataset.n=it.n;a.dataset.id=it.id;a.textContent=m[0];frag.appendChild(a);last=m.index+m[0].length}
     if(frag){if(last<txt.length)frag.appendChild(document.createTextNode(txt.slice(last)));t.parentNode.replaceChild(frag,t)}})}
   function wlHide(){if(WLTIP){WLTIP.remove();WLTIP=null}}
-  function wlShow(a){wlHide();const c=a.dataset.tt?{t:a.dataset.tt,d:'',f:a.dataset.f}:(WL&&WL[+a.dataset.ci]);if(!c)return;const l=D.lessons.find(x=>x.n==+a.dataset.n);
-   const d=document.createElement('div');d.className='wl-tip';d.setAttribute('role','tooltip');d.innerHTML='<b>'+c.t+'</b>'+(c.d?'<div>'+c.d+'</div>':'')+'<small>'+(c.f||'')+' · '+(l?l.title:'')+'</small>';
+  function wlShow(a){wlHide();let t,dd,sm;const l=D.lessons.find(x=>x.n==+a.dataset.n);
+   const c=a.dataset.ci!==undefined&&WL?WL[+a.dataset.ci]:null;
+   if(c){const i=wlRefInfo(c.id?c.id.slice(1).replace('-','.'):''+c.n);t=c.t;dd=c.d;sm=(i&&i.id?i.title+' · ':'')+(l?wlChap(l):'')}
+   else{const i=wlRefInfo(a.dataset.id?a.dataset.id.slice(1).replace('-','.'):''+a.dataset.n);if(!i)return;t=i.title;dd=i.excerpt;sm=i.id?i.chapter:''}
+   const d=document.createElement('div');d.className='wl-tip';d.setAttribute('role','tooltip');d.innerHTML='<b>'+t+'</b>'+(dd?'<div>'+dd+'</div>':'')+(sm?'<small>'+sm+'</small>':'');
    document.body.appendChild(d);const r=a.getBoundingClientRect(),h=d.offsetHeight,wd=d.offsetWidth;
    d.style.left=Math.max(8,Math.min(r.left,innerWidth-wd-8))+'px';d.style.top=(r.bottom+h+12>innerHeight&&r.top>h+12?r.top-h-8:r.bottom+6)+'px';WLTIP=d}
   function wlBarEl(b){const d=document.createElement('div');d.className='backbar';
@@ -349,7 +381,7 @@ function initDemos(){__api.mountDemos([...document.querySelectorAll('.demo-slot'
    if(!b){if(bar)bar.remove();return}
    const nb=wlBarEl(b);if(bar)bar.replaceWith(nb);else c.insertBefore(nb,c.firstChild)}
   function wlGo(a){const n=+a.dataset.n,id=a.dataset.id,c=$('#theory-content'),l=D.lessons.find(x=>x.n==cur);
-   const back={tab:'theory',sel:cur,y:c.scrollTop,label:'Back to '+(l?l.title:'the previous page'),up:BACK};
+   const back=tab!=='theory'?{tab:tab,sel:cur,y:0,label:'Back to the '+(tab==='cheat'?'cheat-sheet':'flashcards'),up:null}:{tab:'theory',sel:cur,y:c.scrollTop,label:'Back to '+(l?wlChap(l):'the previous page'),up:BACK};
    if(n==cur){BACK=back;wlBar(back);if(id)scrollToId(id);else c.scrollTo({top:0,behavior:'smooth'})}
    else{loadTheory(n,{back:back,focus:false});if(id)scrollToId(id,true)}}
   __undo.push(wlHide);

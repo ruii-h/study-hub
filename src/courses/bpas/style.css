@@ -1299,3 +1299,5 @@ a.wl::after{content:"";position:absolute;inset:-7px -3px}
 @media(hover:hover){.backbar .bb-x:hover{background:rgba(0,0,0,.28)}}
 
 .theory-content>.backbar{width:min(92vw,360px)!important;max-width:min(92vw,360px)!important}
+
+.bp-flip-badge{max-width:62%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
