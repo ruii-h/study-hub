@@ -214,7 +214,7 @@ function retryPast(n){const box=$('#pq'+n);box.querySelectorAll('.eo').forEach(l
 let IDX=null;
 function buildIdx(){if(IDX)return;IDX=[];const t=document.createElement('div');
  const clean=h=>h.replace(/<\/(div|p|li|td|th|h\d|span|b|strong)>/g,'$& ');
- D.lessons.forEach(l=>{t.innerHTML=clean(l.html);t.querySelectorAll('.t-section,.case-file').forEach(s=>{if(s.querySelector('.case-file'))return;
+ D.lessons.forEach(l=>{t.innerHTML=clean(l.html);t.querySelectorAll('.t-section,.case-file').forEach(s=>{if(s.classList.contains('t-section')&&/Real-life case files/.test((s.querySelector('.t-h2')||{}).textContent||''))return;
   const h=s.querySelector('.t-h2,h3,.gt');const nm=s.querySelector('.t-num');let title=(h?h.textContent:'').replace(/\s+/g,' ').trim();if(nm)title=title.replace(nm.textContent,'').trim();
   const text=s.textContent.replace(/\s+/g,' ').trim();if(!title)title='Overview';
   IDX.push({n:l.n,ch:l.title,id:s.id||'',title:(nm?nm.textContent+' ':'')+title,text})})});
