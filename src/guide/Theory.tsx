@@ -75,6 +75,13 @@ export default function Theory() {
     return () => { stop(); io.disconnect(); g.api?.disposeDemos?.(); };
   }, [cur]); // eslint-disable-line
   useEffect(() => { if (body.current) runMermaid(body.current, () => g.api!.loadMermaid(), theme || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')); }, [cur, theme]); // eslint-disable-line
+  // cards that would leave an empty grid cell stretch to fill the row (re-run on every size change, like bootstrap's col-*)
+  useEffect(() => {
+    const sc = scroller.current, b = body.current; if (!sc || !b) return;
+    let t = 0; const run = () => { clearTimeout(t); t = window.setTimeout(() => g.wiki.fillRows(sc), 100); };
+    const ro = new ResizeObserver(run); ro.observe(sc); ro.observe(b); document.fonts?.ready.then(run); run();
+    return () => { ro.disconnect(); clearTimeout(t); };
+  }, [cur]); // eslint-disable-line
   useEffect(() => { const h = scroller.current?.querySelector('h1') as HTMLElement | null; h?.focus({ preventScroll: true }); }, [cur]);
 
   const tmr = useRef(0);

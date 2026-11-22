@@ -91,7 +91,7 @@ function buildIdx(){if(IDX)return;IDX=[];const t=document.createElement('div');
     if(frag){if(last<txt.length)frag.appendChild(document.createTextNode(txt.slice(last)));t.parentNode.replaceChild(frag,t)}})}
     /* cards that would leave an empty grid cell next to them stretch to fill the row */
   function fillRows(root){const cont=root||$('#theory-content');if(!cont)return;
-   cont.querySelectorAll('.t-section,.teach').forEach(s=>{const kids=[...s.children].filter(k=>k.offsetHeight>0&&getComputedStyle(k).position!=='absolute');
+   cont.querySelectorAll('.t-section,.teach,.fcards,.fc-grid').forEach(s=>{const kids=[...s.children].filter(k=>k.offsetHeight>0&&getComputedStyle(k).position!=='absolute');
     kids.forEach(k=>k.style.removeProperty('grid-column'));
     const tpl=getComputedStyle(s).gridTemplateColumns;if(!tpl||tpl==='none')return;const cols=tpl.split(' ').length;if(cols<2)return;
     const colW=parseFloat(tpl.split(' ')[0]),gap=parseFloat(getComputedStyle(s).columnGap)||0;

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { cardChap, shuffle, useG } from './state';
 import { flipTiming } from './motion';
@@ -48,8 +48,10 @@ export function Cards() {
     return cs.filter((c) => (!t || (c.t + c.d).toLowerCase().includes(t)) && (f === 'all' || (f === 'known') === !!g.K[c.i]) && (!g.cch || cardChap(c) === g.cch));
   }, [g.D.cards, q, f, shuf, g.cch, g.K]);
   const nKnown = Object.values(g.K).filter(Boolean).length;
+  const pane = useRef<HTMLDivElement>(null);
+  useEffect(() => { const t = setTimeout(() => g.wiki.fillRows(pane.current), 80); const f = () => g.wiki.fillRows(pane.current); addEventListener('resize', f); return () => { clearTimeout(t); removeEventListener('resize', f); }; }, [list]); // eslint-disable-line
   return (
-    <div className="pane" id="cardsm" tabIndex={0}>
+    <div className="pane" id="cardsm" tabIndex={0} ref={pane}>
       <h1 className="t-h1" style={{ fontSize: 26 }}>Flashcards</h1>
       <div className="sub">Say the definition aloud, then tap, click or press Enter to flip. Mark what you know — it is saved.</div>
       <div className="fc-filter">
