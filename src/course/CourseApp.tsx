@@ -1,16 +1,12 @@
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 import { byId, loaders } from '../courses/registry';
+import Guide from '../guide/Guide';
 import extraCss from './course-extra.css?inline';
-import { watchHighlight } from './highlight';
-import { watchMotion } from './motion';
 
 type Loaded = Awaited<ReturnType<(typeof loaders)['algo']>>;
 
-/**
- * Hosts one study guide. The guide's markup, CSS, data and engine are loaded as a lazy chunk the first time
- * the course is opened; leaving the route removes its CSS, listeners and window bindings completely.
- */
+/** Hosts one study guide: loads its data + CSS lazily, injects the CSS while the route is open, and renders the React guide. */
 export default function CourseApp() {
   const { courseId } = useParams();
   const meta = byId(courseId);
@@ -27,7 +23,6 @@ export default function CourseApp() {
 
   const ready = meta && mod && mod.id === meta.id ? mod.m : null;
 
-  // CSS first (layout effect => before paint), then the engine once the shell markup is in the DOM.
   useLayoutEffect(() => {
     if (!meta || !ready) return;
     document.querySelectorAll('style[data-course]').forEach((e) => e.remove()); // never let two guides' CSS coexist
@@ -39,22 +34,11 @@ export default function CourseApp() {
     document.documentElement.dataset.course = meta.id;
     const prevTitle = document.title;
     document.title = `${meta.code} ${meta.title} — Study Guide`;
-    const unmount = ready.mount(ready.D, {
-      loadMermaid: () => import('mermaid').then((m) => m.default),
-      ...ready.api,
-    });
-    const stopHl = watchHighlight();
-    const stopMo = watchMotion();
     return () => {
-      stopHl();
-      stopMo();
-      unmount();
-      ready.dispose?.();
       style.remove();
-      document.querySelectorAll('style[data-course]').forEach((e) => e.remove());
       delete document.documentElement.dataset.course;
       delete document.documentElement.dataset.theme;
-      document.documentElement.style.removeProperty('--vvh');
+      document.documentElement.style.removeProperty('--app-h');
       document.title = prevTitle;
     };
   }, [meta, ready]);
@@ -80,6 +64,5 @@ export default function CourseApp() {
       </div>
     );
   }
-  // display:contents keeps the guide's own layout (header / tabs / main) as direct children of <body>'s flow
-  return <div key={meta.id} style={{ display: 'contents' }} dangerouslySetInnerHTML={{ __html: ready.shell }} />;
+  return <Guide key={meta.id} meta={meta} D={ready.D as never} api={{ loadMermaid: () => import('mermaid').then((m) => m.default), ...ready.api }} />;
 }

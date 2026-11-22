@@ -12,7 +12,8 @@ npm run build     # outputs dist/
 ## Layout
 - `src/hub/` – course picker (React + Tailwind).
 - `src/course/CourseApp.tsx` – loads one course lazily, injects its CSS, mounts its engine, and removes everything when you leave.
-- `src/courses/<id>/` – `data.json` (lessons, quizzes, cards, exams), `shell.html`, `style.css` (original CSS, unchanged), `engine.js` (original behaviour; generated).
+- `src/guide/` – the React + Framer Motion guide app shared by all five courses (theory, practice, flashcards, ICE, past exams, search, wiki-links).
+- `src/courses/<id>/` – `data.json` (lessons, quizzes, cards, exams) and `style.css`.
 - `src/courses/algo/demos/` – the four ALGO demos as React + Tailwind components (mounted into each `.demo-slot` by the engine).
 - `src/styles/animations.css` – the 19 original keyframes, exposed to Tailwind as `animate-*` in `src/index.css`.
 - Mermaid is loaded on demand when a chapter contains a diagram; BPAS gets KaTeX CSS/fonts from the `katex` package.

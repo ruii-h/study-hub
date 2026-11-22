@@ -50,38 +50,20 @@ export const COURSES: CourseMeta[] = [
 
 export const byId = (id?: string) => COURSES.find((c) => c.id === id);
 
-/** Lazy loaders: every course (data, engine, shell, CSS) is its own chunk, fetched only when opened. */
-export const loaders: Record<CourseId, () => Promise<{ D: unknown; mount: (D: unknown, api: unknown) => () => void; shell: string; css: string; api?: Record<string, unknown>; dispose?: () => void }>> = {
+/** Lazy loaders: every course's data and stylesheet is its own chunk, fetched only when the course is opened. */
+type Loaded = { D: unknown; css: string; api?: Record<string, unknown> };
+export const loaders: Record<CourseId, () => Promise<Loaded>> = {
+  cf: async () => { const [D, css] = await Promise.all([import('./cf/data.json'), import('./cf/style.css?inline')]); return { D: D.default, css: css.default }; },
   algo: async () => {
-    const [D, e, shell, css] = await Promise.all([
-      import('./algo/data.json'), import('./algo/engine.js'), import('./algo/shell.html?raw'), import('./algo/style.css?inline'),
-    ]);
+    const [D, css] = await Promise.all([import('./algo/data.json'), import('./algo/style.css?inline')]);
     const demos = await import('./algo/demos'); // React demo components (binary search, sorting, BFS/DFS, UCS)
-    return { D: D.default, mount: e.default, shell: shell.default, css: css.default, api: { mountDemos: demos.mountDemos }, dispose: demos.disposeDemos };
+    return { D: D.default, css: css.default, api: { mountDemos: demos.mountDemos, disposeDemos: demos.disposeDemos } };
   },
   bpas: async () => {
-    const [D, e, shell, css] = await Promise.all([
-      import('./bpas/data.json'), import('./bpas/engine.js'), import('./bpas/shell.html?raw'), import('./bpas/style.css?inline'),
-    ]);
+    const [D, css] = await Promise.all([import('./bpas/data.json'), import('./bpas/style.css?inline')]);
     const katex = (await import('katex/dist/katex.min.css?inline')).default; // BPAS formulas are pre-rendered; only the KaTeX CSS/fonts are needed
-    return { D: D.default, mount: e.default, shell: shell.default, css: katex + '\n' + css.default };
+    return { D: D.default, css: katex + ' ' + css.default };
   },
-  cf: async () => {
-    const [D, e, shell, css] = await Promise.all([
-      import('./cf/data.json'), import('./cf/engine.js'), import('./cf/shell.html?raw'), import('./cf/style.css?inline'),
-    ]);
-    return { D: D.default, mount: e.default, shell: shell.default, css: css.default };
-  },
-  ctp: async () => {
-    const [D, e, shell, css] = await Promise.all([
-      import('./ctp/data.json'), import('./ctp/engine.js'), import('./ctp/shell.html?raw'), import('./ctp/style.css?inline'),
-    ]);
-    return { D: D.default, mount: e.default, shell: shell.default, css: css.default };
-  },
-  idp: async () => {
-    const [D, e, shell, css] = await Promise.all([
-      import('./idp/data.json'), import('./idp/engine.js'), import('./idp/shell.html?raw'), import('./idp/style.css?inline'),
-    ]);
-    return { D: D.default, mount: e.default, shell: shell.default, css: css.default };
-  },
+  idp: async () => { const [D, css] = await Promise.all([import('./idp/data.json'), import('./idp/style.css?inline')]); return { D: D.default, css: css.default }; },
+  ctp: async () => { const [D, css] = await Promise.all([import('./ctp/data.json'), import('./ctp/style.css?inline')]); return { D: D.default, css: css.default }; },
 };
