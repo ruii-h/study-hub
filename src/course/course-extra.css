@@ -50,3 +50,9 @@ details>summary{transition:background-color .2s,color .2s}
 /* one underline colour under the active tab (the accent), no stacked second line */
 .tab.active{box-shadow:none!important;border-bottom:2px solid var(--accent)!important;border-radius:10px 10px 0 0}
 @media(max-width:860px){.tab.active{border-bottom:0!important}.tab::before{background:var(--accent)!important}}
+/* flashcards: every card in a grid is the same size */
+.fcards{grid-auto-rows:1fr}
+.fcard,.fcard .fi{min-height:150px}
+.fc-grid{grid-auto-rows:1fr}
+.bp-card{min-height:190px}
+.lead{font-size:15px;line-height:1.75;color:var(--text);margin:0 0 12px}

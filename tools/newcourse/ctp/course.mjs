@@ -3,6 +3,7 @@ import path from 'node:path';
 import { lines, find, split } from '../src.mjs';
 import { metaAll } from './meta.mjs';
 import { exam } from './extra.mjs';
+import { leads } from './leads.mjs';
 
 const ls = lines(path.join(import.meta.dirname, 'source', 'notes.md'));
 const chap = (n) => {
@@ -54,5 +55,5 @@ export default {
     pastSingle: true,
     pastNote:'These are real final-exam questions: the AY2024-25 paper (with its published solutions) and the AY2020-21 paper. The 2020-21 paper has no answer key in your files, so those answers are my own: the multiple-choice answers and the short-answer solutions were worked out and checked by running the code in Python. The 2020-21 debugging question (Section B Q7, the buggy <code>trace_contacts_2</code> listing) is not included. Each year shows its multiple-choice questions first, then the short-answer questions. Switch <b>Show solutions</b> on (top right) to read the answers and model solutions; leave it off to attempt the paper like an exam.',
   },
-  meta: metaAll, exam, hasPast: true, codeQuestions: true,
+  template: { teach: 'intro', glance: false, quick: false, namesTitle: 'Key terms', namesCols: ['Term', 'Meaning', 'Example or note'], summaryTitle: 'Chapter summary' }, leads, meta: metaAll, exam, hasPast: true, codeQuestions: true,
 };

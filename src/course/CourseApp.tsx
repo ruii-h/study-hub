@@ -3,6 +3,7 @@ import { Navigate, useParams } from 'react-router-dom';
 import { byId, loaders } from '../courses/registry';
 import extraCss from './course-extra.css?inline';
 import { watchHighlight } from './highlight';
+import { watchMotion } from './motion';
 
 type Loaded = Awaited<ReturnType<(typeof loaders)['algo']>>;
 
@@ -43,8 +44,10 @@ export default function CourseApp() {
       ...ready.api,
     });
     const stopHl = watchHighlight();
+    const stopMo = watchMotion();
     return () => {
       stopHl();
+      stopMo();
       unmount();
       ready.dispose?.();
       style.remove();

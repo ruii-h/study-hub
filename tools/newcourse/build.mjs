@@ -33,14 +33,17 @@ const SKIP_Q = /^(Quick examples|Flip to recall)/;
 function chapterHtml(ch, secs) {
   const h = [];
   const titles = secs.filter((s) => !s.unnumbered).map((s) => ({ m: s.m, t: stripEmoji(fixTitle(s.title)).replace(/`/g, '') }));
-  h.push(`<div class="teach"><div class="tc why"><b>💡 Why it matters</b>${il(ch.why)}</div><div class="tc hook"><b>🧠 Memory hook</b>${il(ch.hook)}</div></div>`);
+  const T = C.template || {};
+  if (T.teach === 'intro') h.push(`<div class="t-section reveal"><p>${il(ch.intro || ch.goal)}</p></div>`);
+  else if (T.teach === 'why') h.push(`<div class="teach"><div class="tc why"><b>💡 Overview</b>${il(ch.why)}</div></div>`);
+  else h.push(`<div class="teach"><div class="tc why"><b>💡 Why it matters</b>${il(ch.why)}</div><div class="tc hook"><b>🧠 Memory hook</b>${il(ch.hook)}</div></div>`);
   h.push(`<div class="road"><div class="road-t">🗺️ Roadmap of this chapter</div><div class="flow">${titles.map((x, i) => `${i ? '<i>→</i>' : ''}<span><b>${x.m}</b>${esc(x.t.length > 46 ? x.t.slice(0, 44) + '…' : x.t)}</span>`).join('')}</div></div>`);
-  h.push(`<div class="glance"><div class="gt">⚡ At a glance — ${il(ch.glance[0])}</div><div class="flow">${ch.glance[1].map((x, i) => `${i ? '<i>→</i>' : ''}<span>${il(x)}</span>`).join('')}</div></div>`);
+  if (T.glance !== false) h.push(`<div class="glance"><div class="gt">⚡ At a glance — ${il(ch.glance[0])}</div><div class="flow">${ch.glance[1].map((x, i) => `${i ? '<i>→</i>' : ''}<span>${il(x)}</span>`).join('')}</div></div>`);
   if (ch.names) {
-    h.push(`<div class="t-section names reveal"><div aria-level="2" class="t-h2" role="heading">🔤 Exact names — know these word for word</div>${ch.namesNote ? `<div class="sub">${il(ch.namesNote)}</div>` : ''}<div class="t-table-wrap" tabindex="0"><table class="t-mini-table"><thead><tr><th>Exact name</th><th>What it does</th><th>How to tell it apart</th></tr></thead><tbody>${ch.names.map((r) => `<tr><td><b>${il(r[0])}</b></td><td>${il(r[1])}</td><td>${il(r[2])}</td></tr>`).join('')}</tbody></table></div></div>`);
+    h.push(`<div class="t-section names reveal"><div aria-level="2" class="t-h2" role="heading">${T.namesTitle ? esc(T.namesTitle) : '🔤 Exact names — know these word for word'}</div>${ch.namesNote ? `<div class="sub">${il(ch.namesNote)}</div>` : ''}<div class="t-table-wrap" tabindex="0"><table class="t-mini-table"><thead><tr>${(T.namesCols || ['Exact name', 'What it does', 'How to tell it apart']).map((c) => `<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${ch.names.map((r) => `<tr><td><b>${il(r[0])}</b></td><td>${il(r[1])}</td><td>${il(r[2])}</td></tr>`).join('')}</tbody></table></div></div>`);
   }
   secs.forEach((s) => {
-    const body = mdToHtml(clean(s.md, refMap));
+    const body = (ch.leads && ch.leads[s.m] ? `<p class="lead">${il(ch.leads[s.m])}</p>` : '') + mdToHtml(clean(s.md, refMap));
     if (s.unnumbered) h.push(`<div class="t-section reveal"><div aria-level="2" class="t-h2" role="heading">${s.title}</div>${body}</div>`);
     else h.push(`<div class="t-section reveal" id="s${ch.n}-${s.m}"><div aria-level="2" class="t-h2" role="heading"><span class="t-num">${ch.n}.${s.m}</span>${il(stripEmoji(fixTitle(s.title)))}</div>${body}</div>`);
     if (ch.recall && ch.recall[0] === s.m) h.push(`<details class="recall"><summary>🧩 Pause &amp; recall — ${il(ch.recall[1])}</summary><div class="ans"><b>Answer:</b> ${il(ch.recall[2])}</div></details>`);
@@ -48,8 +51,8 @@ function chapterHtml(ch, secs) {
   if (ch.cases && ch.cases.length) {
     h.push(`<div class="t-section"><div aria-level="2" class="t-h2" role="heading">${ch.casesTitle || '🧪 Worked examples'}</div><div class="sub">${ch.casesSub || 'Work through these by hand before you read the answer.'}</div>${ch.cases.map((c) => `<div class="case-file reveal"><div class="cf-head"><span class="cf-tag">${esc(c.tag)}</span><h3>${il(c.title)}</h3></div><div class="cf-row s"><b>${esc(c.lab?.[0] || 'The setting')}</b>${mdToHtml(c.s)}</div><div class="cf-row w"><b>${esc(c.lab?.[1] || 'What happened')}</b>${mdToHtml(c.w)}</div><div class="cf-row l"><b>${esc(c.lab?.[2] || 'The lesson')}</b><p>${il(c.l)}</p></div></div>`).join('')}</div>`);
   }
-  h.push(`<div class="t-section reveal"><div aria-level="2" class="t-h2" role="heading">⚡ Quick examples</div>${ch.quick.map((q) => `<div class="core"><div class="core-t">${il(q[0])}</div><div class="cc-row"><div class="cc p"><b>Point</b>${il(q[1])}</div><div class="cc e"><b>Example</b>${il(q[2])}</div><div class="cc w"><b>Explanation</b>${il(q[3])}</div></div></div>`).join('')}</div>`);
-  h.push(`<div class="t-section reveal"><div aria-level="2" class="t-h2" role="heading">✅ This chapter in 30 seconds</div><ul class="checks">${ch.checks.map((c) => `<li>${il(c)}</li>`).join('')}</ul></div>`);
+  if (T.quick !== false) h.push(`<div class="t-section reveal"><div aria-level="2" class="t-h2" role="heading">⚡ Quick examples</div>${ch.quick.map((q) => `<div class="core"><div class="core-t">${il(q[0])}</div><div class="cc-row"><div class="cc p"><b>Point</b>${il(q[1])}</div><div class="cc e"><b>Example</b>${il(q[2])}</div><div class="cc w"><b>Explanation</b>${il(q[3])}</div></div></div>`).join('')}</div>`);
+  h.push(`<div class="t-section reveal"><div aria-level="2" class="t-h2" role="heading">${T.summaryTitle ? esc(T.summaryTitle) : '✅ This chapter in 30 seconds'}</div><ul class="checks">${ch.checks.map((c) => `<li>${il(c)}</li>`).join('')}</ul></div>`);
   const fc = ch.cards.slice(0, 6);
   h.push(`<div class="t-section"><div aria-level="2" class="t-h2" role="heading">🃏 Flip to recall</div><div class="sub">Say the answer out loud first, then tap the card.</div><div class="fcards">${fc.map((c) => `<div class="fcard" role="button" tabindex="0" aria-label="Flashcard: ${esc(c[0].replace(/<[^>]+>/g, ''))}. Press Enter to flip." onclick="this.classList.toggle('flip')"><div class="fi"><div class="ff"><span>${il(c[0])}</span><em>tap to flip</em></div><div class="fb">${il(c[1])}</div></div></div>`).join('')}</div></div>`);
   h.push(`<div class="bridge"><b>➡ Where next?</b> ${il(ch.bridge)}</div>`);
@@ -62,7 +65,7 @@ const problems = [];
 raw.forEach(({ ch, secs }) => {
   const meta = C.meta[ch.n];
   if (!meta) { problems.push('no meta for chapter ' + ch.n); return; }
-  const m = { ...ch, ...meta };
+  const m = { ...ch, ...meta, ...(C.leads && C.leads[ch.n] ? { intro: C.leads[ch.n].intro, leads: C.leads[ch.n].l } : {}) };
   if (m.exr && m.exr.length) D.ice += iceBlock(m);
   D.lessons.push({ n: ch.n, title: ch.title, tag: ch.tag, icon: ch.icon, goal: m.goal, subtitle: m.goal, html: chapterHtml(m, secs) });
   // flashcards: [term, definition, section number]
