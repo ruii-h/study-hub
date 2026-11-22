@@ -78,3 +78,22 @@ export function balanceUnits(root: HTMLElement) {
     });
   });
 }
+
+/**
+ * Small two-entity comparison tables (blank corner cell, 2-3 entities as columns, at most 3 attribute rows) read better
+ * flipped: each entity becomes a row and the attributes become the columns.
+ */
+export function transposeTables(root: HTMLElement) {
+  root.querySelectorAll<HTMLTableElement>('table.t-mini-table:not([data-flipped])').forEach((tb) => {
+    const head = tb.tHead?.rows[0]; if (!head) return;
+    const corner = head.cells[0].textContent!.trim();
+    const nCols = head.cells.length - 1; const body = [...(tb.tBodies[0]?.rows || [])];
+    if (!(corner === '' || /^(Aspect|Feature|Attribute)$/.test(corner)) || nCols < 2 || nCols > 3 || body.length < 2 || body.length > 3) return;
+    const entities = [...head.cells].slice(1).map((c) => c.innerHTML);
+    const attrs = body.map((r) => r.cells[0].innerHTML);
+    const strip = (h: string) => h.replace(/^\s*<strong[^>]*>([\s\S]*?)<\/strong>\s*$/, '$1');
+    let h = '<thead><tr><th></th>' + attrs.map((a) => `<th>${strip(a)}</th>`).join('') + '</tr></thead><tbody>';
+    entities.forEach((e, j) => { h += `<tr><td><strong class="k-c">${e}</strong></td>` + body.map((r) => `<td>${r.cells[j + 1]?.innerHTML ?? ''}</td>`).join('') + '</tr>'; });
+    tb.innerHTML = h + '</tbody>'; tb.dataset.flipped = '1';
+  });
+}

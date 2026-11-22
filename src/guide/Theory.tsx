@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, animate, motion } from 'framer-motion';
 import { SideList } from './Guide';
 import { useG } from './state';
-import { balanceUnits, reveal, runMermaid, snakeChains, stackTables } from './enhance';
+import { balanceUnits, transposeTables, reveal, runMermaid, snakeChains, stackTables } from './enhance';
 import { chapterSlide, ease, flipTiming, floatUp } from './motion';
 
 export function scrollToId(id: string, instant = false) {
@@ -62,7 +62,7 @@ export default function Theory() {
     const b = body.current, sc = scroller.current; if (!b || !sc) return;
     const p = g.pendingScroll.current; g.pendingScroll.current = null;
     sc.scrollTop = 0;
-    stackTables(b); snakeChains(b); g.wiki.autolink(sc, cur); balanceUnits(b); g.wiki.fillRows(sc);
+    transposeTables(b); stackTables(b); snakeChains(b); g.wiki.autolink(sc, cur); balanceUnits(b); g.wiki.fillRows(sc);
     const stop = reveal(b, sc);
     const list = [...b.querySelectorAll<HTMLElement>('.t-section[id]')].map((s) => { const n = s.querySelector('.t-num'); const t = s.querySelector('.t-h2')!.textContent!.replace(n ? n.textContent! : '', '').trim(); return { id: s.id, num: n ? n.textContent! : '', t }; });
     setToc(list.length >= 2 ? list : []); setActive('');
