@@ -264,7 +264,7 @@ __L(window,'resize',sched);__L(window,'load',sched);if(document.fonts&&document.
 })();
 
 // ALGO layer
-__L(document,'click',e=>{const a=e.target.closest('a.xref');if(!a)return;e.preventDefault();const n=+a.dataset.n,id=a.dataset.id;if(n==cur){scrollToId(id)}else{loadTheory(n,{focus:false});setTimeout(()=>scrollToId(id),400)}});
+__L(document,'click',e=>{const a=e.target.closest('a.xref');if(!a)return;e.preventDefault();wlGo(a)});
 const _mm=mm;mm=function(){_mm();if(window.initDemos)initDemos()};
 
 // ---------- live demos: React components (src/courses/algo/demos), mounted into each .demo-slot
@@ -289,22 +289,36 @@ function initDemos(){__api.mountDemos([...document.querySelectorAll('.demo-slot'
     const AL={'gestalt principles':['Gestalt'],'design thinking cycle':['Design Thinking'],"nielsen's 10 heuristics":["Nielsen's heuristics",'usability heuristics'],'model human processor (mhp)':['Model Human Processor'],'a/b testing vs. multivariate testing':['A/B test','A/B tests','multivariate testing']};(AL[raw.toLowerCase()]||[]).forEach(add)});
    secs.forEach(e=>{let t=e.title.replace(/^[^A-Za-z]+/,'').replace(/^(the|a|an)\s+/i,'').replace(/\s*[?:—–(].*$/,'').trim();const w=t.split(/\s+/).length;if(w<2||w>4||t.length<8||/^(worked|step|summary|overview|roadmap|key|extra|additional|example|case|common|why|how)\b/i.test(t))return;
     const ti=T.length;T.push({t:t,d:e.text.slice(0,170).replace(/\s+\S*$/,'')+'…',f:'§'+e.id.slice(1).replace('-','.'),n:e.n,id:e.id});cand.push({a:t,ti})});
-   // keep only main topics: the term must be referenced from at least 2 other sections
-   const MINREF=2;const seenA=new Map();const keep=[];
-   cand.forEach(x=>{const k=wlNorm(x.a);if(seenA.has(k))return;seenA.set(k,1);
-    const re=new RegExp("(?<![\\w\u2019'-])"+wlRx(x.a)+"(?![\\w-])",'i');const h=T[x.ti];
-    let cnt=0;for(const e of secs){if(e.id===h.id||(!h.id&&e.n==h.n))continue;if(re.test(e.text)&&++cnt>=MINREF)break}
-    if(cnt>=MINREF)keep.push(x)});
+   // keep only main topics: any spelling of the topic must be referenced from at least 2 other sections; then every spelling is kept
+   const MINREF=2;const seenA=new Map(),byT=new Map(),keep=[];
+   cand.forEach(x=>{const k=wlNorm(x.a);if(seenA.has(k))return;seenA.set(k,1);if(!byT.has(x.ti))byT.set(x.ti,[]);byT.get(x.ti).push(x)});
+   byT.forEach((list,ti)=>{const h=T[ti];const res=list.map(x=>new RegExp("(?<![\\w’'-])"+wlRx(x.a)+"(?![\\w-])",'i'));let cnt=0;
+    for(const e of secs){if(e.id===h.id||(!h.id&&e.n==h.n))continue;if(res.some(re=>re.test(e.text))&&++cnt>=MINREF)break}
+    if(cnt>=MINREF)keep.push(...list)});
    WL=T;WLMAP={};keep.forEach(x=>{WLMAP[wlNorm(x.a)]=x.ti});
    keep.sort((a,b)=>b.a.length-a.a.length);
    WLRE=keep.length?new RegExp("(?<![\\w\u2019'-])("+keep.map(x=>wlRx(x.a)).join('|')+")(?![\\w-])",'gi'):null}
   function wlLookup(t){const k=wlNorm(t);if(k in WLMAP)return WLMAP[k];const k2=k.replace(/s$/,'');return k2 in WLMAP?WLMAP[k2]:-1}
-  function autolink(c,n){wlBuild();if(!WLRE)return;const seen=new Map();
+  function autoref(c,n){const ids=new Set(IDX.filter(e=>!e.term&&e.id).map(e=>e.id));
+   const RE=/§\s?(\d+)(?:\.(\d+))?|\b(?:Chapter|Lecture)\s+(\d+)\b/g;
+   const SKIP='a,button,h1,h2,h3,h4,h5,h6,.t-h1,.t-h2,.t-h3,.t-num,.gt,th,summary,pre,code,svg,.mermaid,.demo,.demo-slot,input,select,textarea,label,script,style,.backbar,.t-nav-footer,.endrow,.toc,.chip,.meta,.t-tag,.t-subtitle';
+   const w=document.createTreeWalker(c,NodeFilter.SHOW_TEXT,{acceptNode:t=>{if(!/§|Chapter|Lecture/.test(t.nodeValue))return NodeFilter.FILTER_REJECT;const p=t.parentElement;return p&&!p.closest(SKIP)?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT}});
+   const nodes=[];while(w.nextNode())nodes.push(w.currentNode);
+   nodes.forEach(t=>{const txt=t.nodeValue;RE.lastIndex=0;let m,last=0,frag=null;
+    while((m=RE.exec(txt))){const cn=+(m[1]||m[3]),sub=m[2];const l=D.lessons.find(x=>x.n==cn);if(!l)continue;
+     if(/flex|grid/.test(getComputedStyle(t.parentElement).display))continue;const id=sub&&ids.has('s'+cn+'-'+sub)?'s'+cn+'-'+sub:'';
+     const sid=(t.parentElement.closest('.t-section[id]')||{}).id||'';
+     if(cn==n&&(!id||id==sid))continue;
+     frag=frag||document.createDocumentFragment();
+     if(m.index>last)frag.appendChild(document.createTextNode(txt.slice(last,m.index)));
+     const a=document.createElement('a');a.className='wl wl-ref';a.href='#'+(id||'ch'+cn);a.dataset.n=cn;a.dataset.id=id;a.dataset.tt=l.title;a.dataset.f=m[1]?'§'+m[1]+(sub?'.'+sub:''):'Chapter '+cn;a.textContent=m[0];frag.appendChild(a);last=m.index+m[0].length}
+    if(frag){if(last<txt.length)frag.appendChild(document.createTextNode(txt.slice(last)));t.parentNode.replaceChild(frag,t)}})}
+  function autolink(c,n){wlBuild();autoref(c,n);if(!WLRE)return;const seen=new Map();
    const SKIP='a,button,h1,h2,h3,h4,h5,h6,.t-h1,.t-h2,.t-h3,.t-num,.gt,th,summary,pre,code,svg,.mermaid,.fcards,.fcard,.demo,.demo-slot,input,select,textarea,label,script,style,.backbar,.t-nav-footer,.endrow,.toc,.chip,.meta,.t-tag,.t-subtitle';
    const w=document.createTreeWalker(c,NodeFilter.SHOW_TEXT,{acceptNode:t=>{if(!t.nodeValue.trim())return NodeFilter.FILTER_REJECT;const p=t.parentElement;return p&&!p.closest(SKIP)?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT}});
    const nodes=[];while(w.nextNode())nodes.push(w.currentNode);
    nodes.forEach(t=>{const txt=t.nodeValue;WLRE.lastIndex=0;let m,last=0,frag=null;
-    while((m=WLRE.exec(txt))){const ti=wlLookup(m[0]);if(ti<0)continue;const it=WL[ti];
+    while((m=WLRE.exec(txt))){const ti=wlLookup(m[0]);if(ti<0)continue;const it=WL[ti];if(/flex|grid/.test(getComputedStyle(t.parentElement).display))continue;
      const secEl=t.parentElement.closest('.t-section,.case-file')||c;const sid=(t.parentElement.closest('.t-section[id]')||{}).id||'';
      if(it.n==n&&(!it.id||it.id==sid))continue; // the section that defines it
      let s=seen.get(secEl);if(!s){s=new Set();seen.set(secEl,s)}if(s.has(ti)||s.size>=6)continue;s.add(ti);
@@ -313,8 +327,8 @@ function initDemos(){__api.mountDemos([...document.querySelectorAll('.demo-slot'
      const a=document.createElement('a');a.className='wl';a.href='#'+(it.id||'ch'+it.n);a.dataset.ci=ti;a.dataset.n=it.n;a.dataset.id=it.id;a.textContent=m[0];frag.appendChild(a);last=m.index+m[0].length}
     if(frag){if(last<txt.length)frag.appendChild(document.createTextNode(txt.slice(last)));t.parentNode.replaceChild(frag,t)}})}
   function wlHide(){if(WLTIP){WLTIP.remove();WLTIP=null}}
-  function wlShow(a){wlHide();const c=WL&&WL[+a.dataset.ci];if(!c)return;const l=D.lessons.find(x=>x.n==+a.dataset.n);
-   const d=document.createElement('div');d.className='wl-tip';d.setAttribute('role','tooltip');d.innerHTML='<b>'+c.t+'</b><div>'+c.d+'</div><small>'+(c.f||'')+' · '+(l?l.title:'')+'</small>';
+  function wlShow(a){wlHide();const c=a.dataset.tt?{t:a.dataset.tt,d:'',f:a.dataset.f}:(WL&&WL[+a.dataset.ci]);if(!c)return;const l=D.lessons.find(x=>x.n==+a.dataset.n);
+   const d=document.createElement('div');d.className='wl-tip';d.setAttribute('role','tooltip');d.innerHTML='<b>'+c.t+'</b>'+(c.d?'<div>'+c.d+'</div>':'')+'<small>'+(c.f||'')+' · '+(l?l.title:'')+'</small>';
    document.body.appendChild(d);const r=a.getBoundingClientRect(),h=d.offsetHeight,wd=d.offsetWidth;
    d.style.left=Math.max(8,Math.min(r.left,innerWidth-wd-8))+'px';d.style.top=(r.bottom+h+12>innerHeight&&r.top>h+12?r.top-h-8:r.bottom+6)+'px';WLTIP=d}
   function wlBar(b){const c=$('#theory-content');let bar=c.querySelector(':scope>.backbar');
