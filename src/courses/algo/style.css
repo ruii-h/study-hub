@@ -999,7 +999,7 @@ kbd{background:var(--surface2);border:1px solid var(--border);border-bottom-widt
 .hk{font-size:13px;line-height:1.7;margin:8px 0}
 #scrim{display:none}
 /* motion: respect the user's setting */
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}.reveal{opacity:1!important;transform:none!important}}
+
 .flow span{animation:chipIn .4s both}
 @keyframes chipIn{from{transform:scale(.9)}to{transform:none}}
 .reveal{transition:opacity .45s ease,transform .45s ease}
@@ -1227,7 +1227,7 @@ button,.eo,.bp-card,summary,.sri,.toc a{-webkit-tap-highlight-color:transparent}
 .tab.pressed .ti{animation:tabBounce .45s ease-out}
 @keyframes tabBounce{0%,100%{transform:none}40%{transform:translateY(-5px) scale(1.2)}}
 .theory-item,.nav-tab{transition:background .15s,color .15s}
-@media(prefers-reduced-motion:reduce){.pressed,.pressed *{animation:none!important}}
+
 
 /* ===== v6: remove chapter-picker button; screen transitions ===== */
 .pq-ctx{display:none!important}
@@ -1247,7 +1247,7 @@ dialog#help[open]::backdrop{animation:fadeIn .24s ease-out}
 #scrim{transition:opacity .22s}
 #resetbtn,.qq,.exq{animation-fill-mode:backwards}
 .exq{animation:scrIn .3s ease-out backwards}
-@media(prefers-reduced-motion:reduce){.tab-view.active,.scr-in,.scr-r,.scr-l,.exq,dialog#help[open]{animation:none!important}}
+
 /* ===== v7: full-width theory, aligned cards, live visual demos ===== */
 .theory-content{padding-left:clamp(16px,3vw,56px)!important;padding-right:clamp(16px,3vw,56px)!important}
 .theory-content>*,.t-section,.glance,.recall,.endrow,.backbar,.bridge,.toc .tocs,.t-nav-footer,.legend{max-width:none!important;width:auto}
@@ -1528,7 +1528,7 @@ details.recall summary{font-weight:700;cursor:pointer}
 pre.mermaid{border-radius:var(--r3)!important;box-shadow:var(--sh1)}
 code{border-radius:6px!important}
 .checks li{border-radius:var(--r1)}
-@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
 .cf-head{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
 .cf-tag{display:inline-flex!important;width:fit-content;align-self:flex-start}
 .cf-head h4{margin:0}

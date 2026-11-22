@@ -41,7 +41,7 @@ function buildNav(){const keep=['#nav','#mnav'].map(s=>{const e=$(s);return e?e.
   m=hd(tab=='cards'?'Flashcards by chapter':'Cheat-sheet by chapter')+navItem('🗂️','',`All chapters (${D.cards.length})`,!CCH,'setCCH(0)')+chapList(l=>{const [c,b]=fn(l);return c?navItem(l.icon,l.n,l.title,CCH==l.n,`setCCH(${l.n})`,b):''})}
  else if(tab=='past'){m=hd('Past exam sections')+Object.keys(SECS).map(k=>{const [a,b2]=SECS[k];const mc=D.exam.mcq.filter(q=>q.n>=a&&q.n<=b2);const ans=mc.filter(q=>P[q.n]!==undefined).length;return navItem('📝',k,SECS[k][2].replace(/^Section [A-E] · /,''),pastSec==k,`renderPast('${k}');toggleNav(false)`,mc.length?`<span class="tq sc ${ans==mc.length?'ok':'mid'}">${ans}/${mc.length}</span>`:'')}).join('')}
  else if(tab=='exam'){const s=qStatus('exam');m=hd('Final exam')+navItem('🏠','','Exam overview',false,'renderExamHome();toggleNav(false)')+navItem('▶️','',s&&!s.done?`Resume exam (${s.a}/${s.n})`:s?'Review your answers':'Start exam',false,'startExam();toggleNav(false)')+navItem('🔄','','Start a new random exam',false,"restart('exam',()=>startExam(true));toggleNav(false)")+navItem('🔁','',`Review my mistakes${mCount()?' ('+mCount()+')':''}`,false,"switchTab('practice');renderPQ('mx')")}
- $('#nav').innerHTML=theory;$('#mnav').innerHTML=m;['#nav','#mnav'].forEach((s,i)=>{$(s).scrollTop=keep[i]})}
+ $('#nav').innerHTML=theory;$('#mnav').innerHTML=m;['#nav','#mnav'].forEach((s,i)=>{$(s).scrollTo({top:keep[i],behavior:'instant'})})}
 function readMins(html){const w=html.replace(/<[^>]+>/g,' ').split(/\s+/).length;return Math.max(1,Math.round(w/200))}
 function loadTheory(n,o){o=o||{};const dir=(cur==null||n==cur)?'':(n>cur?'r':'l');cur=n;V[n]=1;ST.last=n;sv();stat();buildNav();const l=D.lessons.find(x=>x.n==n);const i=D.lessons.findIndex(x=>x.n==n);
  const pv=D.lessons[i-1],nx=D.lessons[i+1];const mins=readMins(l.html);
@@ -64,7 +64,7 @@ function buildToc(){const c=$('#theory-content');const secs=$$('#theory-content 
  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){bar.querySelectorAll('a').forEach(a=>{const on=a.dataset.id==e.target.id;a.classList.toggle('on',on);if(on)a.setAttribute('aria-current','true');else a.removeAttribute('aria-current')});const on=bar.querySelector('a.on');if(on)bar.querySelector('.tocs').scrollTo({left:on.offsetLeft-80,behavior:'smooth'})}}),{root:c,rootMargin:'-10% 0px -75% 0px'});
  secs.forEach(s=>io.observe(s));
  c.onscroll=()=>{const p=c.scrollTop/Math.max(1,c.scrollHeight-c.clientHeight);bar.querySelector('.rp').style.width=(p*100)+'%';ST.y=Math.round(c.scrollTop);ST.yn=cur;clearTimeout(window._sv);window._sv=setTimeout(sv,400)}}
-function scrollToId(id,inst){const c=$('#theory-content'),t=document.getElementById(id);if(t){t.classList.add('in');c.scrollTo({top:t.offsetTop-(c.querySelector('.toc')?c.querySelector('.toc').offsetHeight+8:16),behavior:(inst||matchMedia('(prefers-reduced-motion:reduce)').matches)?'instant':'smooth'});t.classList.remove('flash');void t.offsetWidth;t.classList.add('flash')}}
+function scrollToId(id,inst){const c=$('#theory-content'),t=document.getElementById(id);if(t){t.classList.add('in');c.scrollTo({top:t.offsetTop-(c.querySelector('.toc')?c.querySelector('.toc').offsetHeight+8:16),behavior:(inst)?'instant':'smooth'});t.classList.remove('flash');void t.offsetWidth;t.classList.add('flash')}}
 // ---------- practice
 let pqSel=1;
 let pqMode='hard';
@@ -73,7 +73,7 @@ function renderPQ(sel){pqSel=sel;ST.pq=sel;ST.pqm=pqMode;buildNav();let h=`<div 
  h+=`<button class="pq-item ${sel=='mx'?'active':''}" onclick="renderPQ('mx')"><span class="tn">🔁</span><span class="tt">Review my mistakes</span>${mCount()?`<span class="sc lo">${mCount()}</span>`:''}</button>`;
  D.lessons.forEach(l=>{const s=S[l.n];h+=`<button class="pq-item ${sel==l.n?'active':''}" ${sel==l.n?'aria-current="true"':''} onclick="renderPQ(${l.n})"><span class="tn">${l.n}</span><span class="tt">${l.title}</span>${s?`<span class="sc ${sc(s)}">${s.s}/${s.t}</span>`:''}</button>`});
 
- $('#pql').innerHTML=h;
+ {const _p=$('#pql'),_s=_p.scrollTop;_p.innerHTML=h;_p.scrollTo({top:_s,behavior:'instant'})}
 
  if(sel=='mx'){reviewMistakes();return}
  const l=D.lessons.find(x=>x.n==sel);

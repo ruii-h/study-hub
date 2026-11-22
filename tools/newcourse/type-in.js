@@ -8,7 +8,7 @@ function fillOK(q,v){const k=q.kind||'out',u=fillNorm(v,k,q.ci);if(!u)return fal
 function runFill(title,qs,key,host,pills){const st=QP[key]=QP[key]||{r:{}};if(!st.r)st.r={};
  const N=qs.length;
  const tally=()=>{const d=Object.values(st.r).filter(x=>x.done).length,c=Object.values(st.r).filter(x=>x.ok).length;host.querySelector('#qp').textContent=`Answered ${d} of ${N} · ${c} correct`;host.querySelector('#qb').style.width=(d/N*100)+'%'};
- host.innerHTML=`<h1 class="t-h1" style="font-size:26px">${title}</h1>${pills||''}<div class="sub">${N} questions · <b>type the answer</b> · extra spaces, quote style and the order-free spacing of options are ignored · saved automatically</div><div class="qprog" role="status" aria-live="polite"><span id="qp"></span><i><b id="qb"></b></i><button class="btn ghost sm" id="rs">↺ Start over</button></div><div id="qs"></div>`;
+ host.innerHTML=`<h2 class="t-h1" style="font-size:20px;margin:30px 0 6px">${title}</h2>${pills||''}<div class="sub">${N} questions · <b>type the answer</b> · extra spaces and quote style are ignored · saved automatically</div><div class="qprog" role="status" aria-live="polite"><span id="qp"></span><i><b id="qb"></b></i><button class="btn ghost sm" id="rs">↺ Start over</button></div><div id="qs"></div>`;
  host.querySelector('#rs').onclick=()=>{delete QP[key];sv();renderPQ(pqSel)};
  const box=host.querySelector('#qs');
  qs.forEach((q,i)=>{const d=document.createElement('div');d.className='exq';const multi=(q.kind||'out')==='out'&&/\n/.test(q.a[0]||'');
@@ -18,7 +18,7 @@ function runFill(title,qs,key,host,pills){const st=QP[key]=QP[key]||{r:{}};if(!s
   const showAns=()=>`<div class="why wy"><b>Accepted answer:</b> ${q.a.filter(a=>!a.startsWith('re:')).slice(0,2).map(a=>`<code>${esc(a).replace(/\n/g,'<br>')}</code>`).join(' or ')||esc(q.a[0])}</div>`;
   const paint=()=>{const r=st.r[i];if(!r||!r.done){vd.innerHTML='';return}
    vd.innerHTML=`<div class="verdict ${r.ok?'ok':'no'}"><b>${r.ok?'✅ Correct.':(r.shown?'Answer revealed.':'❌ Not quite.')}</b> ${q.e||''}${r.ok?'':showAns()}</div>`;inp.classList.toggle('ok',!!r.ok)};
-  d.querySelector('[data-c]').onclick=()=>{const ok=fillOK(q,inp.value);st.r[i]={v:inp.value,done:1,ok:ok?1:0};if(ok)delete M['t'+key+'-'+i];else M['t'+key+'-'+i]=null,delete M['t'+key+'-'+i];sv();paint();tally()};
+  d.querySelector('[data-c]').onclick=()=>{const ok=fillOK(q,inp.value);st.r[i]={v:inp.value,done:1,ok:ok?1:0};sv();paint();tally()};
   d.querySelector('[data-s]').onclick=()=>{st.r[i]={v:inp.value,done:1,ok:0,shown:1};sv();paint();tally()};
   inp.addEventListener('input',()=>{if(!st.r[i]||!st.r[i].done){st.r[i]={v:inp.value};sv()}});
   if(!multi)inp.addEventListener('keydown',e=>{if(e.key==='Enter')d.querySelector('[data-c]').click()});

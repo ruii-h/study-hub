@@ -44,9 +44,7 @@
 }
 
 html, body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; }
-@media (prefers-reduced-motion: reduce) {
-  .hub * { animation: none !important; transition: none !important; }
-}
+
 
 /* The guides' layout expects header/tabs/main to be direct children of <body> (a fixed-height flex column).
    React's #root wrapper must not add a box between them, otherwise nothing is height-bounded and nothing scrolls. */

@@ -47,3 +47,6 @@ details>summary{transition:background-color .2s,color .2s}
 .switch input:checked+i::after{transform:translateX(18px)}
 .switch input:focus-visible+i{outline:2px solid var(--accent);outline-offset:3px}
 .switch input:checked~span,.switch:has(input:checked) span{color:var(--text)}
+/* one underline colour under the active tab (the accent), no stacked second line */
+.tab.active{box-shadow:none!important;border-bottom:2px solid var(--accent)!important;border-radius:10px 10px 0 0}
+@media(max-width:860px){.tab.active{border-bottom:0!important}.tab::before{background:var(--accent)!important}}

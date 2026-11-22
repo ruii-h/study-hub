@@ -999,7 +999,7 @@ kbd{background:var(--surface2);border:1px solid var(--border);border-bottom-widt
 .hk{font-size:13px;line-height:1.7;margin:8px 0}
 #scrim{display:none}
 /* motion: respect the user's setting */
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}.reveal{opacity:1!important;transform:none!important}}
+
 .flow span{animation:chipIn .4s both}
 @keyframes chipIn{from{transform:scale(.9)}to{transform:none}}
 .reveal{transition:opacity .45s ease,transform .45s ease}
@@ -1227,7 +1227,7 @@ button,.eo,.bp-card,summary,.sri,.toc a{-webkit-tap-highlight-color:transparent}
 .tab.pressed .ti{animation:tabBounce .45s ease-out}
 @keyframes tabBounce{0%,100%{transform:none}40%{transform:translateY(-5px) scale(1.2)}}
 .theory-item,.nav-tab{transition:background .15s,color .15s}
-@media(prefers-reduced-motion:reduce){.pressed,.pressed *{animation:none!important}}
+
 
 /* ===== v6: remove chapter-picker button; screen transitions ===== */
 .pq-ctx{display:none!important}
@@ -1247,7 +1247,7 @@ dialog#help[open]::backdrop{animation:fadeIn .24s ease-out}
 #scrim{transition:opacity .22s}
 #resetbtn,.qq,.exq{animation-fill-mode:backwards}
 .exq{animation:scrIn .3s ease-out backwards}
-@media(prefers-reduced-motion:reduce){.tab-view.active,.scr-in,.scr-r,.scr-l,.exq,dialog#help[open]{animation:none!important}}
+
 
 
 /* ---- result / action buttons: one primary, one secondary, the rest quiet text links ---- */

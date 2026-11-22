@@ -46,7 +46,7 @@ function buildNav(){const keep=['#nav','#mnav'].map(s=>{const e=$(s);return e?e.
   m=hd(tab=='cards'?'Flashcards by chapter':'Cheat-sheet by chapter')+navItem('🗂️','',`All chapters (${D.cards.length})`,!CCH,'setCCH(0)')+chapList(l=>{const [c,b]=fn(l);return c?navItem(l.icon,l.n,l.title,CCH==l.n,`setCCH(${l.n})`,b):''})}
  else if(tab=='past'){m=hd('Past exam sections')+Object.keys(SECS).map(k=>{const [a,b2]=SECS[k];const mc=D.exam.mcq.filter(q=>q.n>=a&&q.n<=b2);const ans=mc.filter(q=>P[q.n]!==undefined).length;return navItem('📝',k,SECS[k][2].replace(/^Section [A-E] · /,''),pastSec==k,`renderPast('${k}');toggleNav(false)`,mc.length?`<span class="tq sc ${ans==mc.length?'ok':'mid'}">${ans}/${mc.length}</span>`:'')}).join('')}
  else if(tab=='exam'){const s=qStatus('exam');m=hd('Final exam')+navItem('🏠','','Exam overview',false,'renderExamHome();toggleNav(false)')+navItem('▶️','',s&&!s.done?`Resume exam (${s.a}/${s.n})`:s?'Review your answers':'Start exam',false,'startExam();toggleNav(false)')+navItem('🔄','','Start a new random exam',false,"restart('exam',()=>startExam(true));toggleNav(false)")+navItem('🔁','',`Review my mistakes${mCount()?' ('+mCount()+')':''}`,false,"switchTab('practice');renderPQ('mx')")}
- $('#nav').innerHTML=theory;$('#mnav').innerHTML=m;['#nav','#mnav'].forEach((s,i)=>{$(s).scrollTop=keep[i]})}
+ $('#nav').innerHTML=theory;$('#mnav').innerHTML=m;['#nav','#mnav'].forEach((s,i)=>{$(s).scrollTo({top:keep[i],behavior:'instant'})})}
 function readMins(html){const w=html.replace(/<[^>]+>/g,' ').split(/\s+/).length;return Math.max(1,Math.round(w/200))}
 function loadTheory(n,o){o=o||{};const dir=(cur==null||n==cur)?'':(n>cur?'r':'l');cur=n;V[n]=1;ST.last=n;sv();stat();buildNav();const l=D.lessons.find(x=>x.n==n);const i=D.lessons.findIndex(x=>x.n==n);
  const pv=D.lessons[i-1],nx=D.lessons[i+1];const mins=readMins(l.html);
@@ -69,7 +69,7 @@ function buildToc(){const c=$('#theory-content');const secs=$$('#theory-content 
  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){bar.querySelectorAll('a').forEach(a=>{const on=a.dataset.id==e.target.id;a.classList.toggle('on',on);if(on)a.setAttribute('aria-current','true');else a.removeAttribute('aria-current')});const on=bar.querySelector('a.on');if(on)bar.querySelector('.tocs').scrollTo({left:on.offsetLeft-80,behavior:'smooth'})}}),{root:c,rootMargin:'-10% 0px -75% 0px'});
  secs.forEach(s=>io.observe(s));
  c.onscroll=()=>{const p=c.scrollTop/Math.max(1,c.scrollHeight-c.clientHeight);bar.querySelector('.rp').style.width=(p*100)+'%';ST.y=Math.round(c.scrollTop);ST.yn=cur;clearTimeout(window._sv);window._sv=setTimeout(sv,400)}}
-function scrollToId(id,inst){const c=$('#theory-content'),t=document.getElementById(id);if(t){t.classList.add('in');c.scrollTo({top:t.offsetTop-(c.querySelector('.toc')?c.querySelector('.toc').offsetHeight+8:16),behavior:(inst||matchMedia('(prefers-reduced-motion:reduce)').matches)?'instant':'smooth'});t.classList.remove('flash');void t.offsetWidth;t.classList.add('flash')}}
+function scrollToId(id,inst){const c=$('#theory-content'),t=document.getElementById(id);if(t){t.classList.add('in');c.scrollTo({top:t.offsetTop-(c.querySelector('.toc')?c.querySelector('.toc').offsetHeight+8:16),behavior:(inst)?'instant':'smooth'});t.classList.remove('flash');void t.offsetWidth;t.classList.add('flash')}}
 // ---------- practice
 let pqSel=1;
 let pqMode='hard';
@@ -78,15 +78,15 @@ function renderPQ(sel){pqSel=sel;ST.pq=sel;ST.pqm=pqMode;buildNav();let h=`<div 
  h+=`<button class="pq-item ${sel=='mx'?'active':''}" onclick="renderPQ('mx')"><span class="tn">🔁</span><span class="tt">Review my mistakes</span>${mCount()?`<span class="sc lo">${mCount()}</span>`:''}</button>`;
  PQG.forEach(g=>{h+=`<div class="pq-head">${g[0].toUpperCase()}</div>`;g[1].map(n=>D.lessons.find(x=>x.n==n)).forEach(l=>{const s=S[l.n];h+=`<button class="pq-item ${sel==l.n?'active':''}" ${sel==l.n?'aria-current="true"':''} onclick="renderPQ(${l.n})"><span class="tn">${l.n}</span><span class="tt">${l.title}</span>${s?`<span class="sc ${sc(s)}">${s.s}/${s.t}</span>`:''}</button>`})});
  if(D.selfq)h+=`<button class="pq-item ${sel=='sc'?'active':''}" onclick="renderPQ('sc')"><span class="tn">📝</span><span class="tt">Self-check Q&amp;A (${D.selfn||''})</span></button>`;
- $('#pql').innerHTML=h;
+ {const _p=$('#pql'),_s=_p.scrollTop;_p.innerHTML=h;_p.scrollTo({top:_s,behavior:'instant'})}
  if(sel=='sc'){$('#pqm').innerHTML='<h1 class="t-h1" style="font-size:26px;margin-bottom:6px">Self-check Q&amp;A</h1><div class="sub">Think first, then open the answer.</div><div class="t-section">'+D.selfq+'</div>';return}
  if(sel=='mx'){reviewMistakes();return}
  const l=D.lessons.find(x=>x.n==sel);
- const nf=(D.fill&&D.fill[sel]||[]).length;if(pqMode=='type'&&!nf)pqMode='hard';
- const pills=`<div class="pills" role="group" aria-label="Question style"><button class="${pqMode=='hard'?'on':''}" aria-pressed="${pqMode=='hard'}" onclick="pqMode='hard';renderPQ(${sel})">Exam-style (harder) · ${(D.hard[sel]||[]).length}</button><button class="${pqMode=='warm'?'on':''}" aria-pressed="${pqMode=='warm'}" onclick="pqMode='warm';renderPQ(${sel})">Warm-up (easier) · ${(D.quiz[sel]||[]).length}</button>${nf?`<button class="${pqMode=='type'?'on':''}" aria-pressed="${pqMode=='type'}" onclick="pqMode='type';renderPQ(${sel})">Type the answer · ${nf}</button>`:''}</div>`;
- if(pqMode=='type'){runFill(`Chapter ${sel} — ${l.title} (type the answer)`,D.fill[sel].map((q,i)=>({...q})),'f'+sel,$('#pqm'),pills);return}
+ const nf=(D.fill&&D.fill[sel]||[]).length;
+ const pills=`<div class="pills" role="group" aria-label="Question style"><button class="${pqMode=='hard'?'on':''}" aria-pressed="${pqMode=='hard'}" onclick="pqMode='hard';renderPQ(${sel})">Exam-style (harder) · ${(D.hard[sel]||[]).length+nf}</button><button class="${pqMode=='warm'?'on':''}" aria-pressed="${pqMode=='warm'}" onclick="pqMode='warm';renderPQ(${sel})">Warm-up (easier) · ${(D.quiz[sel]||[]).length}</button></div>`;
  if(pqMode=='warm'){runQuiz(`Chapter ${sel} — ${l.title} (warm-up)`,D.quiz[sel],'w'+sel,$('#pqm'),pills);return}
- runMulti(`Chapter ${sel} — ${l.title}`,(D.hard[sel]||[]).map((q,i)=>({...q,id:'h'+sel+'-'+i,ch:sel})),sel,$('#pqm'),pills)}
+ runMulti(`Chapter ${sel} — ${l.title}`,(D.hard[sel]||[]).map((q,i)=>({...q,id:'h'+sel+'-'+i,ch:sel})),sel,$('#pqm'),pills);
+ if(nf){const fh=document.createElement('div');fh.id='pqf';$('#pqm').appendChild(fh);runFill('Type the answer',D.fill[sel].map(q=>({...q})),'f'+sel,fh,'')}}
 function goQuiz(n){pqMode='hard';switchTab('practice');renderPQ(n)}
 function goBack(){const b=BACK;if(!b)return;if(b.tab=='cheat'||b.tab=='cards'){switchTab(b.tab);return}if(b.tab=='theory'){const c=$('#theory-content');if(+b.sel==cur){BACK=b.up||null;wlBar(BACK);c.scrollTo({top:b.y,behavior:'smooth'})}else{loadTheory(+b.sel,{back:b.up||undefined,focus:false});$('#theory-content').scrollTop=b.y}return}if(b.tab=='practice'&&b.sel=='exam'){switchTab('exam')}else if(b.tab=='practice'){switchTab('practice');renderPQ(b.sel=='mx'?'mx':+b.sel)}else if(b.tab=='past'){switchTab('past');renderPast(b.sec);setTimeout(()=>{const e=document.getElementById('pq'+b.q);if(e)e.scrollIntoView({block:'start'})},60)}else if(b.tab=='exam'){switchTab('exam')}}
 function nextOf(n){const i=D.lessons.findIndex(x=>x.n==n);return D.lessons[i+1]}
@@ -228,7 +228,7 @@ function fillOK(q,v){const k=q.kind||'out',u=fillNorm(v,k,q.ci);if(!u)return fal
 function runFill(title,qs,key,host,pills){const st=QP[key]=QP[key]||{r:{}};if(!st.r)st.r={};
  const N=qs.length;
  const tally=()=>{const d=Object.values(st.r).filter(x=>x.done).length,c=Object.values(st.r).filter(x=>x.ok).length;host.querySelector('#qp').textContent=`Answered ${d} of ${N} · ${c} correct`;host.querySelector('#qb').style.width=(d/N*100)+'%'};
- host.innerHTML=`<h1 class="t-h1" style="font-size:26px">${title}</h1>${pills||''}<div class="sub">${N} questions · <b>type the answer</b> · extra spaces, quote style and the order-free spacing of options are ignored · saved automatically</div><div class="qprog" role="status" aria-live="polite"><span id="qp"></span><i><b id="qb"></b></i><button class="btn ghost sm" id="rs">↺ Start over</button></div><div id="qs"></div>`;
+ host.innerHTML=`<h2 class="t-h1" style="font-size:20px;margin:30px 0 6px">${title}</h2>${pills||''}<div class="sub">${N} questions · <b>type the answer</b> · extra spaces and quote style are ignored · saved automatically</div><div class="qprog" role="status" aria-live="polite"><span id="qp"></span><i><b id="qb"></b></i><button class="btn ghost sm" id="rs">↺ Start over</button></div><div id="qs"></div>`;
  host.querySelector('#rs').onclick=()=>{delete QP[key];sv();renderPQ(pqSel)};
  const box=host.querySelector('#qs');
  qs.forEach((q,i)=>{const d=document.createElement('div');d.className='exq';const multi=(q.kind||'out')==='out'&&/\n/.test(q.a[0]||'');
@@ -238,7 +238,7 @@ function runFill(title,qs,key,host,pills){const st=QP[key]=QP[key]||{r:{}};if(!s
   const showAns=()=>`<div class="why wy"><b>Accepted answer:</b> ${q.a.filter(a=>!a.startsWith('re:')).slice(0,2).map(a=>`<code>${esc(a).replace(/\n/g,'<br>')}</code>`).join(' or ')||esc(q.a[0])}</div>`;
   const paint=()=>{const r=st.r[i];if(!r||!r.done){vd.innerHTML='';return}
    vd.innerHTML=`<div class="verdict ${r.ok?'ok':'no'}"><b>${r.ok?'✅ Correct.':(r.shown?'Answer revealed.':'❌ Not quite.')}</b> ${q.e||''}${r.ok?'':showAns()}</div>`;inp.classList.toggle('ok',!!r.ok)};
-  d.querySelector('[data-c]').onclick=()=>{const ok=fillOK(q,inp.value);st.r[i]={v:inp.value,done:1,ok:ok?1:0};if(ok)delete M['t'+key+'-'+i];else M['t'+key+'-'+i]=null,delete M['t'+key+'-'+i];sv();paint();tally()};
+  d.querySelector('[data-c]').onclick=()=>{const ok=fillOK(q,inp.value);st.r[i]={v:inp.value,done:1,ok:ok?1:0};sv();paint();tally()};
   d.querySelector('[data-s]').onclick=()=>{st.r[i]={v:inp.value,done:1,ok:0,shown:1};sv();paint();tally()};
   inp.addEventListener('input',()=>{if(!st.r[i]||!st.r[i].done){st.r[i]={v:inp.value};sv()}});
   if(!multi)inp.addEventListener('keydown',e=>{if(e.key==='Enter')d.querySelector('[data-c]').click()});

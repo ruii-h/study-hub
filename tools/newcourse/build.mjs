@@ -164,11 +164,12 @@ if (!hasPast) {
 }
 // the header comment and API
 
-// type-in questions
+// type-in questions: appended to the exam-style (harder) quiz of each chapter
 if (Object.keys(D.fill).length) {
   must('// ---------- search', fs.readFileSync(path.join(root, 'tools', 'newcourse', 'type-in.js'), 'utf8') + '// ---------- search');
-  must("const pills=`<div class=\"pills\" role=\"group\" aria-label=\"Question style\">", "const nf=(D.fill&&D.fill[sel]||[]).length;if(pqMode=='type'&&!nf)pqMode='hard';\n const pills=`<div class=\"pills\" role=\"group\" aria-label=\"Question style\">");
-  must("Warm-up (easier) · ${(D.quiz[sel]||[]).length}</button></div>`;", "Warm-up (easier) · ${(D.quiz[sel]||[]).length}</button>${nf?`<button class=\"${pqMode=='type'?'on':''}\" aria-pressed=\"${pqMode=='type'}\" onclick=\"pqMode='type';renderPQ(${sel})\">Type the answer · ${nf}</button>`:''}</div>`;\n if(pqMode=='type'){runFill(`Chapter ${sel} — ${l.title} (type the answer)`,D.fill[sel].map((q,i)=>({...q})),'f'+sel,$('#pqm'),pills);return}");
+  must("const pills=`<div class=\"pills\" role=\"group\" aria-label=\"Question style\">", "const nf=(D.fill&&D.fill[sel]||[]).length;\n const pills=`<div class=\"pills\" role=\"group\" aria-label=\"Question style\">");
+  must("Exam-style (harder) · ${(D.hard[sel]||[]).length}", "Exam-style (harder) · ${(D.hard[sel]||[]).length+nf}");
+  must(".map((q,i)=>({...q,id:'h'+sel+'-'+i,ch:sel})),sel,$('#pqm'),pills)}", ".map((q,i)=>({...q,id:'h'+sel+'-'+i,ch:sel})),sel,$('#pqm'),pills);\n if(nf){const fh=document.createElement('div');fh.id='pqf';$('#pqm').appendChild(fh);runFill('Type the answer',D.fill[sel].map(q=>({...q})),'f'+sel,fh,'')}}");
 }
 { const r = dropTabs(eng, fs.readFileSync(path.join(out, 'shell.html'), 'utf8'), { cheat: id === 'ctp' }); eng = r.eng; fs.writeFileSync(path.join(out, 'shell.html'), r.shell); }
 fs.writeFileSync(path.join(out, 'engine.js'), eng);
