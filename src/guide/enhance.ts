@@ -80,7 +80,7 @@ export function balanceUnits(root: HTMLElement) {
 }
 
 /**
- * Small two-entity comparison tables (blank corner cell, 2-3 entities as columns, at most 3 attribute rows) read better
+ * Small two-entity comparison tables (blank corner cell, 2-3 entities as columns, up to 4 attribute rows for two entities, 3 for three) read better
  * flipped: each entity becomes a row and the attributes become the columns.
  */
 export function transposeTables(root: HTMLElement) {
@@ -88,7 +88,7 @@ export function transposeTables(root: HTMLElement) {
     const head = tb.tHead?.rows[0]; if (!head) return;
     const corner = head.cells[0].textContent!.trim();
     const nCols = head.cells.length - 1; const body = [...(tb.tBodies[0]?.rows || [])];
-    if (!(corner === '' || /^(Aspect|Feature|Attribute)$/.test(corner)) || nCols < 2 || nCols > 3 || body.length < 2 || body.length > 3) return;
+    if (!(corner === '' || /^(Aspect|Feature|Attribute|Dimension|Criterion|Property)$/.test(corner)) || nCols < 2 || nCols > 3 || body.length < 2 || (nCols === 2 ? body.length > 4 : body.length > 3)) return;
     const entities = [...head.cells].slice(1).map((c) => c.innerHTML);
     const attrs = body.map((r) => r.cells[0].innerHTML);
     const strip = (h: string) => h.replace(/^\s*<strong[^>]*>([\s\S]*?)<\/strong>\s*$/, '$1');

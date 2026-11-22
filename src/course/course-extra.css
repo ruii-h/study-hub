@@ -73,12 +73,6 @@ details>summary{transition:background-color .2s,color .2s}
 /* section highlight (after jumping from a pill): breathing room around the text, rounded, text stays aligned */
 .t-section[id]{padding:18px 22px;margin-left:-22px;margin-right:-22px;border-radius:16px}
 @media(max-width:900px){.t-section[id]{padding:14px 12px;margin-left:-12px;margin-right:-12px}}
-/* a case file sitting inside another decorated box: drop the outer box so only one border shows */
-.t-unit:has(>.case-file),.t-callout:has(>.case-file),.t-unit.case:has(.case-file),.t-callout.case:has(.case-file){border:0!important;background:none!important;padding:0!important;box-shadow:none!important;border-radius:0}
-.t-unit.case:has(.case-file)::before,.t-callout.case:has(.case-file)::before{display:none}
-/* callouts: one colour family (accent stripe + softened outline of the same hue) and rounded corners */
-.t-callout{--cb:var(--cy,#67d4f5);border-radius:12px;border-color:color-mix(in srgb,var(--cb) 35%,var(--border,#30363d))!important;border-left:4px solid var(--cb)!important}
-.t-callout.success{--cb:var(--gr,#3fb950)}.t-callout.warn{--cb:var(--ye,#f2cc60)}.t-callout.danger{--cb:var(--pk,#ff8ad0)}
 details.recall .ans,.model .ma{border-radius:10px}
 /* audit fixes: long words never clip inside flashcards; remaining square boxes get rounded corners */
 .bp-card .fc-b,.bp-card-header-title{overflow-wrap:anywhere}
@@ -92,3 +86,11 @@ blockquote{border-radius:0 10px 10px 0}
 .t-section>ul,.t-section>ol{padding-top:0;padding-bottom:0}
 .t-section+.t-section,.t-section+details,details+.t-section{margin-top:10px}
 .t-section[id]{padding-top:12px;padding-bottom:12px}
+
+/* !important rules of the legacy sheet live in a cascade layer and beat unlayered !important, so overrides of those must live in the same layer (with higher specificity) */
+@layer legacy {
+  .t-unit.t-unit:has(>.case-file),.t-callout.t-callout:has(>.case-file){border:0!important;background:none!important;padding:0!important;box-shadow:none!important;border-radius:0!important}
+  .t-unit.case:has(.case-file)::before,.t-callout.case:has(.case-file)::before{display:none}
+  .t-callout.t-callout{--cb:var(--cy,#67d4f5);border-radius:12px!important;border-color:color-mix(in srgb,var(--cb) 35%,var(--border,#30363d))!important;border-left:4px solid var(--cb)!important}
+  .t-callout.t-callout.success{--cb:var(--gr,#3fb950)}.t-callout.t-callout.warn{--cb:var(--ye,#f2cc60)}.t-callout.t-callout.danger{--cb:var(--pk,#ff8ad0)}
+}
