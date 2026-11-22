@@ -94,3 +94,8 @@ blockquote{border-radius:0 10px 10px 0}
   .t-callout.t-callout{--cb:var(--cy,#67d4f5);border-radius:12px!important;border-color:color-mix(in srgb,var(--cb) 35%,var(--border,#30363d))!important;border-left:4px solid var(--cb)!important}
   .t-callout.t-callout.success{--cb:var(--gr,#3fb950)}.t-callout.t-callout.warn{--cb:var(--ye,#f2cc60)}.t-callout.t-callout.danger{--cb:var(--pk,#ff8ad0)}
 }
+/* glance / "exact names" tables: same hierarchy as the other tables (coloured header, bright first column, readable body text) */
+.glance td{color:var(--body,var(--text))}
+.glance td:first-child,.glance td:first-child b{color:var(--cy,var(--accent));font-weight:700}
+@layer legacy{.glance.glance th{color:var(--ye,var(--accent))!important;background:color-mix(in srgb,var(--ye,var(--accent)) 12%,var(--surface2))!important}}
+.glance td:last-child:not(:first-child){color:var(--muted);font-style:italic}
