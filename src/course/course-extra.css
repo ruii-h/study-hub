@@ -70,3 +70,6 @@ details>summary{transition:background-color .2s,color .2s}
 /* cards that share a row: width follows content (see balanceUnits in src/guide/enhance.ts) */
 .unit-row{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:14px 28px;align-items:stretch}
 .unit-row>.t-unit{min-width:0}
+/* section highlight (after jumping from a pill): breathing room around the text, rounded, text stays aligned */
+.t-section[id]{padding:18px 22px;margin-left:-22px;margin-right:-22px;border-radius:16px}
+@media(max-width:900px){.t-section[id]{padding:14px 12px;margin-left:-12px;margin-right:-12px}}
