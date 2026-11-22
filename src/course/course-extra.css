@@ -99,3 +99,4 @@ blockquote{border-radius:0 10px 10px 0}
 .glance td:first-child,.glance td:first-child b{color:var(--cy,var(--accent));font-weight:700}
 @layer legacy{.glance.glance th{color:var(--ye,var(--accent))!important;background:color-mix(in srgb,var(--ye,var(--accent)) 12%,var(--surface2))!important}}
 .glance td:last-child:not(:first-child){color:var(--muted);font-style:italic}
+table.has-merge td[rowspan]{vertical-align:middle!important;background:color-mix(in srgb,var(--surface) 94%,var(--text))!important}
