@@ -81,7 +81,7 @@ export default [
     'ABC', 'Prototypes can aim at form, function or experience, and the goal decides the fidelity and what is tested.',
     ['form means look and feel.', 'function means what it does.', 'experience means how the whole use feels.', 'a prototype is usually built to answer a specific question.', 'the goal is set before building so it determines what to build.']],
   [5, 'A team is exploring concepts on day one and has two hours. Which choices are sensible?',
-    ['Use paper or storyboards.', 'Build several prototypes in parallel.', 'Build one polished high-fidelity app first.', 'Test with real users to expose unknown unknowns.', 'Wait until the product is finished to prototype.'],
+    ['Use paper or storyboards.', 'Build several prototypes in parallel.', 'Build one polished high-fidelity app first.', 'Keep each prototype minimal, just enough to test one key assumption.', 'Wait until the product is finished to prototype.'],
     'ABD', 'Early on, quick low-fidelity prototypes in parallel are cheap and surface problems that nobody thought to ask about.',
-    ['paper is fast and cheap for exploring concepts.', 'parallel prototypes give more divergent ideas.', 'a polished first build is slow and encourages fixation.', 'real users reveal unknown unknowns.', 'prototyping is meant to happen early.']],
+    ['paper is fast and cheap for exploring concepts.', 'parallel prototypes give more divergent ideas.', 'a polished first build is slow and encourages fixation.', 'a minimal prototype can be built within the two hours and still answers the riskiest question.', 'prototyping is meant to happen early.']],
 ];
