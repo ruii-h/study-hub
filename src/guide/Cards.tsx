@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { cardChap, shuffle, useG } from './state';
+import { flipTiming } from './motion';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function ChapterSelect() {
@@ -24,7 +25,7 @@ function Card({ c, i }: { c: { t: string; d: string; f: string }; i: number }) {
   return (
     <motion.div className={`bp-card ${known ? 'known' : ''}`} role="button" tabIndex={0} aria-label={`Flashcard: ${c.t.replace(/<[^>]+>/g, '')}. Press Enter to flip.`}
       onClick={flip} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(); } }}
-      animate={{ scaleX: phase === 'close' ? 0 : 1 }} whileHover={{ y: -3 }} transition={{ duration: phase === 'close' ? 0.18 : 0.22, ease: 'easeInOut' }}
+      animate={{ scaleX: phase === 'close' ? 0 : 1 }} whileHover={{ y: -3 }} transition={{ duration: phase === 'close' ? flipTiming.close : flipTiming.open, ease: 'easeInOut' }}
       onAnimationComplete={() => { if (phase === 'close') { setBack((b) => !b); setPhase('open'); } else if (phase === 'open') setPhase('idle'); }}>
       {back ? (<>
         <div className="bp-card-header bp-card-back"><div className="bp-card-header-title" dangerouslySetInnerHTML={{ __html: c.t }} /><span className="bp-flip-badge">Definition</span></div>

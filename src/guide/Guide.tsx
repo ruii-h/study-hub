@@ -7,6 +7,8 @@ import Theory, { WikiLayer } from './Theory';
 import Practice from './Practice';
 import { Cards, Cheat } from './Cards';
 import Past from './Past';
+import { tabSwap } from './motion';
+import { watchHighlight } from '../course/highlight';
 
 const TAB_DEF: Record<string, [string, string, string]> = {
   theory: ['📖', 'Theory', ''], practice: ['🧠', 'Practice', ' Questions'], cards: ['🃏', 'Flashcards', ''],
@@ -169,7 +171,7 @@ function Shell({ meta }: { meta: CourseMeta }) {
     <main id="main"><div id="content">
       <AnimatePresence mode="wait" initial={false}>
         <motion.div key={tab} className="tab-view active" role="tabpanel" id={'tab-' + tab} style={{ animation: 'none' }}
-          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.2, ease: 'easeOut' }}>
+          {...tabSwap}>
           {tab === 'theory' && <Theory />}
           {tab === 'practice' && <Practice />}
           {tab === 'cards' && <Cards />}
@@ -202,5 +204,6 @@ export default function Guide({ meta, D, api }: { meta: CourseMeta; D: Data; api
     }
     return () => { delete w.dm; delete w.loadTheory; };
   }, [meta.id]);
+  useEffect(() => watchHighlight(), []); // Obsidian code colours for every code block
   return <GuideProvider meta={meta} D={data} api={api}><Shell meta={meta} /></GuideProvider>;
 }

@@ -3,10 +3,10 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { EXTRA } from './config';
 import { useG } from './state';
 import { JumpBtn } from './Practice';
+import { fade, riseSwap } from './motion';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const L5 = 'ABCDE';
-const fade = { initial: { opacity: 0, y: -6 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0 }, transition: { duration: 0.22 } };
 
 function Mcq({ q, sec }: { q: any; sec: string }) {
   const g = useG(); const { P, PS, M, ST, patch, D } = g;
@@ -77,7 +77,7 @@ export default function Past() {
         {keys.map((k) => <button key={k} className={k === sec ? 'on' : ''} aria-pressed={k === sec} onClick={() => g.setPastSec(k)}>{secs[k][2].split(' · ')[0]} · {secs[k][3] || `Q${secs[k][0]}–${secs[k][1]}`}</button>)}
       </div>
       <div className="sub" style={{ margin: '8px 0 4px' }}><b>{label}</b> &nbsp;·&nbsp; <span role="status">{a1} of {D.exam.mcq.length} answered · {c1} correct</span></div>
-      <AnimatePresence mode="wait" initial={false}><motion.div key={sec} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+      <AnimatePresence mode="wait" initial={false}><motion.div key={sec} {...riseSwap}>
         {mc.map((q) => <Mcq key={q.n + String(!!ST.psol)} q={q} sec={sec} />)}
         {wr.map((q) => <Written key={q.n} q={q} sec={sec} />)}
         <div className="endrow"><div className="endmsg">End of this section. {nk ? 'Keep the momentum.' : 'That is everything here.'}</div>

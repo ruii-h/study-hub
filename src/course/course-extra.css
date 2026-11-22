@@ -65,3 +65,5 @@ details>summary{transition:background-color .2s,color .2s}
 .fc-grid{grid-auto-rows:1fr}
 .bp-card{min-height:190px}
 .lead{font-size:15px;line-height:1.75;color:var(--text);margin:0 0 12px}
+/* case-file / worked-example rows: every block after the label sits in the content column, never under the label */
+.cf-row>*:not(b:first-child){grid-column:2}

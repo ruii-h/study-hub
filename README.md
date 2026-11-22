@@ -122,3 +122,14 @@ These are the owner's standing preferences. Follow them for every change, in all
 `node tools/newcourse/build.mjs cf` and `... ctp` rebuild `src/courses/cf` and `src/courses/ctp` from the author's notes (`tools/newcourse/<id>/source/notes.md`) plus hand-written chapter extras (`m1-m3.mjs`: flashcards, warm-up and exam-style questions, ICE exercises). IS1704 has an extra ICE tab and a Past Exam tab.
 
 **Unfinished:** IS1704 labs (Lab 1-8, mock labs, past lab tests) are not included on purpose: they are meant to be run against test cases. See `tools/newcourse/ctp/LABS-TODO.md`.
+
+## How I want things done (house rules — read before changing anything)
+- **Code blocks always use the Obsidian colour scheme**: black `#000000` background, `#F8F8F2` text, keywords `#FFA4D8`, operators and `and/or/not/in/is` `#FF5555`, `True/False/None` `#FF79C6`, strings `#50FA7B`, numbers `#BD93F9`, comments `#6272A4`, function names `#F1FA8C`, built-ins and variables `#00FFFF`, parameters `#F8F8F2`. The palette lives in `src/course/course-extra.css` (`.tk-*`) and is applied at runtime by `src/course/highlight.ts`, started from `src/guide/Guide.tsx`. If code ever looks uncoloured, the highlighter is not mounted.
+- IS1704 code uses a Python editor font; IS114 shows commands in a terminal-style block labelled `powershell`.
+- **One place for everything shared.** Animations come only from `src/guide/motion.ts` (no inline motion props). Shared UI behaviour lives in `src/guide/*`; shared look and utility classes live in `src/course/course-extra.css`. Build reusable pieces ("our own bootstrap") instead of repeating markup or CSS.
+- Animations must always run: never add `prefers-reduced-motion` kill switches. Flips and reveals use Framer Motion.
+- Side lists never rebuild on click (stable React nodes); only highlights change.
+- Each module has its own teaching format; do not copy IS211's "why it matters / memory hook" template onto other modules. IS1704 teaches like the author's Python notes: explanation first, then code.
+- Tabs: no Final Exam tab anywhere; no cheat-sheet for IS1704. Type-the-answer questions belong inside the Exam-style quiz.
+- Check desktop and mobile (375px) after UI changes; no empty containers, no content landing in the wrong grid column, rounded corners everywhere.
+- Commit and push after each finished change. Keep replies short and do not elaborate unless asked.

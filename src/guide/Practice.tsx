@@ -2,11 +2,11 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { EXTRA } from './config';
 import { scoreClass, shuffle, useG } from './state';
+import { fade, pop, rise, slideX } from './motion';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const L5 = 'ABCDE';
 const esc = (s: string) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] as string));
-const fade = { initial: { opacity: 0, y: -6 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0 }, transition: { duration: 0.22 } };
 
 export function JumpBtn({ ch, text, back }: { ch: number; text: string; back: any }) {
   const g = useG();
@@ -57,7 +57,7 @@ function MultiBody({ title, qs, qkey, pills, ch }: MQ) {
       {prep.map((q: any, i: number) => {
         const sel: number[] = q.rec.sel, chk = !!q.rec.chk, ok = chk && isOk(q);
         return (
-          <motion.div className="exq" key={q.rec.id} id={'mq' + i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25, delay: Math.min(i, 6) * 0.03 }}>
+          <motion.div className="exq" key={q.rec.id} id={'mq' + i} {...rise(i)}>
             <div className="qh"><h2 className="qn">Question {i + 1}</h2><span className="ms">SELECT ALL THAT APPLY</span></div>
             <div className="qt" dangerouslySetInnerHTML={{ __html: q.src.q }} />
             <div role="group" aria-label={`Options for question ${i + 1}`}>
@@ -81,7 +81,7 @@ function MultiBody({ title, qs, qkey, pills, ch }: MQ) {
       })}
     </div>
     <AnimatePresence>{done === N && (
-      <motion.div className="exq resultcard" aria-live="polite" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3 }} ref={(el) => { el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }}>
+      <motion.div className="exq resultcard" aria-live="polite" {...pop} ref={(el) => { el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }}>
         <Ring p={p} /><div className="rt"><div style={{ fontWeight: 800, fontSize: 18 }}>{score} of {N} fully correct</div>
           <div className="sub">{p >= 80 ? 'Strong. Move on to the next chapter. 🎉' : p >= 50 ? 'Decent. Revisit the explanations of the ones you missed, then retry.' : 'Re-read the chapter, then try again. Partial credit does not exist in the exam either.'}{mCount && key !== 'mx' ? <> Missed questions are saved in <b>Review my mistakes</b> so they come back until you get them right.</> : null}</div>
           <div className="row">
@@ -122,7 +122,7 @@ function SingleBody({ title, qs, n, pills }: SQ) {
     <div className="sub">{N} questions · instant feedback · saved automatically · options reshuffle every new attempt</div>
     <div className="qprog" role="status" aria-live="polite"><span>Answered {done} of {N} · {score} correct</span><i><b style={{ width: `${(done / N) * 100}%` }} /></i><button className="btn ghost sm" onClick={restart}>↺ Start over</button></div>
     {prep.map((q: any, i: number) => (
-      <motion.div className="qq" key={q.rec.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25, delay: Math.min(i, 6) * 0.03 }}>
+      <motion.div className="qq" key={q.rec.id} {...rise(i)}>
         <div className="t"><span>{i + 1}. </span><span dangerouslySetInnerHTML={{ __html: q.q }} /></div>
         {q.o.map((o: string, j: number) => <button key={j} className={`opt ${q.rec.chk ? (j === q.c ? 'ok' : j === q.rec.sel ? 'bad' : '') : ''}`} disabled={!!q.rec.chk} onClick={() => pick(q.rec.id, j)} dangerouslySetInnerHTML={{ __html: o }} />)}
         <AnimatePresence>{q.rec.chk ? (
@@ -134,7 +134,7 @@ function SingleBody({ title, qs, n, pills }: SQ) {
           </motion.div>) : null}</AnimatePresence>
       </motion.div>))}
     <AnimatePresence>{done === N && (
-      <motion.div className="qq resultcard" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} ref={(el) => { el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }}>
+      <motion.div className="qq resultcard" {...pop} ref={(el) => { el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }}>
         <Ring p={p} /><div className="rt"><div style={{ fontWeight: 700 }}>Score: {score}/{N}</div><div className="sub">{p >= 80 ? 'Strong — move on. 🎉' : p >= 50 ? 'Decent — revisit the weak parts, then retry.' : 'Re-read the chapter and try again.'}</div>
           <div className="row"><button className="btn" onClick={restart}>Retry (reshuffled)</button><button className="btn ghost" onClick={() => g.goQuiz(n, 'hard')}>Try the exam-style quiz →</button></div></div>
       </motion.div>)}</AnimatePresence>
@@ -220,7 +220,7 @@ export default function Practice() {
         {D.selfq ? item('', 'sc', pqSel === 'sc', () => g.setPqSel('sc'), <><span className="tn">📝</span><span className="tt">Self-check Q&amp;A ({D.selfn || ''})</span></>) : null}
       </div>
       <div className="pane" id="pqm" tabIndex={0}>
-        <AnimatePresence mode="wait" initial={false}><motion.div key={String(pqSel) + pqMode} initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>{pane}</motion.div></AnimatePresence>
+        <AnimatePresence mode="wait" initial={false}><motion.div key={String(pqSel) + pqMode} {...slideX}>{pane}</motion.div></AnimatePresence>
       </div>
     </div>
   );

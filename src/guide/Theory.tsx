@@ -3,6 +3,7 @@ import { AnimatePresence, animate, motion } from 'framer-motion';
 import { SideList } from './Guide';
 import { useG } from './state';
 import { reveal, runMermaid, snakeChains, stackTables } from './enhance';
+import { chapterSlide, ease, flipTiming, floatUp } from './motion';
 
 export function scrollToId(id: string, instant = false) {
   const c = document.getElementById('theory-content'), t = document.getElementById(id);
@@ -87,14 +88,14 @@ export default function Theory() {
     const fc = (e.target as HTMLElement).closest<HTMLElement>('.fcard'); if (!fc) return;
     const fi = fc.querySelector<HTMLElement>('.fi'); if (!fi || fc.dataset.busy) return;
     const to = fc.dataset.flip === '1' ? 0 : 180; fc.dataset.busy = '1';
-    animate(fi, { rotateY: to }, { duration: 0.55, ease: [0.4, 0.2, 0.2, 1] }).then(() => { fc.dataset.flip = to ? '1' : '0'; delete fc.dataset.busy; });
+    animate(fi, { rotateY: to }, { duration: flipTiming.lesson, ease }).then(() => { fc.dataset.flip = to ? '1' : '0'; delete fc.dataset.busy; });
   };
 
   return (
     <>
       <div className="theory-nav" id="nav" tabIndex={0} aria-label="Chapter list"><SideList /></div>
       <div ref={scroller} id="theory-content" className="theory-content" tabIndex={0} aria-label="Chapter content" onScroll={onScroll}>
-        <motion.div key={cur} initial={{ opacity: 0, x: dirRef.current * 28, y: dirRef.current ? 0 : 14 }} animate={{ opacity: 1, x: 0, y: 0 }} transition={{ duration: 0.3, ease: 'easeOut' }}>
+        <motion.div key={cur} {...chapterSlide(dirRef.current)}>
           <div className="t-hero"><div className={`t-tag ${lesson.tag}`}>Chapter {cur} of {D.lessons.length}</div><h1 className="t-h1" tabIndex={-1}>{lesson.title}</h1><div className="t-subtitle" dangerouslySetInnerHTML={{ __html: lesson.goal }} /><div className="meta">⏱ about {mins} min read · {nq} exam-style questions at the end</div></div>
           {toc.length > 0 && (
             <nav className="toc" aria-label="Sections in this chapter">
@@ -110,7 +111,7 @@ export default function Theory() {
         </motion.div>
         <AnimatePresence>
           {g.back && (
-            <motion.div className="backbar" key="bb" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 16 }} transition={{ duration: 0.2 }}>
+            <motion.div className="backbar" key="bb" {...floatUp}>
               <button className="bb-go" onClick={g.goBack}>↩ {g.back.label}</button>
               <button className="bb-x" title="Dismiss" aria-label="Dismiss" onClick={() => g.setBack(null)}>×</button>
             </motion.div>)}
