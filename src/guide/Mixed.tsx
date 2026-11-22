@@ -6,7 +6,7 @@ import { fade, pop, rise } from './motion';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const L5 = 'ABCDE';
-const TAG: Record<string, string> = { s: 'CHOOSE ONE', m: 'SELECT ALL THAT APPLY', f: 'TYPE THE ANSWER' };
+const TAG: Record<string, string> = { s: 'CHOOSE ONE', m: 'SELECT ALL THAT APPLY', f: 'TYPE THE ANSWER', w: 'SHORT ANSWER' };
 
 /** One mixed bank per chapter: single choice, select-all and typed answers, shuffled together. */
 export function buildBank(D: any, n: number) {
@@ -54,20 +54,20 @@ function Body({ n, title, qs, k }: { n: number; title: string; qs: any[]; k: str
   const back = { tab: 'practice', sel: n, y: 0, label: 'Back to your quiz', up: null };
   return (<>
     <h1 className="t-h1" style={{ fontSize: 26 }}>{title}</h1>
-    <div className="sub">{N} questions · choose one, select all that apply, or type the answer · saved automatically{prep.some((q: any) => q.rec.chk) ? <> · <b>resumed where you left off</b></> : null}</div>
+    <div className="sub">{N} questions · choose one, select all, type the answer, or write a short answer · saved automatically{prep.some((q: any) => q.rec.chk) ? <> · <b>resumed where you left off</b></> : null}</div>
     <div className="qprog" role="status" aria-live="polite"><span>Answered {done} of {N} · {score} correct</span><i><b style={{ width: `${(done / N) * 100}%` }} /></i><button className="btn ghost sm" onClick={restart}>↺ Start over</button></div>
     <div>
       {prep.map((q: any, i: number) => {
-        const t = q.src.t as string, rec = q.rec, sel: number[] = rec.sel || [], chk = !!rec.chk, ok = chk && isOk(q);
+        const self = q.src.t === 'f' && q.src.kind === 'self'; const t = (self ? 'w' : q.src.t) as string, rec = q.rec, sel: number[] = rec.sel || [], chk = !!rec.chk, ok = chk && isOk(q);
         const multi = t === 'm';
-        const fillShown = t === 'f' ? (q.src.fa as string[]).filter((a) => !a.startsWith('re:')).slice(0, 2) : [];
+        const fillShown = t === 'f' || t === 'w' ? (q.src.fa as string[]).filter((a) => !a.startsWith('re:')).slice(0, 2) : [];
         const long = t === 'f' && /\n/.test(q.src.fa[0] || '');
         const check = () => (t === 'f' ? finish(q, { ...rec }, fillOK({ a: q.src.fa, kind: q.src.kind, ci: q.src.ci }, rec.v || '')) : finish(q, { ...rec }, isOk(q)));
         return (
           <motion.div className="exq" key={rec.id} id={'mq' + i} {...rise(i)}>
             <div className="qh"><h2 className="qn">Question {i + 1}</h2><span className="ms">{TAG[t]}</span></div>
             <div className="qt" dangerouslySetInnerHTML={{ __html: q.src.q }} />
-            {t === 'f' ? (
+            {t === 'f' || t === 'w' ? (
               long ? <textarea rows={4} id={'fa' + i} spellCheck={false} disabled={chk} value={rec.v || ''} aria-label={`Your answer to question ${i + 1}`} style={{ width: '100%', font: '14px/1.5 ui-monospace,Consolas,monospace' }} onChange={(e) => setRec(rec.id, (r) => ({ ...r, v: e.target.value }))} />
                 : <input type="text" id={'fa' + i} spellCheck={false} autoComplete="off" autoCapitalize="off" disabled={chk} className={chk && ok ? 'ok' : ''} value={rec.v || ''} aria-label={`Your answer to question ${i + 1}`} style={{ width: '100%', font: '14px/1.5 ui-monospace,Consolas,monospace' }} onChange={(e) => setRec(rec.id, (r) => ({ ...r, v: e.target.value }))} onKeyDown={(e) => { if (e.key === 'Enter' && !chk && (rec.v || '').trim()) check(); }} />
             ) : (
@@ -82,15 +82,21 @@ function Body({ n, title, qs, k }: { n: number; title: string; qs: any[]; k: str
                   </div>);
                 })}
               </div>)}
+            {t === 'w' ? (<>
+              {!chk && !rec.rev ? <div className="row"><button className="btn" onClick={() => setRec(rec.id, (r) => ({ ...r, rev: 1 }))}>Show model answer</button></div> : null}
+              <AnimatePresence>{!chk && rec.rev ? (
+                <motion.div {...fade}><div className="why wy"><b>Model answer:</b> {q.src.fa[0]}</div>
+                  <div className="row"><span className="sub">Be honest: does your answer cover the same points?</span><button className="btn" onClick={() => finish(q, { ...rec }, true)}>✓ I got it</button><button className="btn ghost" onClick={() => finish(q, { ...rec }, false)}>✗ Not yet</button></div></motion.div>) : null}</AnimatePresence>
+            </>) : (
             <div className="row">
               <button className="btn" disabled={chk || (t === 'f' ? !(rec.v || '').trim() : !sel.length)} onClick={check}>Check answer</button>
               {t === 'f' ? <button className="btn ghost" disabled={chk} onClick={() => finish(q, { ...rec, shown: 1 }, false)}>Show answer</button> : null}
-            </div>
+            </div>)}
             <AnimatePresence>{chk && (
               <motion.div className="vd" aria-live="polite" {...fade}>
                 <div className={`verdict ${ok ? 'ok' : 'no'}`}>
-                  <b>{ok ? '✅ Correct.' : rec.shown ? 'Answer revealed.' : '❌ Not quite.'}</b>{' '}
-                  {t !== 'f' ? <>Correct: <b>{q.a.map((x: number) => L5[x]).join(', ')}</b>. </> : null}<span dangerouslySetInnerHTML={{ __html: q.src.e || '' }} />
+                  <b>{ok ? (t === 'w' ? '✅ Marked as known.' : '✅ Correct.') : rec.shown ? 'Answer revealed.' : t === 'w' ? '↺ Marked to review.' : '❌ Not quite.'}</b>{' '}
+                  {t !== 'f' && t !== 'w' ? <>Correct: <b>{q.a.map((x: number) => L5[x]).join(', ')}</b>. </> : null}<span dangerouslySetInnerHTML={{ __html: q.src.e || '' }} />
                   {t === 'f' && !ok ? <div className="why wy"><b>Accepted answer:</b> {fillShown.map((a: string, m: number) => <span key={m}>{m ? ' or ' : ''}<code>{a}</code></span>)}</div> : null}
                   {!ok ? <div className="row"><JumpBtn ch={n} text={q.src.q + ' ' + (q.src.e || '')} back={back} /></div> : null}
                 </div>

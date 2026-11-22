@@ -79,7 +79,7 @@ raw.forEach(({ ch, secs }) => {
     const pos = (ch.n + i) % (q[2].length + 1);
     const o = [...wrong.map((x) => x[0])]; o.splice(pos, 0, bq(q[1]));
     const w = wrong.map((x) => x[1] || null); w.splice(pos, 0, null);
-    if (wrong.length < 1 || wrong.length > 3 || wrong.some((x) => !x[1])) problems.push(`ch${ch.n} warm#${i} needs 1-3 wrong options with reasons`);
+    if (q[4] !== 'bank' && (wrong.length < 1 || wrong.length > 3 || wrong.some((x) => !x[1]))) problems.push(`ch${ch.n} warm#${i} needs 1-3 wrong options with reasons`);
     return { q: bq(q[0]), o, c: pos, e: bq(q[3]), w };
   });
   if (m.fill && m.fill.length) D.fill[ch.n] = m.fill.map((f) => ({ q: bq(f[0]), a: f[1], e: bq(f[2] || ''), kind: f[3] || 'out', ci: !!f[4] }));
@@ -98,6 +98,7 @@ raw.forEach(({ ch, secs }) => {
     });
     return { q: stem, o, a, e, w };
   });
+  (m.multi || []).forEach((q) => D.hard[ch.n].push({ q: bq(q[0]), o: q[1].map(bq), a: q[2], e: bq(q[3] || ''), w: null }));
   if (D.hard[ch.n].length < 10) problems.push(`ch${ch.n} has ${D.hard[ch.n].length} exam-style questions (need 10)`);
 });
 if (C.exam) { D.exam = C.exam(refMap); }
