@@ -15,11 +15,35 @@
 /* code fonts: IS1704 = Python editor font, IS114 = terminal font */
 :root[data-course=ctp] .t-code-body,:root[data-course=ctp] code,:root[data-course=ctp] pre{font-family:'JetBrains Mono','Cascadia Code','Fira Code',Consolas,'Liberation Mono',monospace;font-size:.92em}
 :root[data-course=cf] .t-code-body,:root[data-course=cf] code,:root[data-course=cf] pre:not(.mermaid){font-family:'Cascadia Mono','Cascadia Code',Consolas,'Lucida Console','Liberation Mono',monospace;font-size:.92em}
-:root[data-course=cf] .t-code{background:#012456;border-color:#2b4a7a}
-:root[data-course=cf] .t-code-body{color:#eaeaea;background:#012456}
-:root[data-course=cf] .t-code-header{background:#0b1f3f;color:#b9c6e0}
 /* header: never wrap the logo or the chapters pill; let the long course name truncate instead */
 .logo,.badge{white-space:nowrap;flex:none}
 .course{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media (max-width:1000px){.course{display:none}}
 .figcap{font-size:13px;color:var(--muted);font-style:italic;margin:4px 0 14px;padding-left:10px;border-left:2px solid var(--border)}
+
+/* Obsidian code theme (all guides): black editor, #F8F8F2 text, pink keywords, green strings, purple numbers, blue-grey comments, yellow functions, cyan built-ins/variables, red operators */
+.t-code{background:#000;border:1px solid #1f1f1f;border-radius:12px;overflow:hidden}
+.t-code-header{background:#0a0a0a;border-bottom:1px solid #1f1f1f;color:#6272A4}
+.t-code-body{background:#000;color:#F8F8F2;font-family:'JetBrains Mono','Cascadia Code','Fira Code',Consolas,'Liberation Mono',monospace;font-size:.92em;line-height:1.65}
+.tk-k{color:#FFA4D8}.tk-o{color:#FF5555}.tk-b{color:#FF79C6}.tk-s{color:#50FA7B}.tk-n{color:#BD93F9}.tk-c{color:#6272A4}.tk-f{color:#F1FA8C}.tk-bi{color:#00FFFF}.tk-v{color:#00FFFF}.tk-p{color:#F8F8F2}
+/* rounded focus / press highlights everywhere */
+summary,.btn,.pq-item,.theory-item,.eo,.sri,.t-nav-btn,.tab,.bp-card,.fcard,.fcard .fi,.exq,.exr,details,input[type=text],input[type=search],textarea,select{border-radius:12px}
+summary{border-radius:12px;padding:8px 12px;list-style-position:inside}
+:focus-visible{outline-offset:3px}
+details.model,details.recall{border-radius:12px}
+/* smooth open/close for every <details> (height animates where the browser supports ::details-content, otherwise a fade) */
+:root{interpolate-size:allow-keywords}
+details::details-content{block-size:0;overflow:clip;opacity:0;transition:block-size .32s cubic-bezier(.4,.2,.2,1),opacity .28s ease,content-visibility .32s allow-discrete}
+details[open]::details-content{block-size:auto;opacity:1}
+@supports not selector(::details-content){details[open]>*:not(summary){animation:fadeIn .3s ease both}}
+details>summary{transition:background-color .2s,color .2s}
+/* past exam: title row with the solutions switch on the right */
+.pastbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.switch{display:inline-flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);user-select:none}
+.switch input{position:absolute;opacity:0;width:0;height:0}
+.switch i{position:relative;width:44px;height:26px;border-radius:999px;background:var(--surface3);border:1px solid var(--border);transition:background .25s,border-color .25s}
+.switch i::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.4);transition:transform .25s cubic-bezier(.4,.2,.2,1)}
+.switch input:checked+i{background:var(--accent);border-color:var(--accent)}
+.switch input:checked+i::after{transform:translateX(18px)}
+.switch input:focus-visible+i{outline:2px solid var(--accent);outline-offset:3px}
+.switch input:checked~span,.switch:has(input:checked) span{color:var(--text)}

@@ -155,7 +155,7 @@ if (!hasPast) {
   // solution toggle for the past exam
   const sol = fs.readFileSync(path.join(root, 'tools', 'newcourse', 'past-solution.js'), 'utf8');
   must('// ---------- search', sol + '// ---------- search');
-  must('<div class="pills" role="group" aria-label="Exam sections">', '\'+solPills()+\'<div class="pills" role="group" aria-label="Exam sections">');
+  must('<h1 class="t-h1" style="font-size:26px">Past exam questions</h1>', "<div class=\"pastbar\"><h1 class=\"t-h1\" style=\"font-size:26px;margin:0\">Past exam questions</h1>'+solSwitch()+'</div>");
   must('D.exam.mcq.filter(q=>q.n>=a&&q.n<=b&&PS[q.n]!==undefined).forEach(', 'D.exam.mcq.filter(q=>!ST.psol&&q.n>=a&&q.n<=b&&PS[q.n]!==undefined).forEach(');
   must('ST.psec=sec;sv()}', 'applySol(a,b);ST.psec=sec;sv()}');
   must('const __names = {\n', 'const __names = {\n    "setPsol": { configurable: true, get: () => setPsol },\n');

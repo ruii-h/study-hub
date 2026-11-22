@@ -1,5 +1,5 @@
 // ---------- past exam: "No solutions" / "Show solutions" mode
-function solPills(){return `<div class="pills" role="group" aria-label="Solution mode"><button class="${ST.psol?'':'on'}" aria-pressed="${!ST.psol}" onclick="setPsol(0)">No solutions</button><button class="${ST.psol?'on':''}" aria-pressed="${!!ST.psol}" onclick="setPsol(1)">Show solutions</button></div>`}
+function solSwitch(){return `<label class="switch"><span>Show solutions</span><input type="checkbox" role="switch" ${ST.psol?'checked':''} onchange="setPsol(this.checked)"><i></i></label>`}
 function setPsol(v){ST.psol=v?1:0;sv();renderPast(pastSec)}
 function applySol(a,b){const m=$('#pastm');const sol=!!ST.psol;
  m.querySelectorAll('details.model').forEach(d=>{if(sol){d.open=true;d.style.display=''}else{d.open=false;d.style.display='none'}});

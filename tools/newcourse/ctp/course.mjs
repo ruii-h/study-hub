@@ -50,9 +50,9 @@ export default {
       ['Section B · Scope, files and efficiency', [9, 10, 11]],
       ['Putting it together', [12]],
     ],
-    secs: { A: [1, 10, 'Section A · AY2024-25 multiple choice', 'Q1–10'], B: [11, 15, 'Section B · AY2024-25 short answer', 'Q11–15'], C: [101, 110, 'Section C · AY2020-21 multiple choice', 'Q1–10'], D: [111, 116, 'Section D · AY2020-21 short answer', 'Q1–6'] },
+    secs: { Y25: [1, 15, 'AY2024-25 final exam', '15 questions'], Y21: [101, 116, 'AY2020-21 final exam', '16 questions'] },
     pastSingle: true,
-    pastNote:'These are real final-exam questions: the AY2024-25 paper (with its published solutions) and the AY2020-21 paper. The 2020-21 paper has no answer key in your files, so those answers are my own: the multiple-choice answers and the short-answer solutions were worked out and checked by running the code in Python. The 2020-21 debugging question (Section B Q7, the buggy <code>trace_contacts_2</code> listing) is not included. Use <b>No solutions</b> to attempt a section like an exam, and <b>Show solutions</b> to read the answers and model solutions.',
+    pastNote:'These are real final-exam questions: the AY2024-25 paper (with its published solutions) and the AY2020-21 paper. The 2020-21 paper has no answer key in your files, so those answers are my own: the multiple-choice answers and the short-answer solutions were worked out and checked by running the code in Python. The 2020-21 debugging question (Section B Q7, the buggy <code>trace_contacts_2</code> listing) is not included. Each year shows its multiple-choice questions first, then the short-answer questions. Switch <b>Show solutions</b> on (top right) to read the answers and model solutions; leave it off to attempt the paper like an exam.',
   },
   meta: metaAll, exam, hasPast: true, codeQuestions: true,
 };

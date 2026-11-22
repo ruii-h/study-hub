@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useState } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 import { byId, loaders } from '../courses/registry';
 import extraCss from './course-extra.css?inline';
+import { watchHighlight } from './highlight';
 
 type Loaded = Awaited<ReturnType<(typeof loaders)['algo']>>;
 
@@ -41,7 +42,9 @@ export default function CourseApp() {
       loadMermaid: () => import('mermaid').then((m) => m.default),
       ...ready.api,
     });
+    const stopHl = watchHighlight();
     return () => {
+      stopHl();
       unmount();
       ready.dispose?.();
       style.remove();
