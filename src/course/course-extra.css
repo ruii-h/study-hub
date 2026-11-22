@@ -12,3 +12,9 @@
 :root[data-course=cf][data-theme=light]{--accent:#bc4c00}
 :root[data-course=ctp][data-theme=dark]{--accent:#e3b341}
 :root[data-course=ctp][data-theme=light]{--accent:#9a6700}
+/* code fonts: IS1704 = Python editor font, IS114 = terminal font */
+:root[data-course=ctp] .t-code-body,:root[data-course=ctp] code,:root[data-course=ctp] pre{font-family:'JetBrains Mono','Cascadia Code','Fira Code',Consolas,'Liberation Mono',monospace;font-size:.92em}
+:root[data-course=cf] .t-code-body,:root[data-course=cf] code,:root[data-course=cf] pre:not(.mermaid){font-family:'Cascadia Mono','Cascadia Code',Consolas,'Lucida Console','Liberation Mono',monospace;font-size:.92em}
+:root[data-course=cf] .t-code{background:#012456;border-color:#2b4a7a}
+:root[data-course=cf] .t-code-body{color:#eaeaea;background:#012456}
+:root[data-course=cf] .t-code-header{background:#0b1f3f;color:#b9c6e0}

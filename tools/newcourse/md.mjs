@@ -43,7 +43,7 @@ export function makeMarked() {
       codespan({ text }) { return `<code>${text}</code>`; },
       code({ text, lang }) {
         if (lang === 'mermaid') return `<pre class="mermaid">${esc(text.replace(/^\s*%%\{init:.*\}%%\s*\n?/m, ''))}</pre>\n`;
-        const l = (lang || 'text').replace('text', 'output');
+        const l = (lang || 'text').replace('text', 'output').replace(/^(bash|sh|shell|console)$/, 'powershell');
         return `<div class="t-code"><div class="t-code-header"><span>${esc(l)}</span></div><div class="t-code-body" tabindex="0">${esc(text.replace(/\n+$/, ''))}</div></div>\n`;
       },
       table({ header, rows }) {
