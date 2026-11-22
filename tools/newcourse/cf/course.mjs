@@ -57,5 +57,5 @@ export default {
     selfn: 0,
   },
   titleFix: (t) => t.replace(/ from the compendium/, '').replace(/ \(compendium quiz items\)/, '').replace(/ \(from Week \d+\)/, '').replace(/^Lab 1 — all 28 tasks with answers/, 'Lab 1 — all 28 tasks with answers').replace(/\s*—?\s*\(all (\d+) steps\)/, ' ($1 steps)'),
-  meta: metaAll, exam, selfq, hasPast: false,
+  meta: metaAll, exam, selfq, hasPast: false, codeQuestions: true,
 };

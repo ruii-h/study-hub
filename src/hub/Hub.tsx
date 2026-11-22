@@ -64,10 +64,10 @@ export default function Hub() {
           {COURSES.map((c, i) => {
             const p = progress(c);
             return (
-              <li key={c.id} className="animate-tab-in" style={{ animationDelay: `${i * 80}ms`, ['--card-accent' as string]: theme === 'dark' ? c.accent[0] : c.accent[1] }}>
+              <li key={c.id} className="animate-tab-in flex" style={{ animationDelay: `${i * 80}ms`, ['--card-accent' as string]: theme === 'dark' ? c.accent[0] : c.accent[1] }}>
                 <Link
                   to={`/${c.id}`}
-                  className="group relative flex h-full flex-col overflow-hidden rounded-xl no-underline text-ink border border-line bg-surface p-5 transition duration-200 hover:-translate-y-1 hover:border-card-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-card-accent"
+                  className="group relative flex w-full flex-col overflow-hidden rounded-xl no-underline text-ink border border-line bg-surface p-5 transition duration-200 hover:-translate-y-1 hover:border-card-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-card-accent"
                 >
                   <span aria-hidden className="absolute inset-x-0 top-0 h-1 bg-card-accent" />
                   <div className="flex items-center justify-between">

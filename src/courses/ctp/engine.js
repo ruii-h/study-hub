@@ -16,7 +16,7 @@ const sv=()=>{try{localStorage.setItem(KEY+'scores',JSON.stringify(S));localStor
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let cur=null,tab='theory',BACK=null;
-const TABS=['theory','practice','cards','cheat','ice','past','exam'];
+const TABS=['theory','practice','cards','ice','past'];
 // ---------- theme / size
 function applyTheme(t){document.documentElement.dataset.theme=t;$('#theme').innerHTML=t=='light'?'<span class="ti">🌙</span><span class="tx"> Dark</span>':'<span class="ti">☀️</span><span class="tx"> Light</span>'}
 function toggleTheme(){const t=document.documentElement.dataset.theme=='light'?'dark':'light';ST.theme=t;sv();applyTheme(t);if(tab=='theory'&&cur)loadTheory(cur,{keep:true})}
@@ -24,7 +24,7 @@ function setSize(d){ST.fs=Math.min(1.35,Math.max(.85,(ST.fs||1)+d));sv();applySi
 function applySize(){const c=$('#theory-content');if(c)c.style.zoom='';$$('.fsv').forEach(e=>e.textContent=Math.round((ST.fs||1)*100)+'%')}
 // ---------- tabs / nav
 function switchTab(t,focus){tab=t;ST.tab=t;sv();setTimeout(buildNav,0);$$('.tab').forEach(e=>{const on=e.dataset.t==t;e.classList.toggle('active',on);e.setAttribute('aria-selected',on)});$$('.tab-view').forEach(e=>e.classList.toggle('active',e.id=='tab-'+t));
- toggleNav(false);if(t=='practice')renderPQ(pqSel);if(t=='cards')renderCards();if(t=='cheat')renderCheat();if(t=='ice')renderIce();if(t=='exam')renderExamHome();if(t=='past')renderPast(pastSec)}
+ toggleNav(false);if(t=='practice')renderPQ(pqSel);if(t=='cards')renderCards();if(t=='ice')renderIce();if(t=='past')renderPast(pastSec)}
 function toggleNav(f){const n=$('#mnav');const o=f===undefined?!n.classList.contains('open'):f;n.classList.toggle('open',o);$('#scrim').classList.toggle('on',o);$('#menu').setAttribute('aria-expanded',o)}
 function stat(){const n=Object.keys(V).length;$('#stat').textContent=n+' / '+D.lessons.length+' read';const p=$('#pbar');p.firstElementChild.style.width=(n/D.lessons.length*100)+'%';p.setAttribute('aria-valuenow',n)}
 function sc(s){return s.s/s.t>=.8?'ok':s.s/s.t>=.5?'mid':'lo'}
@@ -53,7 +53,7 @@ function loadTheory(n,o){o=o||{};const dir=(cur==null||n==cur)?'':(n>cur?'r':'l'
  const back=o.back?`<div class="backbar"><button class="bb-go" onclick="goBack()">↩ ${esc(o.back.label)}</button><button class="bb-x" title="Dismiss" aria-label="Dismiss" onclick="this.parentNode.remove()">×</button></div>`:'';BACK=o.back||null;
  $('#theory-content').innerHTML=`<div class="t-hero"><div class="t-tag ${l.tag}">Chapter ${n} of ${D.lessons.length}</div><h1 class="t-h1" tabindex="-1">${l.title}</h1><div class="t-subtitle">${l.goal}</div><div class="meta">⏱ about ${mins} min read · ${(D.hard[n]||[]).length} exam-style questions at the end</div></div>${l.html}
  <div class="endrow"><div class="endmsg">You have reached the end of Chapter ${n}. <b>Next step:</b> test yourself while it is fresh.</div><button class="btn" onclick="goQuiz(${n})">🧠 Take the Chapter ${n} quiz</button></div>
- <div class="t-nav-footer">${pv?`<button class="t-nav-btn" onclick="loadTheory(${pv.n})"><small>Previous</small>← ${pv.title}</button>`:'<div></div>'}${nx?`<button class="t-nav-btn next" onclick="loadTheory(${nx.n})"><small>Next chapter</small>${nx.title} →</button>`:`<button class="t-nav-btn next" onclick="switchTab('exam')"><small>You finished the course notes</small>Take the Final Exam →</button>`}</div>${back}`;
+ <div class="t-nav-footer">${pv?`<button class="t-nav-btn" onclick="loadTheory(${pv.n})"><small>Previous</small>← ${pv.title}</button>`:'<div></div>'}${nx?`<button class="t-nav-btn next" onclick="loadTheory(${nx.n})"><small>Next chapter</small>${nx.title} →</button>`:`<button class="t-nav-btn next" onclick="switchTab('practice')"><small>You finished the course notes</small>Go to the practice questions →</button>`}</div>${back}`;
  const c=$('#theory-content');applySize();c.scrollTop=0;anim(c,dir?'scr-'+dir:'scr-in');buildToc();switchTab('theory');stackTables(c);mm();reveal();autolink(c,n);fillRows(c);
  if(!o.keep){const h=c.querySelector('h1');if(h&&o.focus!==false)h.focus({preventScroll:true})}}
 function reveal(){const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{root:$('#theory-content'),threshold:.05});
@@ -82,7 +82,9 @@ function renderPQ(sel){pqSel=sel;ST.pq=sel;ST.pqm=pqMode;buildNav();let h=`<div 
  if(sel=='sc'){$('#pqm').innerHTML='<h1 class="t-h1" style="font-size:26px;margin-bottom:6px">Self-check Q&amp;A</h1><div class="sub">Think first, then open the answer.</div><div class="t-section">'+D.selfq+'</div>';return}
  if(sel=='mx'){reviewMistakes();return}
  const l=D.lessons.find(x=>x.n==sel);
- const pills=`<div class="pills" role="group" aria-label="Question style"><button class="${pqMode=='hard'?'on':''}" aria-pressed="${pqMode=='hard'}" onclick="pqMode='hard';renderPQ(${sel})">Exam-style (harder) · ${(D.hard[sel]||[]).length}</button><button class="${pqMode=='warm'?'on':''}" aria-pressed="${pqMode=='warm'}" onclick="pqMode='warm';renderPQ(${sel})">Warm-up (easier) · ${(D.quiz[sel]||[]).length}</button></div>`;
+ const nf=(D.fill&&D.fill[sel]||[]).length;if(pqMode=='type'&&!nf)pqMode='hard';
+ const pills=`<div class="pills" role="group" aria-label="Question style"><button class="${pqMode=='hard'?'on':''}" aria-pressed="${pqMode=='hard'}" onclick="pqMode='hard';renderPQ(${sel})">Exam-style (harder) · ${(D.hard[sel]||[]).length}</button><button class="${pqMode=='warm'?'on':''}" aria-pressed="${pqMode=='warm'}" onclick="pqMode='warm';renderPQ(${sel})">Warm-up (easier) · ${(D.quiz[sel]||[]).length}</button>${nf?`<button class="${pqMode=='type'?'on':''}" aria-pressed="${pqMode=='type'}" onclick="pqMode='type';renderPQ(${sel})">Type the answer · ${nf}</button>`:''}</div>`;
+ if(pqMode=='type'){runFill(`Chapter ${sel} — ${l.title} (type the answer)`,D.fill[sel].map((q,i)=>({...q})),'f'+sel,$('#pqm'),pills);return}
  if(pqMode=='warm'){runQuiz(`Chapter ${sel} — ${l.title} (warm-up)`,D.quiz[sel],'w'+sel,$('#pqm'),pills);return}
  runMulti(`Chapter ${sel} — ${l.title}`,(D.hard[sel]||[]).map((q,i)=>({...q,id:'h'+sel+'-'+i,ch:sel})),sel,$('#pqm'),pills)}
 function goQuiz(n){pqMode='hard';switchTab('practice');renderPQ(n)}
@@ -160,7 +162,7 @@ function finishMulti(host,key,score,N,o){
  let acts='';
  if(key==='exam'){acts=(mCount()?`<button class="btn main" onclick="renderPQ('mx');switchTab('practice')">Review my ${mCount()} mistakes</button><button class="btn ghost" onclick="restart('exam',()=>startExam(true))">Take a new random exam</button>`:`<button class="btn main" onclick="restart('exam',()=>startExam(true))">Take a new random exam</button>`)+(document.querySelector('[data-t=past]')?`<button class="btn lnk" onclick="switchTab('past')">Try the past-year questions</button>`:'')}
  else if(key==='mx'){acts=`<button class="btn main" onclick="reviewMistakes()">${mCount()?'Review remaining mistakes':'Nothing left to review ✓'}</button>`}
- else{const pass=p>=80;const rr=`<button class="btn lnk" onclick="reread(${n},{tab:'practice',sel:${n},label:'Back to your quiz'})">Re-read Chapter ${n}</button>`;const rt=`<button class="btn lnk" onclick="restart('${n}',()=>renderPQ(${n}))">Retry this quiz (reshuffled)</button>`;if(pass){acts=(nx?`<button class="btn main" onclick="loadTheory(${nx.n})">Continue to Chapter ${nx.n}</button><button class="btn ghost" onclick="renderPQ(${nx.n})">Quiz me on Chapter ${nx.n}</button>`:`<button class="btn main" onclick="switchTab('exam')">Take the Final Exam</button>`)+rt+rr}else{acts=`<button class="btn main" onclick="restart('${n}',()=>renderPQ(${n}))">Retry this quiz (reshuffled)</button><button class="btn ghost" onclick="reread(${n},{tab:'practice',sel:${n},label:'Back to your quiz'})">Re-read Chapter ${n}</button>`+(nx?`<button class="btn lnk" onclick="loadTheory(${nx.n})">Skip ahead to Chapter ${nx.n}</button>`:'')}}
+ else{const pass=p>=80;const rr=`<button class="btn lnk" onclick="reread(${n},{tab:'practice',sel:${n},label:'Back to your quiz'})">Re-read Chapter ${n}</button>`;const rt=`<button class="btn lnk" onclick="restart('${n}',()=>renderPQ(${n}))">Retry this quiz (reshuffled)</button>`;if(pass){acts=(nx?`<button class="btn main" onclick="loadTheory(${nx.n})">Continue to Chapter ${nx.n}</button><button class="btn ghost" onclick="renderPQ(${nx.n})">Quiz me on Chapter ${nx.n}</button>`:`<button class="btn main" onclick="switchTab('practice')">Go to the practice questions</button>`)+rt+rr}else{acts=`<button class="btn main" onclick="restart('${n}',()=>renderPQ(${n}))">Retry this quiz (reshuffled)</button><button class="btn ghost" onclick="reread(${n},{tab:'practice',sel:${n},label:'Back to your quiz'})">Re-read Chapter ${n}</button>`+(nx?`<button class="btn lnk" onclick="loadTheory(${nx.n})">Skip ahead to Chapter ${nx.n}</button>`:'')}}
  host.querySelector('#res').innerHTML=`<div class="exq resultcard"><div class="ring" id="rg"><span>${p}%</span></div><div class="rt"><div style="font-weight:800;font-size:18px">${score} of ${N} fully correct</div><div class="sub">${p>=80?'Strong. Move on to the next chapter. 🎉':p>=50?'Decent. Revisit the explanations of the ones you missed, then retry.':'Re-read the chapter, then try again. Partial credit does not exist in the exam either.'}${mCount()&&key!=='mx'?` Missed questions are saved in <b>Review my mistakes</b> so they come back until you get them right.`:''}</div><div class="row">${acts}</div></div></div>`;
  requestAnimationFrame(()=>{const g=host.querySelector('#rg');if(g)g.style.setProperty('--p',p)});if(!o.quiet)host.querySelector('#res').scrollIntoView({behavior:'smooth'})}
 function reviewMistakes(){const host=$('#pqm');const qs=Object.values(M);
@@ -174,7 +176,7 @@ function startExam(fresh){const get=id=>{const m=/^h(\d+)-(\d+)$/.exec(id);const
  let list;const st=QP.exam;
  if(!fresh&&st){list=st.ord.map(x=>get(x.id)).filter(Boolean);if(list.length!=st.ord.length){delete QP.exam;list=null}}
  if(!list){delete QP.exam;let all=[];Object.entries(D.hard).forEach(([n,a])=>a.forEach((q,i)=>all.push({...q,id:'h'+n+'-'+i,ch:+n})));list=shuffle(all).slice(0,40)}
- runMulti('Final Exam',list,'exam',$('#examm'),'')}
+ runMulti('Final Exam',list,$('#examm'),'')}
 function renderIce(){buildNav();$('#icem').innerHTML='<h1 class="t-h1" style="font-size:26px">In-class exercises (ICE)</h1><div class="sub">Exercises from the weekly in-class sessions, grouped by chapter. Attempt each one first, then open the answer. Lab exercises are not included: they are meant to be run against test cases.</div>'+D.ice;$('#icem').scrollTop=0}
 // ---------- cards
 let shuf=false;
@@ -198,7 +200,7 @@ function renderPast(sec){pastSec=sec;buildNav();const m=$('#pastm');
  const [a,b]=SECS[sec];
  D.exam.mcq.filter(q=>q.n>=a&&q.n<=b).forEach(q=>{h+=`<div class="exq" id="pq${q.n}"><div class="qh"><h2 class="qn">Question ${q.no||q.n}</h2><span class="ms">${D.pastSingle?'CHOOSE THE BEST ANSWER':'SELECT ALL THAT APPLY'}</span></div><div class="qt">${q.q}</div><div role="group" aria-label="Options for question ${q.n}">`+q.o.map((o,i)=>`<label class="eo"><input type="checkbox" value="${'ABCDE'[i]}" onchange="selPast(${q.n})"><i>${'ABCDE'[i]}.</i><span>${o}</span></label>`).join('')+`</div><div class="row"><button class="btn" id="pb${q.n}" disabled onclick="checkPast(${q.n})">Check answer</button><button class="btn ghost" onclick="reread(${q.ch},{tab:'past',sec:'${sec}',q:${q.n},label:'Back to Past Exam Q${q.n}'})">📖 Revise chapter ${q.ch}</button></div><div id="pv${q.n}" aria-live="polite"></div></div>`});
  D.exam.wr.filter(q=>q.n>=a&&q.n<=b).forEach(q=>{h+=`<div class="exq"><div class="qh"><h2 class="qn">Question ${q.no||q.n}</h2><span class="ms">${q.pts} POINTS</span></div><div class="qt">${q.q}</div><label class="sr" for="ta${q.n}">Your answer</label><textarea id="ta${q.n}" placeholder="Write your own answer first (saved on this device)…" oninput="PW[${q.n}]=this.value;sv()">${esc(PW[q.n]||'')}</textarea><div class="row"><button class="btn ghost" onclick="reread(${q.ch},{tab:'past',sec:'${sec}',q:0,label:'Back to Past Exam'})">📖 Revise chapter ${q.ch}</button></div><details class="model"><summary>Show model answer (from the notes)</summary><div class="ma">${q.a}</div></details></div>`});
- const ks=Object.keys(SECS),ix=ks.indexOf(sec),nk=ks[ix+1];h+=`<div class="endrow"><div class="endmsg">End of this section. ${nk?'Keep the momentum.':'That is the whole past paper.'}</div>${nk?`<button class="btn go" onclick="renderPast('${nk}')">Next: ${SECS[nk][2].split(' · ')[0]} →</button>`:`<button class="btn go" onclick="switchTab('exam')">Take the Final Exam →</button>${mCount()?`<button class="btn ghost" onclick="switchTab('practice');renderPQ('mx')">🔁 Review ${mCount()} mistakes</button>`:''}`}</div>`;
+ const ks=Object.keys(SECS),ix=ks.indexOf(sec),nk=ks[ix+1];h+=`<div class="endrow"><div class="endmsg">End of this section. ${nk?'Keep the momentum.':'That is the whole past paper.'}</div>${nk?`<button class="btn go" onclick="renderPast('${nk}')">Next: ${SECS[nk][2].split(' · ')[0]} →</button>`:`<button class="btn go" onclick="switchTab('practice')">Go to the practice questions →</button>${mCount()?`<button class="btn ghost" onclick="switchTab('practice');renderPQ('mx')">🔁 Review ${mCount()} mistakes</button>`:''}`}</div>`;
  m.innerHTML=h;m.scrollTop=0;D.exam.mcq.filter(q=>!ST.psol&&q.n>=a&&q.n<=b&&PS[q.n]!==undefined).forEach(q=>{const box=$('#pq'+q.n);PS[q.n].split('').forEach(v=>{const i=box.querySelector('input[value="'+v+'"]');if(i)i.checked=true});selPast(q.n);checkPast(q.n,true)});applySol(a,b);ST.psec=sec;sv()}
 function selPast(n){const box=$('#pq'+n);box.querySelectorAll('.eo').forEach(l=>l.classList.toggle('sel',l.querySelector('input').checked));$('#pb'+n).disabled=!box.querySelector('input:checked')}
 function checkPast(n,restore){const q=D.exam.mcq.find(x=>x.n==n);const box=$('#pq'+n);const sel=[...box.querySelectorAll('input:checked')].map(x=>x.value).sort().join('');const ans=q.a.split('').sort().join('');
@@ -216,6 +218,32 @@ function applySol(a,b){const m=$('#pastm');const sol=!!ST.psol;
   box.querySelectorAll('.eo').forEach((l,j)=>{l.querySelector('input').disabled=true;if(q.a.includes('ABCDE'[j]))l.classList.add('right')});
   const bt=$('#pb'+q.n);if(bt)bt.style.display='none';
   $('#pv'+q.n).innerHTML=`<div class="verdict ok"><b>Solution:</b> <b>${q.a.split('').join(', ')}</b>. ${q.e}</div>`})}
+// ---------- practice: type-in questions (answers are checked after normalising spacing, quotes and option spacing; several accepted spellings)
+function fillNorm(s,kind,ci){s=String(s).replace(/\r/g,'').split('\n').map(l=>l.trim().replace(/\s+/g,' ')).join('\n').replace(/^\n+|\n+$/g,'').replace(/\n{2,}/g,'\n');
+ s=s.replace(/["'`\u201c\u201d\u2018\u2019]/g,'');
+ if(kind==='cmd'){s=s.replace(/\s*\|\s*/g,' | ').replace(/\s*(>>?)\s*/g,' $1 ').replace(/(\s-[A-Za-z])\s+(?=[^\s-])/g,'$1').replace(/\s+/g,' ').trim()}
+ return ci?s.toLowerCase():s}
+function fillOK(q,v){const k=q.kind||'out',u=fillNorm(v,k,q.ci);if(!u)return false;
+ return q.a.some(a=>{if(a.startsWith('re:'))return new RegExp(a.slice(3),'i').test(u);return fillNorm(a,k,q.ci)===u})}
+function runFill(title,qs,key,host,pills){const st=QP[key]=QP[key]||{r:{}};if(!st.r)st.r={};
+ const N=qs.length;
+ const tally=()=>{const d=Object.values(st.r).filter(x=>x.done).length,c=Object.values(st.r).filter(x=>x.ok).length;host.querySelector('#qp').textContent=`Answered ${d} of ${N} · ${c} correct`;host.querySelector('#qb').style.width=(d/N*100)+'%'};
+ host.innerHTML=`<h1 class="t-h1" style="font-size:26px">${title}</h1>${pills||''}<div class="sub">${N} questions · <b>type the answer</b> · extra spaces, quote style and the order-free spacing of options are ignored · saved automatically</div><div class="qprog" role="status" aria-live="polite"><span id="qp"></span><i><b id="qb"></b></i><button class="btn ghost sm" id="rs">↺ Start over</button></div><div id="qs"></div>`;
+ host.querySelector('#rs').onclick=()=>{delete QP[key];sv();renderPQ(pqSel)};
+ const box=host.querySelector('#qs');
+ qs.forEach((q,i)=>{const d=document.createElement('div');d.className='exq';const multi=(q.kind||'out')==='out'&&/\n/.test(q.a[0]||'');
+  const field=multi?`<textarea id="fa${i}" rows="4" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Your answer to question ${i+1}" style="width:100%;font:14px/1.5 ui-monospace,Consolas,monospace"></textarea>`:`<input id="fa${i}" type="text" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Your answer to question ${i+1}" style="width:100%;font:14px/1.5 ui-monospace,Consolas,monospace">`;
+  d.innerHTML=`<div class="qh"><h2 class="qn">Question ${i+1}</h2><span class="ms">TYPE THE ANSWER</span></div><div class="qt">${q.q}</div>${field}<div class="row"><button class="btn" data-c>Check answer</button><button class="btn ghost" data-s>Show answer</button></div><div class="vd" aria-live="polite"></div>`;
+  const inp=d.querySelector('#fa'+i),vd=d.querySelector('.vd');const r=st.r[i];if(r)inp.value=r.v||'';
+  const showAns=()=>`<div class="why wy"><b>Accepted answer:</b> ${q.a.filter(a=>!a.startsWith('re:')).slice(0,2).map(a=>`<code>${esc(a).replace(/\n/g,'<br>')}</code>`).join(' or ')||esc(q.a[0])}</div>`;
+  const paint=()=>{const r=st.r[i];if(!r||!r.done){vd.innerHTML='';return}
+   vd.innerHTML=`<div class="verdict ${r.ok?'ok':'no'}"><b>${r.ok?'✅ Correct.':(r.shown?'Answer revealed.':'❌ Not quite.')}</b> ${q.e||''}${r.ok?'':showAns()}</div>`;inp.classList.toggle('ok',!!r.ok)};
+  d.querySelector('[data-c]').onclick=()=>{const ok=fillOK(q,inp.value);st.r[i]={v:inp.value,done:1,ok:ok?1:0};if(ok)delete M['t'+key+'-'+i];else M['t'+key+'-'+i]=null,delete M['t'+key+'-'+i];sv();paint();tally()};
+  d.querySelector('[data-s]').onclick=()=>{st.r[i]={v:inp.value,done:1,ok:0,shown:1};sv();paint();tally()};
+  inp.addEventListener('input',()=>{if(!st.r[i]||!st.r[i].done){st.r[i]={v:inp.value};sv()}});
+  if(!multi)inp.addEventListener('keydown',e=>{if(e.key==='Enter')d.querySelector('[data-c]').click()});
+  box.appendChild(d);paint()});
+ tally();host.scrollTop=0}
 // ---------- search
 let IDX=null;
 function buildIdx(){if(IDX)return;IDX=[];const t=document.createElement('div');
@@ -246,7 +274,7 @@ __L(document,'keydown',e=>{
  if(e.key=='/'){e.preventDefault();$('#q').focus();$('#q').select()}
  else if(e.key=='?'){openHelp()}
  else if(e.key=='t'){toggleTheme()}
- else if(/^[1-7]$/.test(e.key)){switchTab(TABS[+e.key-1])}
+ else if(/^[1-9]$/.test(e.key)&&TABS[+e.key-1]){switchTab(TABS[+e.key-1])}
  else if(tab=='theory'&&(e.key=='ArrowRight'||e.key=='ArrowLeft')&&!tg.closest('.toc')){const i=D.lessons.findIndex(x=>x.n==cur),j=i+(e.key=='ArrowRight'?1:-1);if(D.lessons[j])loadTheory(D.lessons[j].n)}
 });
 $('#q').addEventListener('input',doSearch);$('#q').addEventListener('focus',doSearch);
