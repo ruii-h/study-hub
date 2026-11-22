@@ -6,7 +6,7 @@ import { fade, pop, rise, slideX } from './motion';
 import MixedQuiz from './Mixed';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const L5 = 'ABCDE';
+const L5 = 'ABCDEF';
 const esc = (s: string) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] as string));
 
 export function JumpBtn({ ch, text, back }: { ch: number; text: string; back: any }) {

@@ -3,6 +3,7 @@ import path from 'node:path';
 import { lines, find, split } from '../src.mjs';
 import { metaAll } from './meta.mjs';
 import { exam, selfq } from './extra.mjs';
+import { loadBank } from './bank-v2.mjs';
 
 const ls = lines(path.join(import.meta.dirname, 'source', 'notes.md'));
 const part = (L, next) => {
@@ -58,5 +59,5 @@ export default {
     mixed: true,
   },
   titleFix: (t) => t.replace(/ from the compendium/, '').replace(/ \(compendium quiz items\)/, '').replace(/ \(from Week \d+\)/, '').replace(/^Lab 1 — all 28 tasks with answers/, 'Lab 1 — all 28 tasks with answers').replace(/\s*—?\s*\(all (\d+) steps\)/, ' ($1 steps)'),
-  template: { teach: 'why', glance: true, quick: false, namesTitle: 'Easily confused terms', namesCols: ['Term', 'What it is', 'Not to be confused with'], summaryTitle: 'Chapter summary' }, meta: metaAll, exam, selfq, hasPast: false, codeQuestions: true,
+  template: { teach: 'why', glance: true, quick: false, namesTitle: 'Easily confused terms', namesCols: ['Term', 'What it is', 'Not to be confused with'], summaryTitle: 'Chapter summary' }, meta: metaAll, exam, selfq, hasPast: false, codeQuestions: true, bank: (bq) => loadBank(bq), bank: (bq) => loadBank(bq),
 };

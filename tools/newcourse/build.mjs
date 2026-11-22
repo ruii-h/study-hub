@@ -99,8 +99,9 @@ raw.forEach(({ ch, secs }) => {
     return { q: stem, o, a, e, w };
   });
   (m.multi || []).forEach((q) => D.hard[ch.n].push({ q: bq(q[0]), o: q[1].map(bq), a: q[2], e: bq(q[3] || ''), w: null }));
-  if (D.hard[ch.n].length < 10) problems.push(`ch${ch.n} has ${D.hard[ch.n].length} exam-style questions (need 10)`);
+  if (!C.bank && D.hard[ch.n].length < 10) problems.push(`ch${ch.n} has ${D.hard[ch.n].length} exam-style questions (need 10)`);
 });
+if (C.bank) { const b = C.bank(bq); D.quiz = b.quiz; D.hard = b.hard; D.fill = b.fill; problems.push(...b.problems); }
 if (C.exam) { D.exam = C.exam(refMap); }
 Object.assign(D, C.extra || {});
 if (C.selfq && D.selfq) D.selfn = C.selfq.count;

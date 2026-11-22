@@ -5,7 +5,7 @@ import { JumpBtn, Ring, WhyRow, fillOK } from './Practice';
 import { fade, pop, rise } from './motion';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const L5 = 'ABCDE';
+const L5 = 'ABCDEF';
 const TAG: Record<string, string> = { s: 'CHOOSE ONE', m: 'SELECT ALL THAT APPLY', f: 'TYPE THE ANSWER', w: 'SHORT ANSWER' };
 
 /** One mixed bank per chapter: single choice, select-all and typed answers, shuffled together. */

@@ -323,6 +323,13 @@ Hardware summary table `[LT]`:
 
 </div>
 
+<div class="callout tip">
+
+- **Why a fast CPU can still be slow:** if storage is slow, data loads slowly and the CPU sits idle waiting for it — storage becomes the bottleneck, not the processor.
+- **Why the CPU does not just use storage:** RAM is the fast working area; the number of programs that can run at once is limited by RAM, not by disk size.
+
+</div>
+
 ## A.6 How it all works together (when you open a browser)
 
 1. **Storage** loads the program into **RAM**.
@@ -339,6 +346,12 @@ Hardware summary table `[LT]`:
 - **Display:** *size* = diagonal of the screen; *resolution* = pixels wide × high (1920 × 1080 → 1,920 pixels across, 1,080 down).
 - **USB:** standardised bidirectional interface for data and power `[Comp §1.4]`. **HDMI:** uncompressed digital audio + video to monitors/TVs.
 - **Bluetooth:** short range, low power → ideal for keyboards, mice, earphones `[Comp §1.4]`.
+
+<div class="callout tip">
+
+- **Why a GPU matters for gaming:** rendering fast, complex images every frame would overwhelm the main processor, so the GPU takes that job.
+
+</div>
 
 ## A.8 Embedded systems and the micro:bit
 
@@ -426,6 +439,12 @@ Why beginners struggle with the Linux CLI: it is **case-sensitive** and needs **
 
 **Which computer am I on?** Look at the **prompt**: it shows the username and the **hostname** of the machine you're commanding `[LT Q24, Q46]`.
 
+<div class="callout tip">
+
+- **CLI vs GUI trade-off:** the CLI gives precise, quick changes and can be automated, so it wins for large-scale or repeated work; the GUI is more intuitive but slower for bulk changes. Beginner habits that avoid mistakes: re-read the syntax before pressing Enter and remember that names and options are case-sensitive.
+
+</div>
+
 ## B.5 Program vs process
 
 | | Program | Process |
@@ -439,6 +458,13 @@ Synonyms for program: app, application, executable file `[LT glossary]`.
 **See them:** Programs — Windows *Start ➜ Settings ➜ Apps*; macOS *Finder ➜ Applications*. Processes — Windows *Task Manager*; macOS *Activity Monitor* `[W2 s9]`. Try opening and closing Notepad/Calculator and watch the process appear and vanish.
 
 **Foreground vs background** `[W2 s10]`: the **foreground** process is the one you're interacting with right now; **background** processes run without direct user interaction. GUI analogies `[LT Q45]`: foreground ≈ maximised app you are using; background ≈ minimised/behind other windows; Ctrl-C ≈ closing the app.
+
+<div class="callout tip">
+
+- **Analogy:** a program is a recipe book; a process is actually cooking from it. You can have one recipe book and several pots on the stove (one program, several processes).
+- **Suspended processes are not free:** a process paused with Ctrl-z is stopped but still sits in memory, so it keeps using RAM until you resume or kill it.
+
+</div>
 
 ## B.6 Process control commands
 
@@ -660,6 +686,12 @@ Why directories? They group and organise files logically `[LT Q47]`, and a direc
 
 **Linux filenames are case-sensitive:** `data.txt` and `Data.txt` are different files and can coexist `[LT Q48]` `[Comp §11.3]`. Mistyping a name can therefore act on the wrong file `[LT Q66]`.
 
+<div class="callout tip">
+
+- **Why directories exist:** they group files logically so that thousands of files stay findable and manageable.
+
+</div>
+
 ## D.2 Text files vs binary files
 
 | | Text file | Binary file |
@@ -677,12 +709,24 @@ Why directories? They group and organise files logically `[LT Q47]`, and a direc
 
 A `.docx` is **binary** because it embeds formatting, fonts, margins, colours and media beside the text `[LT Q51, Q68]` `[Comp §3.1]`.
 
+<div class="callout tip">
+
+- **Why binary files are less friendly:** a person cannot read them directly — they need specific software to open or edit them, whereas a text file can be read in any editor.
+
+</div>
+
 ## D.3 File types and extensions
 
 - **File type** = the kind of information in a file. **Extension** = the part after the dot (`.jpg`, `.csv`) that indicates the type; names are `Filename.Extension` `[W3 s5]`.
 - Purpose: helps the OS choose which program opens the file (`MyProg.java` → code editor; `family.jpg` → image viewer).
 - **Extension ≠ truth.** Renaming `virus.exe` to `funny-cat.jpg` does not change what it is `[LT]`. Changing an extension (or any part of the name) does not change the contents `[LT Q53]`; you can't "convert" a file by renaming `[LT Q69]`.
 - What happens on double-click: OS checks extension → opens associated program → program reads the real format → mismatch gives an error `[LT Q54]`.
+
+<div class="callout tip">
+
+- **Renaming an extension does not convert a file:** the extension is only a label. The bytes inside keep their original format, so a program expecting the new format fails to open it.
+
+</div>
 
 ## D.4 File operations
 
@@ -820,6 +864,12 @@ Note: `chmod u=rw, go=r file` in `[LT]` contains a stray space — the real synt
 | World-readable, not writable file | Any user can view; cannot modify/delete `[LT Q71]` |
 | `chmod u=rw,go=` result | Only owner can read/write `[LT Q93]` |
 
+<div class="callout tip">
+
+- **Why protection matters on shared computers:** it stops other users from reading or changing your files. Giving *world* read and write access to sensitive files risks anyone modifying or deleting them, and data leaks or loss.
+
+</div>
+
 ## D.9 Lab 2 — walking the `is114-nav` tree (all 27 steps)
 
 Starting tree `[LT]` (extensionless names are files):
@@ -924,6 +974,13 @@ Concepts practised `[LT]`: `cd` navigation (steps 1,3,5,7,12,17,23,26); relative
 
 </div>
 
+<div class="callout tip">
+
+- **`No such file or directory` after `cd projects/old`:** first check that the path exists and that the spelling and case match exactly (Linux is case-sensitive), and that you start from the CWD you think you are in.
+- **Files vanish after a reboot:** suspect that the folder lives in RAM (a memory-backed area). Files on storage survive a reboot; anything in RAM is lost when power is cut.
+
+</div>
+
 ---
 
 # Part E — Computer Networks, Addressing & Diagnostics (Week 5)
@@ -1020,6 +1077,12 @@ An IP address gets data to the right **computer**; a **port** gets it to the rig
 
 Identify two web servers: same computer → different **port numbers**; different computers → different **IP address + port** `[LT lab Q]`.
 
+<div class="callout tip">
+
+- **Port ≈ mailbox number:** the IP address finds the computer, and the port number finds the right process on it, like the mailbox number inside a building. Two processes cannot share one port on the same address; the second one fails to start (errors or failed connections). Port 22 is SSH (secure remote access).
+
+</div>
+
 ## E.7 DNS
 
 **DNS** = a distributed system for managing hostname resolution `[W5 s22]`; a **domain name server** translates hostnames to IPs. Without DNS we'd memorise IPs `[LT Q101, Q113]`.
@@ -1043,6 +1106,12 @@ sequenceDiagram
 ```
 
 *Caption: DNS resolution `[W5 s23]`.* In the compendium's fuller description `[Comp §4.5]`: the client contacts the local default DNS nameserver (typically on the local router); if it can't resolve locally, recursive queries propagate up through **root nameservers** and **authoritative nameservers** until the address is found or the query times out. A failed resolution means all servers involved failed or the request timed out `[LT Q103]`. In a typical home network the default DNS server runs on the **router** (can be changed) `[Comp Quiz Q32]`.
+
+<div class="callout tip">
+
+- **Without DNS** people would have to remember numeric IP addresses instead of hostnames, which makes using the Internet impractical.
+
+</div>
 
 ## E.8 Diagnostic tools: ping, dig, nmap
 
@@ -1074,6 +1143,12 @@ Public DNS servers `[LT]`: `1.1.1.1` (Cloudflare), `8.8.8.8` (Google), `9.9.9.9`
 Other items `[LT]`: `traceroute` shows network path/hop times; performance monitoring ideas — latency, hop tracking, bandwidth utilisation, packet loss; architecture principles — scalability, redundancy, security, QoS.
 
 **Two different IPs for one computer** `[LT]`: external IP from a browser (`https://icanhazip.com`, your ISP-assigned public IP) vs internal IP from the terminal (Windows `ipconfig | findstr /i "IPv4"`, macOS `ipconfig getifaddr en0`). Reasons: NAT, multiple interfaces (Wi-Fi/Ethernet/VPN), virtual machines, network segmentation, dynamic assignment.
+
+<div class="callout tip">
+
+- **Why test on localhost / 127.0.0.1 first:** the loopback address never leaves the device, so a draft site stays private while you develop it and nobody else can see unfinished work.
+
+</div>
 
 ## E.9 Network gotchas
 
@@ -1149,6 +1224,12 @@ The browser uses tags + CSS, **ignores** your carriage returns, extra spaces and
 | `<video controls><source src type></video>` | video (lab) |
 
 **Attributes** (`name=value`, in the start tag) give extra information: `style="text-align:center"`, `<img src="myPicture.gif" />`, `<a href="http://google.com/">Google It!</a>`. `href` = destination URL `[LT Q121]`. (The slide shows `href` without quotes; quote attribute values.)
+
+<div class="callout tip">
+
+- **Badly nested tags:** browsers try to repair malformed HTML in their own way, so improperly nested tags give unpredictable layout and formatting quirks.
+
+</div>
 
 ## F.3 HTTP — request/response
 
@@ -1228,6 +1309,12 @@ public_html
 </div>
 
 Server running ⇒ `nmap localhost -p 8000` shows **open**; stopped ⇒ **closed**; the browser then fails to connect.
+
+<div class="callout tip">
+
+- **Web root mistakes:** if the web root is set too high (for example your home directory), private files become reachable from the Internet. Only the folder you mean to publish should be the root.
+
+</div>
 
 ## F.6 Lab exercises (full list) and answers
 
@@ -1314,6 +1401,13 @@ Any IP **outside** these ranges is public. **Analogy** `[LT]`: public IP = count
 
 Check yourself: `172.15.0.1` is **public** (below 172.16); `172.32.0.1` is **public** (above 172.31); `10.1.2.3` and `192.168.8.8` are private (added context applying the ranges).
 
+<div class="callout tip">
+
+- **Why not every device has a public IP:** there are far more devices than public addresses, which is why private addresses and NAT exist. Public addresses are handed out by regional registries (such as APNIC) to ISPs, which assign them to customers, so each public address is globally unique.
+- **Reusing private IPs is fine:** two separate networks can give two devices the same private address with no conflict, because they are separate networks.
+
+</div>
+
 ## G.3 DHCP
 
 When a device joins, it asks a **DHCP server** (the router) for an address; the router leases a private IP automatically (e.g. 192.168.0.15): *device requests → router assigns* `[W7 s9]`. The router also leases other configuration to joining devices `[Comp §5.1]`.
@@ -1349,6 +1443,12 @@ The lab handout mentions NAT "provides basic security by hiding internal network
 **Communication flow** `[W7 s11]`: **within LAN** — private IPs via the router's switch/AP. **Outside LAN** — data to the router → NAT translates private to public → router forwards externally.
 
 Two routers in separate networks may give the same private IP to different devices with no conflict `[LT Q152]`. If the router's public IP changes, internal communication continues but external access may be disrupted until reconnection `[LT Q145]`.
+
+<div class="callout tip">
+
+- **Internet access from a LAN laptop:** the laptop sends its request to the router, which (with NAT) forwards it to the ISP and onward until it reaches the website. If the router's public IP changes unexpectedly, the LAN still works internally but Internet access drops until the connection is re-established.
+
+</div>
 
 ## G.5 LAN lab walkthrough `[LT]`
 
@@ -1415,6 +1515,13 @@ flowchart LR
 **On-premise** `[W10 s3]`: the organisation owns and manages its own physical servers and infrastructure, on-site or in a private data centre (heavy capital expenditure, power, cooling, maintenance `[Comp §7.1]`).
 
 **Analogy** `[Comp §7.1]` (added by source): on-premise = buying and maintaining a whole residential building; an EC2 VM = renting a furnished hotel room, paying only for the stay.
+
+<div class="callout tip">
+
+- **Why businesses choose cloud:** lower hardware and maintenance costs, and the provider manages the resources. Cloud storage is also usually more reliable than one personal device because of redundancy and automatic backups. Users can be indifferent to where resources sit physically.
+- **Analogy:** running your own server is like buying a house; EC2 is like booking a hotel room — a furnished place for as long as you need it, then you check out.
+
+</div>
 
 ## H.2 Cloud deployment models
 
@@ -1520,6 +1627,12 @@ flowchart LR
 
 Typical hardening `[Comp §9.4]`: open **80/443 to `0.0.0.0/0`** so public clients and sensors can connect; lock **22 (SSH)** to administrator IP addresses.
 
+<div class="callout tip">
+
+- **Room analogy:** SSH (22) is a private entrance for people holding the key; HTTP (80) is a public shop window. Without "Allow SSH from Anywhere", SSH and FileZilla are refused because port 22 is not open. Other ports can be opened by adding an inbound rule whenever a process listens on them. An **outbound** rule allows specific traffic from the instance to leave for outside destinations. If port 80 is missing while the web server runs, the browser waits and finally shows "This site can't be reached" or a timeout.
+
+</div>
+
 ## H.8 Cloud gotchas
 
 <div class="callout mistake">
@@ -1529,6 +1642,12 @@ Typical hardening `[Comp §9.4]`: open **80/443 to `0.0.0.0/0`** so public clien
 - `.pem` with permissions too open ⇒ `ssh` refuses to use it.
 - Server running but Security Group missing the port ⇒ looks like an outage (`filtered`).
 - Public/private/community/hybrid is about **who can use it**, not about where the hardware is.
+
+</div>
+
+<div class="callout tip">
+
+- **Why terminate:** a running instance is billed continuously and an abandoned one is also a security risk. For creating files on the server, nano is fast in the terminal but text-only; FileZilla offers a graphical drag-and-drop transfer.
 
 </div>
 
@@ -1581,6 +1700,12 @@ flowchart TD
 
 *CISA warning* `[Comp §8.2]`: avoid SMS as a factor — messages travel unencrypted over carrier networks, are vulnerable to SIM-swapping, and are not phishing-resistant.
 
+<div class="callout tip">
+
+- **Why passwords alone are weak:** they are only *something you know* and can be guessed, stolen or leaked. 2FA requires two different kinds of credential (for example a password plus a code on your phone); MFA adds more factors. Biometrics are harder to copy because they are physical traits. A password manager reduces reuse but is a single point of failure if breached.
+
+</div>
+
 ## I.4 Cryptography vocabulary
 
 | Term | Definition |
@@ -1631,6 +1756,12 @@ sequenceDiagram
 
 *Caption: the asymmetric exchange `[Comp §8.3]`.* Because the private key is never shared or transmitted, there is nothing to intercept, solving the symmetric key-distribution problem `[Comp §11.8 Q7]`.
 
+<div class="callout tip">
+
+- **Certificate authority:** it vouches that a public key really belongs to its owner by issuing a digital certificate, preventing impersonation. If a *private* key is compromised, anyone holding it can decrypt your messages or pose as you.
+
+</div>
+
 ## I.5 Firewalls
 
 A **firewall** is a gateway machine and its software that protects a network by **filtering the traffic it allows** `[W11 s17]`; it enforces an **access control policy** — rules specifying what types of network communication are permitted and denied. In the figure `[W11 s18]` a firewall sits between the protected LAN and the Internet users.
@@ -1652,6 +1783,12 @@ flowchart LR
 |---|---|
 | **Port filtering** | Baseline: deny traffic on specific ports (e.g. drop inbound port 22 from the Internet, allow it from the LAN) |
 | **Stateful / deep packet inspection** | Tracks connection state and inspects payloads for malicious patterns; stronger protection but introduces **latency** |
+
+<div class="callout tip">
+
+- **Firewall:** it checks incoming traffic against rules and filters out what is not allowed. Separating management privileges among different people means no single person can make major changes without oversight, which limits insider threats.
+
+</div>
 
 ## I.6 Putting security vocabulary to work
 
