@@ -13,12 +13,6 @@ export function watchMotion(): () => void {
       if (fi) fi.animate([{ transform: was ? 'rotateY(180deg)' : 'rotateY(0deg)' }, { transform: was ? 'rotateY(0deg)' : 'rotateY(180deg)' }], { duration: 550, easing: 'cubic-bezier(.4,.2,.2,1)' });
       return;
     }
-    const bp = t.closest<HTMLElement>('.bp-card');
-    if (bp && !bp.dataset.busy) {
-      bp.animate([{ transform: 'scaleX(1)' }, { transform: 'scaleX(0)' }], { duration: 180, easing: 'ease-in' }).onfinish = () => {
-        setTimeout(() => bp.animate([{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: 220, easing: 'ease-out' }), 0);
-      };
-    }
   };
   document.addEventListener('click', onClick, true);
   return () => document.removeEventListener('click', onClick, true);

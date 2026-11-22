@@ -50,6 +50,15 @@ details>summary{transition:background-color .2s,color .2s}
 /* one underline colour under the active tab (the accent), no stacked second line */
 .tab.active{box-shadow:none!important;border-bottom:2px solid var(--accent)!important;border-radius:10px 10px 0 0}
 @media(max-width:860px){.tab.active{border-bottom:0!important}.tab::before{background:var(--accent)!important}}
+/* compact snake layout for simple step chains */
+.snake{display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));gap:30px 38px;margin:18px 0 26px}
+.snake .sn{position:relative;border:1px solid var(--border);background:var(--surface);border-radius:12px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.5;color:var(--text)}
+.snake .sn b{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 22%,transparent);color:var(--accent);font-size:12px}
+.snake .sn::after{content:attr(data-a);position:absolute;color:var(--accent);font-size:20px;line-height:1;font-weight:700}
+.snake .sn[data-a="→"]::after{right:-28px;top:50%;transform:translateY(-50%)}
+.snake .sn[data-a="←"]::after{left:-28px;top:50%;transform:translateY(-50%)}
+.snake .sn[data-a="↓"]::after{bottom:-26px;left:50%;transform:translateX(-50%)}
+.t-section[id]{scroll-margin-top:24px}
 /* flashcards: every card in a grid is the same size */
 .fcards{grid-auto-rows:1fr}
 .fcard,.fcard .fi{min-height:150px}

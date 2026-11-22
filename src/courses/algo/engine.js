@@ -41,7 +41,7 @@ function buildNav(){const keep=['#nav','#mnav'].map(s=>{const e=$(s);return e?e.
   m=hd(tab=='cards'?'Flashcards by chapter':'Cheat-sheet by chapter')+navItem('🗂️','',`All chapters (${D.cards.length})`,!CCH,'setCCH(0)')+chapList(l=>{const [c,b]=fn(l);return c?navItem(l.icon,l.n,l.title,CCH==l.n,`setCCH(${l.n})`,b):''})}
  else if(tab=='past'){m=hd('Past exam sections')+Object.keys(SECS).map(k=>{const [a,b2]=SECS[k];const mc=D.exam.mcq.filter(q=>q.n>=a&&q.n<=b2);const ans=mc.filter(q=>P[q.n]!==undefined).length;return navItem('📝',k,SECS[k][2].replace(/^Section [A-E] · /,''),pastSec==k,`renderPast('${k}');toggleNav(false)`,mc.length?`<span class="tq sc ${ans==mc.length?'ok':'mid'}">${ans}/${mc.length}</span>`:'')}).join('')}
  else if(tab=='exam'){const s=qStatus('exam');m=hd('Final exam')+navItem('🏠','','Exam overview',false,'renderExamHome();toggleNav(false)')+navItem('▶️','',s&&!s.done?`Resume exam (${s.a}/${s.n})`:s?'Review your answers':'Start exam',false,'startExam();toggleNav(false)')+navItem('🔄','','Start a new random exam',false,"restart('exam',()=>startExam(true));toggleNav(false)")+navItem('🔁','',`Review my mistakes${mCount()?' ('+mCount()+')':''}`,false,"switchTab('practice');renderPQ('mx')")}
- $('#nav').innerHTML=theory;$('#mnav').innerHTML=m;['#nav','#mnav'].forEach((s,i)=>{$(s).scrollTo({top:keep[i],behavior:'instant'})})}
+ morph($('#nav'),theory);morph($('#mnav'),m);['#nav','#mnav'].forEach((s,i)=>{$(s).scrollTo({top:keep[i],behavior:'instant'})})}
 function readMins(html){const w=html.replace(/<[^>]+>/g,' ').split(/\s+/).length;return Math.max(1,Math.round(w/200))}
 function loadTheory(n,o){o=o||{};const dir=(cur==null||n==cur)?'':(n>cur?'r':'l');cur=n;V[n]=1;ST.last=n;sv();stat();buildNav();const l=D.lessons.find(x=>x.n==n);const i=D.lessons.findIndex(x=>x.n==n);
  const pv=D.lessons[i-1],nx=D.lessons[i+1];const mins=readMins(l.html);
@@ -53,8 +53,26 @@ function loadTheory(n,o){o=o||{};const dir=(cur==null||n==cur)?'':(n>cur?'r':'l'
  if(!o.keep){const h=c.querySelector('h1');if(h&&o.focus!==false)h.focus({preventScroll:true})}}
 function reveal(){const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{root:$('#theory-content'),threshold:.05});
  $$('#theory-content .reveal').forEach((el,i)=>{el.style.transitionDelay=(Math.min(i,4)*60)+'ms';io.observe(el)})}
-function mm(){const bl=$$('#theory-content pre.mermaid');if(!bl.length)return;if(!window.mermaid){__api.loadMermaid().then(m=>{window.mermaid=m;mm()});return}
- try{mermaid.initialize({startOnLoad:false,securityLevel:'loose',theme:(document.documentElement.dataset.theme=='light'?'neutral':'dark')});mermaid.run({nodes:bl})}catch(e){}}
+function morph(el,html){const t=document.createElement('div');t.innerHTML=html;const sel='button,.theory-group-title,.theory-nav-header,.pq-head';const a=[...el.querySelectorAll(sel)],b=[...t.querySelectorAll(sel)];
+ if(a.length&&a.length===b.length&&a.every((x,i)=>x.tagName===b[i].tagName&&x.className.split(' ')[0]===b[i].className.split(' ')[0]&&(x.getAttribute('onclick')||'')===(b[i].getAttribute('onclick')||''))){
+  a.forEach((x,i)=>{if(x.className!==b[i].className)x.className=b[i].className;if(x.innerHTML!==b[i].innerHTML)x.innerHTML=b[i].innerHTML;const c=b[i].getAttribute('aria-current');if(c)x.setAttribute('aria-current',c);else x.removeAttribute('aria-current')});return}
+ el.innerHTML=html}
+/* simple one-way vertical chains (flowchart TD with no branches) become a compact snake of numbered boxes */
+function snakeChains(){$$('#theory-content pre.mermaid:not([data-processed])').forEach(pre=>{const src=pre.textContent;if(!/^\s*(%%.*\n)?\s*(flowchart|graph)\s+(TD|TB)/m.test(src)||/subgraph|-\.|==>/.test(src))return;
+ const lab={},edges=[];const nodeRe=/([A-Za-z_]\w*)\s*(?:\["([^"]*)"\]|\[([^\]]*)\]|\("([^"]*)"\)|\(([^)]*)\))/g;let m;while((m=nodeRe.exec(src)))lab[m[1]]=(m[2]||m[3]||m[4]||m[5]||'').trim();
+ src.replace(nodeRe,'$1').split('\n').forEach(l=>{const p=l.split('-->').map(x=>x.replace(/\|[^|]*\|/g,'').trim());for(let i=0;i<p.length-1;i++){const a=p[i].match(/^[A-Za-z_]\w*/),b=p[i+1].match(/^[A-Za-z_]\w*/);if(a&&b)edges.push([a[0],b[0]])}});
+ if(edges.length<3)return;const out={},inn={};edges.forEach(([a,b])=>{out[a]=(out[a]||0)+1;inn[b]=(inn[b]||0)+1});
+ if(Object.values(out).some(v=>v>1)||Object.values(inn).some(v=>v>1))return;
+ const start=edges.map(e=>e[0]).find(a=>!inn[a]);if(!start)return;const next={};edges.forEach(([a,b])=>next[a]=b);const order=[];let c=start,g=0;while(c&&g++<40){order.push(c);c=next[c]}
+ if(order.length<4||order.length!==new Set(order).size)return;
+ const w=(pre.parentElement&&pre.parentElement.clientWidth)||600,cols=Math.max(1,Math.min(4,Math.floor(w/210)));
+ const d=document.createElement('div');d.className='snake';d.style.setProperty('--cols',cols);
+ d.innerHTML=order.map((id,i)=>{const r=Math.floor(i/cols),k=i%cols,col=r%2?cols-k:k+1,last=i===order.length-1,arrow=last?'':(k===cols-1?'↓':(r%2?'←':'→'));
+  const t=esc(lab[id]||id).replace(/^\d+\.\s*/,'').replace(/&lt;br\s*\/?&gt;/g,'<br>');return `<div class="sn" style="grid-row:${r+1};grid-column:${col}" data-a="${arrow}"><b>${i+1}</b><span>${t}</span></div>`}).join('');
+ pre.replaceWith(d)})}
+function mm(){snakeChains();const bl=$$('#theory-content pre.mermaid:not([data-processed])');if(!bl.length)return;if(!window.mermaid){__api.loadMermaid().then(m=>{window.mermaid=m;mm()}).catch(()=>{});return}
+ const go=async(nodes,n)=>{try{mermaid.initialize({startOnLoad:false,securityLevel:'loose',theme:(document.documentElement.dataset.theme=='light'?'neutral':'dark')});await mermaid.run({nodes})}catch(e){}
+  const bad=nodes.filter(x=>x.isConnected&&!x.querySelector('svg'));if(bad.length&&n<3)setTimeout(()=>go(bad,n+1),600)};go(bl,0)}
 function stackTables(c){if(innerWidth>600)return;c.querySelectorAll('.t-table-wrap').forEach(w=>{if(w.scrollWidth<=w.clientWidth+1)return;const tb=w.querySelector('table');if(!tb||tb.tHead==null&&!tb.querySelector('th'))return;const hs=[...tb.rows[0].cells].map(x=>x.textContent.trim());tb.querySelectorAll('tr').forEach((r,i)=>{if(i==0)return;[...r.cells].forEach((cell,j)=>{if(hs[j]&&j>0)cell.setAttribute('data-l',hs[j])})});w.classList.add('stack')})}
 function buildToc(){const c=$('#theory-content');const secs=$$('#theory-content .t-section[id]');if(secs.length<2)return;
  const bar=document.createElement('nav');bar.className='toc';bar.setAttribute('aria-label','Sections in this chapter');
@@ -73,7 +91,7 @@ function renderPQ(sel){pqSel=sel;ST.pq=sel;ST.pqm=pqMode;buildNav();let h=`<div 
  h+=`<button class="pq-item ${sel=='mx'?'active':''}" onclick="renderPQ('mx')"><span class="tn">🔁</span><span class="tt">Review my mistakes</span>${mCount()?`<span class="sc lo">${mCount()}</span>`:''}</button>`;
  D.lessons.forEach(l=>{const s=S[l.n];h+=`<button class="pq-item ${sel==l.n?'active':''}" ${sel==l.n?'aria-current="true"':''} onclick="renderPQ(${l.n})"><span class="tn">${l.n}</span><span class="tt">${l.title}</span>${s?`<span class="sc ${sc(s)}">${s.s}/${s.t}</span>`:''}</button>`});
 
- {const _p=$('#pql'),_s=_p.scrollTop;_p.innerHTML=h;_p.scrollTo({top:_s,behavior:'instant'})}
+ morph($('#pql'),h);
 
  if(sel=='mx'){reviewMistakes();return}
  const l=D.lessons.find(x=>x.n==sel);
