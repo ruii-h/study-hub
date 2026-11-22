@@ -2,5 +2,8 @@ import m1 from './m1.mjs';
 import m2 from './m2.mjs';
 import m3 from './m3.mjs';
 import { fill } from './fill.mjs';
+import { warm as bankWarm, fill as bankFill } from './bank.mjs';
 export const metaAll = { ...m1, ...m2, ...m3 };
 for (const [n, f] of Object.entries(fill)) metaAll[n].fill = f;
+for (const [n, w] of Object.entries(bankWarm)) metaAll[n].warm = [...metaAll[n].warm, ...w];
+for (const [n, f] of Object.entries(bankFill)) metaAll[n].fill = [...(metaAll[n].fill || []), ...f];

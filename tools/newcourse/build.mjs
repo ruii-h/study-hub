@@ -76,10 +76,10 @@ raw.forEach(({ ch, secs }) => {
   // warm-up: [stem, correct, [3 wrong 'text :: why'], explanation]; correct answer position rotates so it is not always first
   D.quiz[ch.n] = m.warm.map((q, i) => {
     const wrong = q[2].map((x) => x.split(' :: ').map(bq));
-    const pos = (ch.n + i) % 4;
+    const pos = (ch.n + i) % (q[2].length + 1);
     const o = [...wrong.map((x) => x[0])]; o.splice(pos, 0, bq(q[1]));
     const w = wrong.map((x) => x[1] || null); w.splice(pos, 0, null);
-    if (wrong.length !== 3 || wrong.some((x) => !x[1])) problems.push(`ch${ch.n} warm#${i} needs 3 wrong options with reasons`);
+    if (wrong.length < 1 || wrong.length > 3 || wrong.some((x) => !x[1])) problems.push(`ch${ch.n} warm#${i} needs 1-3 wrong options with reasons`);
     return { q: bq(q[0]), o, c: pos, e: bq(q[3]), w };
   });
   if (m.fill && m.fill.length) D.fill[ch.n] = m.fill.map((f) => ({ q: bq(f[0]), a: f[1], e: bq(f[2] || ''), kind: f[3] || 'out', ci: !!f[4] }));

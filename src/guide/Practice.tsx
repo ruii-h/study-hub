@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { EXTRA } from './config';
 import { scoreClass, shuffle, useG } from './state';
 import { fade, pop, rise, slideX } from './motion';
+import MixedQuiz from './Mixed';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const L5 = 'ABCDE';
@@ -15,9 +16,9 @@ export function JumpBtn({ ch, text, back }: { ch: number; text: string; back: an
   return <button className="btn ghost jump" onClick={() => g.openChapter(ch, { back, sec: s?.id || undefined })}>{s ? '📖 Review ' + t : '📖 Review Chapter ' + ch}</button>;
 }
 
-const WhyRow = ({ ok, r }: { ok: boolean; r?: string | null }) => (r ? <div className={`why ${ok ? 'wy' : 'wn'}`}><b>{ok ? 'Why this is right' : 'Why this is wrong'}:</b> {r}</div> : null);
+export const WhyRow = ({ ok, r }: { ok: boolean; r?: string | null }) => (r ? <div className={`why ${ok ? 'wy' : 'wn'}`}><b>{ok ? 'Why this is right' : 'Why this is wrong'}:</b> {r}</div> : null);
 
-function Ring({ p }: { p: number }) { return <div className="ring" style={{ ['--p' as any]: p }}><span>{p}%</span></div>; }
+export function Ring({ p }: { p: number }) { return <div className="ring" style={{ ['--p' as any]: p }}><span>{p}%</span></div>; }
 
 /* ---------- multi-select quiz ---------- */
 type MQ = { title: string; qs: any[]; qkey: string; pills?: React.ReactNode; ch?: number };
@@ -203,7 +204,8 @@ export default function Practice() {
     : <MultiQuiz key={'mx' + mxSnap.current.length} title={`Review my mistakes (${mxSnap.current.length})`} qs={mxSnap.current} qkey="mx" />;
   else if (l) {
     const pills = <Pills sel={l.n} />;
-    pane = pqMode === 'warm' || !(D.hard[l.n] || []).length
+    pane = (D as any).mixed ? <MixedQuiz key={'x' + l.n} n={l.n} title={`Chapter ${l.n} — ${l.title}`} />
+      : pqMode === 'warm' || !(D.hard[l.n] || []).length
       ? <SingleQuiz key={'w' + l.n} title={`Chapter ${l.n} — ${l.title} (warm-up)`} qs={D.quiz[l.n] || []} n={l.n} pills={pills} />
       : <>
         <MultiQuiz key={'h' + l.n} title={`Chapter ${l.n} — ${l.title}`} qkey={String(l.n)} pills={pills} qs={(D.hard[l.n] || []).map((q: any, i: number) => ({ ...q, id: 'h' + l.n + '-' + i, ch: l.n }))} />

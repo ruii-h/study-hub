@@ -54,7 +54,7 @@ export default function Theory() {
   const dirRef = useRef(0); const prev = useRef(cur);
   if (prev.current !== cur) { dirRef.current = cur > prev.current ? 1 : -1; prev.current = cur; }
   const theme = ST.theme;
-  const nq = (D.hard[cur]?.length || 0) + (D.fill?.[cur]?.length || 0);
+  const nq = (D.hard[cur]?.length || 0) + (D.fill?.[cur]?.length || 0) + ((D as any).mixed ? D.quiz[cur]?.length || 0 : 0);
   const mins = useMemo(() => Math.max(1, Math.round(lesson.html.replace(/<[^>]+>/g, ' ').split(/\s+/).length / 200)), [lesson]);
   const htmlStr = useMemo(() => lesson.html.replace(/ onclick="this\.classList\.toggle\('flip'\)"/g, ''), [lesson]);
 
