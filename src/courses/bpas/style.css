@@ -1266,3 +1266,12 @@ html[data-theme=light] .btn.main{color:#fff}
 .fcard.flip .fi,.fcard.flip:hover .fi{transform:rotateY(180deg)}
 .bp-card.flipping,.bp-card.flipping:hover{transform:scaleX(0)}
 .fcard,.bp-card{touch-action:manipulation}
+
+/* ---- wiki-style cross-links ---- */
+a.wl{color:#6cb2ff;text-decoration:none;cursor:pointer}
+html[data-theme=light] a.wl{color:#0645ad}
+a.wl:focus-visible{outline:2px solid currentColor;outline-offset:2px;border-radius:2px}
+@media(hover:hover){a.wl:hover{text-decoration:underline;text-underline-offset:2px}}
+.wl-tip{position:fixed;z-index:10000;max-width:min(340px,calc(100vw - 16px));padding:10px 12px;border-radius:8px;background:var(--surface2,#1c2128);color:var(--text,#e6edf3);border:1px solid var(--border,#30363d);box-shadow:0 8px 24px rgba(0,0,0,.35);font-size:12.5px;line-height:1.5;pointer-events:none}
+.wl-tip b{display:block;margin-bottom:3px;font-size:13px}
+.wl-tip small{display:block;margin-top:6px;color:var(--muted,#8b949e);font-size:11px}
