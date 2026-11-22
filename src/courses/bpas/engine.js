@@ -46,9 +46,9 @@ function readMins(html){const w=html.replace(/<[^>]+>/g,' ').split(/\s+/).length
 function loadTheory(n,o){o=o||{};const dir=(cur==null||n==cur)?'':(n>cur?'r':'l');cur=n;V[n]=1;ST.last=n;sv();stat();buildNav();const l=D.lessons.find(x=>x.n==n);const i=D.lessons.findIndex(x=>x.n==n);
  const pv=D.lessons[i-1],nx=D.lessons[i+1];const mins=readMins(l.html);
  const back=o.back?`<div class="backbar"><button class="bb-go" onclick="goBack()">↩ ${esc(o.back.label)}</button><button class="bb-x" title="Dismiss" aria-label="Dismiss" onclick="this.parentNode.remove()">×</button></div>`:'';BACK=o.back||null;
- $('#theory-content').innerHTML=`${back}<div class="t-hero"><div class="t-tag ${l.tag}">Chapter ${n} of ${D.lessons.length}</div><h1 class="t-h1" tabindex="-1">${l.title}</h1><div class="t-subtitle">${l.goal}</div><div class="meta">⏱ about ${mins} min read · ${(D.hard[n]||[]).length} exam-style questions at the end</div></div>${l.html}
+ $('#theory-content').innerHTML=`<div class="t-hero"><div class="t-tag ${l.tag}">Chapter ${n} of ${D.lessons.length}</div><h1 class="t-h1" tabindex="-1">${l.title}</h1><div class="t-subtitle">${l.goal}</div><div class="meta">⏱ about ${mins} min read · ${(D.hard[n]||[]).length} exam-style questions at the end</div></div>${l.html}
  <div class="endrow"><div class="endmsg">You have reached the end of Chapter ${n}. <b>Next step:</b> test yourself while it is fresh.</div><button class="btn" onclick="goQuiz(${n})">🧠 Take the Chapter ${n} quiz</button></div>
- <div class="t-nav-footer">${pv?`<button class="t-nav-btn" onclick="loadTheory(${pv.n})"><small>Previous</small>← ${pv.title}</button>`:'<div></div>'}${nx?`<button class="t-nav-btn next" onclick="loadTheory(${nx.n})"><small>Next chapter</small>${nx.title} →</button>`:`<button class="t-nav-btn next" onclick="switchTab('exam')"><small>You finished the course notes</small>Take the Final Exam →</button>`}</div>`;
+ <div class="t-nav-footer">${pv?`<button class="t-nav-btn" onclick="loadTheory(${pv.n})"><small>Previous</small>← ${pv.title}</button>`:'<div></div>'}${nx?`<button class="t-nav-btn next" onclick="loadTheory(${nx.n})"><small>Next chapter</small>${nx.title} →</button>`:`<button class="t-nav-btn next" onclick="switchTab('exam')"><small>You finished the course notes</small>Take the Final Exam →</button>`}</div>${back}`;
  const c=$('#theory-content');applySize();c.scrollTop=0;anim(c,dir?'scr-'+dir:'scr-in');buildToc();switchTab('theory');stackTables(c);mm();reveal();autolink(c,n);fillRows(c);
  if(!o.keep){const h=c.querySelector('h1');if(h&&o.focus!==false)h.focus({preventScroll:true})}}
 function reveal(){const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{root:$('#theory-content'),threshold:.05});
@@ -360,7 +360,7 @@ if(ST.tab&&ST.tab!='theory'&&document.getElementById('tab-'+ST.tab))switchTab(ST
    d.append(go,x);return d}
   function wlBar(b){const c=$('#theory-content');let bar=c.querySelector(':scope>.backbar');
    if(!b){if(bar)bar.remove();return}
-   const nb=wlBarEl(b);if(bar)bar.replaceWith(nb);else c.insertBefore(nb,c.firstChild)}
+   const nb=wlBarEl(b);if(bar)bar.replaceWith(nb);else c.appendChild(nb)}
   function wlGo(a){const n=+a.dataset.n,id=a.dataset.id,c=$('#theory-content'),l=D.lessons.find(x=>x.n==cur);
    const back=tab!=='theory'?{tab:tab,sel:cur,y:0,label:'Back to the '+(tab==='cheat'?'cheat-sheet':'flashcards'),up:null}:{tab:'theory',sel:cur,y:c.scrollTop,label:'Back to '+(l?wlChap(l):'the previous page'),up:BACK};
    if(n==cur){BACK=back;wlBar(back);if(id)scrollToId(id);else c.scrollTo({top:0,behavior:'smooth'})}
