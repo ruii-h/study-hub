@@ -45,11 +45,11 @@ function buildNav(){const keep=['#nav','#mnav'].map(s=>{const e=$(s);return e?e.
 function readMins(html){const w=html.replace(/<[^>]+>/g,' ').split(/\s+/).length;return Math.max(1,Math.round(w/200))}
 function loadTheory(n,o){o=o||{};const dir=(cur==null||n==cur)?'':(n>cur?'r':'l');cur=n;V[n]=1;ST.last=n;sv();stat();buildNav();const l=D.lessons.find(x=>x.n==n);const i=D.lessons.findIndex(x=>x.n==n);
  const pv=D.lessons[i-1],nx=D.lessons[i+1];const mins=readMins(l.html);
- const back=o.back?`<button class="backbar" onclick="goBack()">↩ ${esc(o.back.label)}</button>`:'';BACK=o.back||null;
+ const back=o.back?`<div class="backbar"><button class="bb-go" onclick="goBack()">↩ ${esc(o.back.label)}</button><button class="bb-x" title="Dismiss" aria-label="Dismiss" onclick="this.parentNode.remove()">×</button></div>`:'';BACK=o.back||null;
  $('#theory-content').innerHTML=`${back}<div class="t-hero"><div class="t-tag ${l.tag}">Chapter ${n} of ${D.lessons.length}</div><h1 class="t-h1" tabindex="-1">${l.title}</h1><div class="t-subtitle">${l.goal}</div><div class="meta">⏱ about ${mins} min read · ${(D.hard[n]||[]).length} exam-style questions at the end</div></div>${l.html}
  <div class="endrow"><div class="endmsg">You have reached the end of Chapter ${n}. <b>Next step:</b> test yourself while it is fresh.</div><button class="btn" onclick="goQuiz(${n})">🧠 Take the Chapter ${n} quiz</button></div>
  <div class="t-nav-footer">${pv?`<button class="t-nav-btn" onclick="loadTheory(${pv.n})"><small>Previous</small>← ${pv.title}</button>`:'<div></div>'}${nx?`<button class="t-nav-btn next" onclick="loadTheory(${nx.n})"><small>Next chapter</small>${nx.title} →</button>`:`<button class="t-nav-btn next" onclick="switchTab('exam')"><small>You finished the course notes</small>Take the Final Exam →</button>`}</div>`;
- const c=$('#theory-content');applySize();c.scrollTop=0;anim(c,dir?'scr-'+dir:'scr-in');buildToc();switchTab('theory');stackTables(c);mm();reveal();autolink(c,n);
+ const c=$('#theory-content');applySize();c.scrollTop=0;anim(c,dir?'scr-'+dir:'scr-in');buildToc();switchTab('theory');stackTables(c);mm();reveal();autolink(c,n);fillRows(c);
  if(!o.keep){const h=c.querySelector('h1');if(h&&o.focus!==false)h.focus({preventScroll:true})}}
 function reveal(){const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{root:$('#theory-content'),threshold:.05});
  $$('#theory-content .reveal').forEach((el,i)=>{el.style.transitionDelay=(Math.min(i,4)*60)+'ms';io.observe(el)})}
@@ -294,6 +294,16 @@ if(ST.tab&&ST.tab!='theory'&&document.getElementById('tab-'+ST.tab))switchTab(ST
      if(m.index>last)frag.appendChild(document.createTextNode(txt.slice(last,m.index)));
      const a=document.createElement('a');a.className='wl wl-ref';a.href='#'+(id||'ch'+cn);a.dataset.n=cn;a.dataset.id=id;a.dataset.tt=l.title;a.dataset.f=m[1]?'§'+m[1]+(sub?'.'+sub:''):'Chapter '+cn;a.textContent=m[0];frag.appendChild(a);last=m.index+m[0].length}
     if(frag){if(last<txt.length)frag.appendChild(document.createTextNode(txt.slice(last)));t.parentNode.replaceChild(frag,t)}})}
+  /* cards that would leave an empty grid cell next to them stretch to fill the row */
+  function fillRows(root){const cont=root||$('#theory-content');if(!cont)return;
+   cont.querySelectorAll('.t-section,.teach').forEach(s=>{const kids=[...s.children].filter(k=>k.offsetHeight>0&&getComputedStyle(k).position!=='absolute');
+    kids.forEach(k=>k.style.removeProperty('grid-column'));
+    const tpl=getComputedStyle(s).gridTemplateColumns;if(!tpl||tpl==='none')return;const cols=tpl.split(' ').length;if(cols<2)return;
+    const colW=parseFloat(tpl.split(' ')[0]),gap=parseFloat(getComputedStyle(s).columnGap)||0;
+    const rows=new Map();kids.forEach(k=>{const key=k.offsetTop;if(!rows.has(key))rows.set(key,[]);rows.get(key).push(k)});
+    rows.forEach(list=>{const spans=list.map(k=>Math.max(1,Math.round((k.offsetWidth+gap)/(colW+gap))));const used=spans.reduce((a,b)=>a+b,0);
+     if(used<cols){const last=list[list.length-1];last.style.gridColumn='span '+(spans[spans.length-1]+cols-used)}})})}
+  var FRT=0;__L(window,'resize',()=>{clearTimeout(FRT);FRT=setTimeout(()=>fillRows(),160)});__undo.push(()=>clearTimeout(FRT));
   function autolink(c,n){wlBuild();autoref(c,n);if(!WLRE)return;const seen=new Map();
    const SKIP='a,button,h1,h2,h3,h4,h5,h6,.t-h1,.t-h2,.t-h3,.t-num,.gt,th,summary,pre,code,svg,.mermaid,.fcards,.fcard,.demo,.demo-slot,input,select,textarea,label,script,style,.backbar,.t-nav-footer,.endrow,.toc,.chip,.meta,.t-tag,.t-subtitle';
    const w=document.createTreeWalker(c,NodeFilter.SHOW_TEXT,{acceptNode:t=>{if(!t.nodeValue.trim())return NodeFilter.FILTER_REJECT;const p=t.parentElement;return p&&!p.closest(SKIP)?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT}});
@@ -312,9 +322,13 @@ if(ST.tab&&ST.tab!='theory'&&document.getElementById('tab-'+ST.tab))switchTab(ST
    const d=document.createElement('div');d.className='wl-tip';d.setAttribute('role','tooltip');d.innerHTML='<b>'+c.t+'</b>'+(c.d?'<div>'+c.d+'</div>':'')+'<small>'+(c.f||'')+' · '+(l?l.title:'')+'</small>';
    document.body.appendChild(d);const r=a.getBoundingClientRect(),h=d.offsetHeight,wd=d.offsetWidth;
    d.style.left=Math.max(8,Math.min(r.left,innerWidth-wd-8))+'px';d.style.top=(r.bottom+h+12>innerHeight&&r.top>h+12?r.top-h-8:r.bottom+6)+'px';WLTIP=d}
+  function wlBarEl(b){const d=document.createElement('div');d.className='backbar';
+   const go=document.createElement('button');go.className='bb-go';go.textContent='↩ '+b.label;go.onclick=()=>goBack();
+   const x=document.createElement('button');x.className='bb-x';x.textContent='×';x.title='Dismiss';x.setAttribute('aria-label','Dismiss');x.onclick=()=>d.remove();
+   d.append(go,x);return d}
   function wlBar(b){const c=$('#theory-content');let bar=c.querySelector(':scope>.backbar');
    if(!b){if(bar)bar.remove();return}
-   if(bar){bar.textContent='↩ '+b.label}else{bar=document.createElement('button');bar.className='backbar';bar.textContent='↩ '+b.label;bar.onclick=()=>goBack();c.insertBefore(bar,c.firstChild)}}
+   const nb=wlBarEl(b);if(bar)bar.replaceWith(nb);else c.insertBefore(nb,c.firstChild)}
   function wlGo(a){const n=+a.dataset.n,id=a.dataset.id,c=$('#theory-content'),l=D.lessons.find(x=>x.n==cur);
    const back={tab:'theory',sel:cur,y:c.scrollTop,label:'Back to '+(l?l.title:'the previous page'),up:BACK};
    if(n==cur){BACK=back;wlBar(back);if(id)scrollToId(id);else c.scrollTo({top:0,behavior:'smooth'})}
