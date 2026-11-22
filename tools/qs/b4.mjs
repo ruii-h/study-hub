@@ -12,7 +12,7 @@ export default [
     ['A macro conversion is the primary success metric.', 'Micro conversions are frequent smaller actions that lead to it.', 'Ramp-up gradually increases the traffic given to the treatment.', 'Auto-abort stops the test automatically on a negative signal.', 'The experiment should send all traffic to the treatment on day one.'],
     'ABCD', 'Ramp up gradually and abort automatically on a negative signal to limit harm.',
     ['the macro conversion is the main outcome.', 'smaller actions lead to the macro conversion.', 'it limits risk by starting small.', 'it protects users and the business.', 'starting with all traffic removes the safeguard.']],
-  [17, 'Where does web analytics sit among evaluation methods?',
+  [17, 'Which statements describe where web analytics sits among evaluation methods?',
     ['It is an empirical method.', 'It is the least obtrusive empirical method.', 'It observes real behaviour without users knowing they are studied.', 'Inspection is more empirical than web analytics.', 'It is the most obtrusive method.'],
     'ABC', 'Methods differ in how obtrusive they are and whether they are empirical or theoretical.',
     ['it measures real behaviour.', 'users do not notice it.', 'that is why it is unobtrusive.', 'inspection sits toward the theoretical end.', 'it is the least obtrusive.']],
