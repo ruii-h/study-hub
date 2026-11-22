@@ -55,7 +55,7 @@ function chapterHtml(ch, secs) {
   return h.join('');
 }
 
-const iceBlock = (ch) => `<div class="t-section"><div aria-level="2" class="t-h2" role="heading"><span class="t-num">${ch.n}</span>${esc(ch.title)}</div>${ch.exr.map((e, i) => `<div class="exr reveal"><div class="exr-q"><span class="exr-n">${i + 1}</span><div>${mdToHtml(clean(e[0])).replace(/^<p>|<\/p>\s*$/g, '')}</div></div><details class="model"><summary>Show answer</summary><div class="ma">${mdToHtml(clean(e[1]))}</div></details></div>`).join('')}</div>`;
+const iceBlock = (ch) => `<div class="t-section"><div aria-level="2" class="t-h2" role="heading"><span class="t-num">${ch.n}</span>${esc(ch.title)}</div>${ch.exr.map((e, i) => `<div class="exr"><div class="exr-q"><span class="exr-n">${i + 1}</span><div>${mdToHtml(clean(e[0])).replace(/^<p>|<\/p>\s*$/g, '')}</div></div><details class="model"><summary>Show answer</summary><div class="ma">${mdToHtml(clean(e[1]))}</div></details></div>`).join('')}</div>`;
 const D = { ice: '', hard: {}, lessons: [], groups: C.groups, quiz: {}, cards: [], selfq: C.selfq ? C.selfq(refMap) : '', exam: { mcq: [], wr: [] } };
 const problems = [];
 raw.forEach(({ ch, secs }) => {
@@ -122,7 +122,7 @@ if (!hasPast) {
   shell = shell.replace('<kbd>1</kbd>–<kbd>6</kbd>', '<kbd>1</kbd>–<kbd>5</kbd>');
 }
 fs.writeFileSync(path.join(out, 'shell.html'), shell);
-fs.copyFileSync(path.join(idp, 'style.css'), path.join(out, 'style.css'));
+fs.writeFileSync(path.join(out, 'style.css'), fs.readFileSync(path.join(idp, 'style.css'), 'utf8') + String.fromCharCode(10) + fs.readFileSync(path.join(root, 'tools', 'newcourse', 'exr.css'), 'utf8'));
 
 let eng = fs.readFileSync(path.join(idp, 'engine.js'), 'utf8').replace(/\r/g, '');
 const must = (a, b) => { if (!eng.includes(a)) throw new Error('engine pattern missing: ' + a.slice(0, 60)); eng = eng.replace(a, b); };

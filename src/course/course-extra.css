@@ -18,3 +18,8 @@
 :root[data-course=cf] .t-code{background:#012456;border-color:#2b4a7a}
 :root[data-course=cf] .t-code-body{color:#eaeaea;background:#012456}
 :root[data-course=cf] .t-code-header{background:#0b1f3f;color:#b9c6e0}
+/* header: never wrap the logo or the chapters pill; let the long course name truncate instead */
+.logo,.badge{white-space:nowrap;flex:none}
+.course{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:1000px){.course{display:none}}
+.figcap{font-size:13px;color:var(--muted);font-style:italic;margin:4px 0 14px;padding-left:10px;border-left:2px solid var(--border)}

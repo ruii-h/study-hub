@@ -1342,7 +1342,7 @@ Why NAT exists: IPv4 exhaustion and cost efficiency. **Less critical for IPv6** 
 
 <div class="callout tip">
 
-`[LT]` mentions NAT "provides basic security by hiding internal network structure". *(added context)*: this is a side effect of address translation, not a substitute for a firewall (see Part I).
+The lab handout mentions NAT "provides basic security by hiding internal network structure". *(added context)*: this is a side effect of address translation, not a substitute for a firewall (see Part I).
 
 </div>
 
