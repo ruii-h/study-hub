@@ -67,3 +67,6 @@ details>summary{transition:background-color .2s,color .2s}
 .lead{font-size:15px;line-height:1.75;color:var(--text);margin:0 0 12px}
 /* case-file / worked-example rows: every block after the label sits in the content column, never under the label */
 .cf-row>*:not(b:first-child){grid-column:2}
+/* cards that share a row: width follows content (see balanceUnits in src/guide/enhance.ts) */
+.unit-row{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:14px 28px;align-items:stretch}
+.unit-row>.t-unit{min-width:0}

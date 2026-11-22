@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, animate, motion } from 'framer-motion';
 import { SideList } from './Guide';
 import { useG } from './state';
-import { reveal, runMermaid, snakeChains, stackTables } from './enhance';
+import { balanceUnits, reveal, runMermaid, snakeChains, stackTables } from './enhance';
 import { chapterSlide, ease, flipTiming, floatUp } from './motion';
 
 export function scrollToId(id: string, instant = false) {
@@ -62,7 +62,7 @@ export default function Theory() {
     const b = body.current, sc = scroller.current; if (!b || !sc) return;
     const p = g.pendingScroll.current; g.pendingScroll.current = null;
     sc.scrollTop = 0;
-    stackTables(b); snakeChains(b); g.wiki.autolink(sc, cur); g.wiki.fillRows(sc);
+    stackTables(b); snakeChains(b); g.wiki.autolink(sc, cur); balanceUnits(b); g.wiki.fillRows(sc);
     const stop = reveal(b, sc);
     const list = [...b.querySelectorAll<HTMLElement>('.t-section[id]')].map((s) => { const n = s.querySelector('.t-num'); const t = s.querySelector('.t-h2')!.textContent!.replace(n ? n.textContent! : '', '').trim(); return { id: s.id, num: n ? n.textContent! : '', t }; });
     setToc(list.length >= 2 ? list : []); setActive('');
@@ -78,7 +78,7 @@ export default function Theory() {
   // cards that would leave an empty grid cell stretch to fill the row (re-run on every size change, like bootstrap's col-*)
   useEffect(() => {
     const sc = scroller.current, b = body.current; if (!sc || !b) return;
-    let t = 0; const run = () => { clearTimeout(t); t = window.setTimeout(() => g.wiki.fillRows(sc), 100); };
+    let t = 0; const run = () => { clearTimeout(t); t = window.setTimeout(() => { balanceUnits(b); g.wiki.fillRows(sc); }, 100); };
     const ro = new ResizeObserver(run); ro.observe(sc); ro.observe(b); document.fonts?.ready.then(run); run();
     return () => { ro.disconnect(); clearTimeout(t); };
   }, [cur]); // eslint-disable-line

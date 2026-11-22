@@ -59,3 +59,22 @@ export function reveal(root: HTMLElement, scroller: HTMLElement) {
   root.querySelectorAll<HTMLElement>('.reveal').forEach((el, i) => { el.style.transitionDelay = Math.min(i, 4) * 60 + 'ms'; io.observe(el); });
   return () => io.disconnect();
 }
+
+/**
+ * Content-aware widths: when several `.t-unit` cards share a row, wrap them in a flex row where each card grows in
+ * proportion to how much text it holds, so a long card is wide and a short one is narrow. Re-run on every size change.
+ */
+export function balanceUnits(root: HTMLElement) {
+  root.querySelectorAll<HTMLElement>('.unit-row').forEach((w) => { [...w.children].forEach((u) => ((u as HTMLElement).style.flex = '')); w.replaceWith(...w.childNodes); });
+  root.querySelectorAll<HTMLElement>('.t-section').forEach((sec) => {
+    if (getComputedStyle(sec).display !== 'grid') return;
+    [...sec.children].forEach((k) => (k as HTMLElement).style.removeProperty('grid-column'));
+    const rows = new Map<number, HTMLElement[]>();
+    [...sec.children].filter((k) => k.classList.contains('t-unit') && (k as HTMLElement).offsetHeight > 0).forEach((u) => { const t = (u as HTMLElement).offsetTop; rows.set(t, [...(rows.get(t) || []), u as HTMLElement]); });
+    rows.forEach((list) => {
+      if (list.length < 2) return;
+      const w = document.createElement('div'); w.className = 'unit-row'; list[0].before(w);
+      list.forEach((u) => { u.style.flex = `${Math.max(120, (u.textContent || '').length)} 1 220px`; w.appendChild(u); });
+    });
+  });
+}
