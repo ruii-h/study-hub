@@ -33,7 +33,7 @@ function useTheme() {
 
 export default function Hub() {
   const [theme, toggle] = useTheme();
-  useEffect(() => { document.title = 'Study Hub — ALGO · BPAS · IDP'; }, []);
+  useEffect(() => { document.title = 'Study Hub — IS114 · IS115 · IS210 · IS211 · IS1704'; }, []);
 
   return (
     <div className="hub min-h-dvh bg-bg text-ink font-sans">
@@ -60,7 +60,7 @@ export default function Hub() {
           </p>
         </section>
 
-        <ul className="m-0 mt-8 grid list-none p-0 gap-5 md:grid-cols-3">
+        <ul className="m-0 mt-8 grid list-none p-0 gap-5 md:grid-cols-2 lg:grid-cols-3">
           {COURSES.map((c, i) => {
             const p = progress(c);
             return (
@@ -71,10 +71,10 @@ export default function Hub() {
                 >
                   <span aria-hidden className="absolute inset-x-0 top-0 h-1 bg-card-accent" />
                   <div className="flex items-center justify-between">
-                    <span className="rounded-md bg-surface2 px-2 py-0.5 font-mono text-xs text-muted">{c.code}</span>
+                    <span className="rounded-md bg-surface2 px-2 py-0.5 font-mono text-xs text-muted">Study guide</span>
                     <span className="text-muted transition group-hover:text-card-accent group-hover:translate-x-0.5" aria-hidden>→</span>
                   </div>
-                  <div className="mt-4 text-3xl font-extrabold tracking-tight text-card-accent">{c.short}</div>
+                  <div className="mt-4 text-3xl font-extrabold tracking-tight text-card-accent">{c.code}</div>
                   <h2 className="mt-1 text-base font-semibold">{c.title}</h2>
                   <p className="mt-3 flex-1 text-sm leading-relaxed text-muted">{c.blurb}</p>
 

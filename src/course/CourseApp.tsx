@@ -36,7 +36,7 @@ export default function CourseApp() {
     document.head.appendChild(style);
     document.documentElement.dataset.course = meta.id;
     const prevTitle = document.title;
-    document.title = `${meta.short} Study Guide — ${meta.title}`;
+    document.title = `${meta.code} ${meta.title} — Study Guide`;
     const unmount = ready.mount(ready.D, {
       loadMermaid: () => import('mermaid').then((m) => m.default),
       ...ready.api,

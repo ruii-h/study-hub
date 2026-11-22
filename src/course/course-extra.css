@@ -6,3 +6,9 @@
 :root[data-course=bpas][data-theme=light]{--accent:#1a7f37}
 :root[data-course=idp][data-theme=dark]{--accent:#bc8cff}
 :root[data-course=idp][data-theme=light]{--accent:#8250df}
+:root[data-course=algo][data-theme=dark]{--accent:#58a6ff}
+:root[data-course=algo][data-theme=light]{--accent:#0969da}
+:root[data-course=cf][data-theme=dark]{--accent:#f0883e}
+:root[data-course=cf][data-theme=light]{--accent:#bc4c00}
+:root[data-course=ctp][data-theme=dark]{--accent:#e3b341}
+:root[data-course=ctp][data-theme=light]{--accent:#9a6700}

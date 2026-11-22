@@ -1,6 +1,6 @@
 # Study Hub
 
-ALGO (IS115), BPAS (IS210) and IDP (IS211) study guides combined into one app.
+IS114, IS115, IS210, IS211 and IS1704 study guides combined into one app (routes: `cf`, `algo`, `bpas`, `idp`, `ctp`).
 Vite + React + TypeScript + Tailwind v4. Progress lives in `localStorage` (same keys as the original files, so existing progress carries over).
 
 ```
@@ -116,3 +116,8 @@ These are the owner's standing preferences. Follow them for every change, in all
 - A story or case is told in one place. Its extra tellings are folded into that case card under "More from the lecture"; the end-of-chapter "Real-life case files" list holds only cases that are not told in the lesson text.
 - The study-aid layers (at a glance, exact names, quick examples, 30-second summary, flashcards) are deliberate summaries, but they must not retell stories or introduce different wording for the same definition.
 - Before adding content, check for overlap: `node tools/find-topic-repeats.mjs <course> all 3` lists topics discussed in three or more segments of a lesson, and `node tools/merge-cases.mjs <course>` (dry run) shows case stories told more than once.
+
+## IS114 and IS1704 (generated)
+`node tools/newcourse/build.mjs cf` and `... ctp` rebuild `src/courses/cf` and `src/courses/ctp` from the author's notes (`tools/newcourse/<id>/source/notes.md`) plus hand-written chapter extras (`m1-m3.mjs`: flashcards, warm-up and exam-style questions, ICE exercises). IS1704 has an extra ICE tab and a Past Exam tab.
+
+**Unfinished:** IS1704 labs (Lab 1-8, mock labs, past lab tests) are not included on purpose: they are meant to be run against test cases. See `tools/newcourse/ctp/LABS-TODO.md`.
