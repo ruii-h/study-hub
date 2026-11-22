@@ -41,7 +41,7 @@ function navItem(ico,num,title,on,act,badge){return `<button class="theory-item 
 const chapList=fn=>D.groups.map(g=>`<div class="theory-group"><div class="theory-group-title static">${g.t}</div>`+g.ns.map(n=>fn(D.lessons.find(x=>x.n==n))).join('')+'</div>').join('');
 const hd=s=>`<div class="theory-nav-header">${s}</div>`;
 /* practice tab: chapter quizzes grouped by exam section */
-const PQG=[['Section A · Empathy to evaluating designs',[2,3,4,5,13]],['Section B · Models, cognition, input and interface design',[6,7,8,9,10,11,16]],['Section C · Evaluation methods, experiments and analysis',[12,14,15,17,18,19]],['Introduction, presenting and review',[1,20,21,22,23]]];
+const PQG=[['Section A · Introduction to evaluating designs',[1,2,3,4,5,13]],['Section B · Models, cognition, input and interface design',[6,7,8,9,10,11,16]],['Section C · Evaluation methods, experiments and analysis',[12,14,15,17,18,19]],['Presenting, review and AI',[20,21,22,23]]];
 const pqList=fn=>PQG.map(g=>`<div class="theory-group"><div class="theory-group-title static">${g[0]}</div>`+g[1].map(n=>fn(D.lessons.find(x=>x.n==n))).join('')+'</div>').join('');
 function buildNav(){const keep=['#nav','#mnav'].map(s=>{const e=$(s);return e?e.scrollTop:0});
  const theory=hd('Chapters')+chapList(l=>{const s=S[l.n];return navItem(l.icon,l.n,l.title,cur==l.n,`loadTheory(${l.n})`,(V[l.n]?'<span class="rd" title="Read" aria-label="read">●</span>':'')+(s?`<span class="tq sc ${sc(s)}" title="Quiz score">${s.s}/${s.t}</span>`:''))});
