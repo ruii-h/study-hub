@@ -40,17 +40,51 @@ export function snakeChains(root: HTMLElement) {
   });
 }
 
-type MermaidLike = { initialize: (o: unknown) => void; run: (o: { nodes: HTMLElement[] }) => Promise<void> };
-export function runMermaid(root: HTMLElement, load: () => Promise<MermaidLike>, theme: string) {
-  const bl = [...root.querySelectorAll<HTMLElement>('pre.mermaid:not([data-processed])')]; if (!bl.length) return;
-  load().then((mermaid) => {
-    const go = async (nodes: HTMLElement[], n: number) => {
-      try { mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: theme === 'light' ? 'neutral' : 'dark' }); await mermaid.run({ nodes }); } catch { /* retried below */ }
-      const bad = nodes.filter((x) => x.isConnected && !x.querySelector('svg'));
-      if (bad.length && n < 3) setTimeout(() => go(bad, n + 1), 600);
-    };
-    go(bl, 0);
-  }).catch(() => undefined);
+type MermaidLike = { initialize: (o: unknown) => void; render: (id: string, text: string) => Promise<{ svg: string }> };
+let mid = 0;
+const vbWidth = (svg: string) => { const m = /viewBox="[-\d.]+ [-\d.]+ ([\d.]+) ([\d.]+)"/.exec(svg); return m ? +m[1] : 0; };
+
+/**
+ * Renders every `pre.mermaid` block. For readability a wide left-to-right flowchart is flipped top-down when fitting it
+ * to the page would shrink its text below ~78%, and anything still too wide keeps a readable size and scrolls sideways.
+ * Blocks keep their source in data-src so they re-render when the theme changes.
+ */
+export function runMermaid(root: HTMLElement, load: () => Promise<MermaidLike>, theme: string): Promise<void> {
+  const all = [...root.querySelectorAll<HTMLElement>('pre.mermaid')].filter((x) => x.dataset.rendered !== theme);
+  if (!all.length) return Promise.resolve();
+  return load().then(async (mermaid) => {
+    const dark = theme !== 'light';
+    const FONT = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+    // one palette for every diagram type, matched to the app (labels and arrows stay readable in both themes)
+    const P = dark
+      ? { background: '#0d1117', primaryColor: '#1f2a3a', primaryTextColor: '#e6edf3', primaryBorderColor: '#58a6ff', secondaryColor: '#1e2d24', tertiaryColor: '#161b22', lineColor: '#9aa7b4', textColor: '#e6edf3', edgeLabelBackground: '#10161d', clusterBkg: '#131a22', clusterBorder: '#3b4654', titleColor: '#e6edf3', noteBkgColor: '#2b2a17', noteTextColor: '#f0e6b0', noteBorderColor: '#a89a3c', actorBkg: '#1f2a3a', actorBorder: '#58a6ff', actorTextColor: '#e6edf3', actorLineColor: '#6b7785', signalColor: '#c9d1d9', signalTextColor: '#e6edf3', labelBoxBkgColor: '#1f2a3a', labelBoxBorderColor: '#58a6ff', labelTextColor: '#e6edf3', loopTextColor: '#e6edf3', activationBkgColor: '#2b3a52', sequenceNumberColor: '#0d1117' }
+      : { background: '#ffffff', primaryColor: '#e8f1fb', primaryTextColor: '#1f2328', primaryBorderColor: '#0969da', secondaryColor: '#e9f6ec', tertiaryColor: '#f6f8fa', lineColor: '#57606a', textColor: '#1f2328', edgeLabelBackground: '#ffffff', clusterBkg: '#f6f8fa', clusterBorder: '#c9d1d9', titleColor: '#1f2328', noteBkgColor: '#fff8c5', noteTextColor: '#3d3300', noteBorderColor: '#d4a72c', actorBkg: '#e8f1fb', actorBorder: '#0969da', actorTextColor: '#1f2328', actorLineColor: '#8c959f', signalColor: '#24292f', signalTextColor: '#1f2328', labelBoxBkgColor: '#e8f1fb', labelBoxBorderColor: '#0969da', labelTextColor: '#1f2328', loopTextColor: '#1f2328', activationBkgColor: '#d0e4fa', sequenceNumberColor: '#ffffff' };
+    mermaid.initialize({
+      startOnLoad: false, securityLevel: 'loose', theme: 'base',
+      themeVariables: { fontSize: '16px', fontFamily: FONT, ...P },
+      flowchart: { htmlLabels: true, curve: 'basis', nodeSpacing: 36, rankSpacing: 46, padding: 14, wrappingWidth: 230, useMaxWidth: true },
+      sequence: { useMaxWidth: true, actorMargin: 60, messageFontSize: 15, noteFontSize: 15, actorFontSize: 15 },
+      mindmap: { useMaxWidth: true, padding: 14 },
+    });
+    for (const el of all) {
+      if (!el.isConnected) continue;
+      const src = el.dataset.src ?? (el.dataset.src = (el.textContent || '').trim());
+      const avail = el.parentElement?.clientWidth || el.clientWidth || 720;
+      try {
+        let { svg } = await mermaid.render('mmd' + ++mid, src);
+        let w = vbWidth(svg);
+        if (w && avail / w < 0.78 && /^\s*(flowchart|graph)\s+(LR|RL)\b/.test(src)) {
+          const td = src.replace(/^(\s*(?:flowchart|graph)\s+)(?:LR|RL)\b/, '$1TB');
+          const r2 = await mermaid.render('mmd' + ++mid, td);
+          if (vbWidth(r2.svg) < w) { svg = r2.svg; w = vbWidth(r2.svg); }
+        }
+        if (!el.isConnected) continue;
+        el.innerHTML = svg; el.dataset.rendered = theme; el.dataset.processed = 'true';
+        const s = el.querySelector('svg');
+        if (s && w && avail / w < 0.78) { s.style.minWidth = Math.round(w * 0.78) + 'px'; el.classList.add('mm-scroll'); } else el.classList.remove('mm-scroll');
+      } catch (err) { console.warn('mermaid render failed', err); }
+    }
+  }).catch((err) => console.warn('mermaid load failed', err));
 }
 
 /** Adds `.in` to `.reveal` blocks as they scroll into view (the CSS animates the rest). */

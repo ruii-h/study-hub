@@ -75,6 +75,7 @@ export default function Theory() {
     (async () => {
       const b = body.current; if (!b) return;
       await highlightChunked(b);
+      await runMermaid(b, () => g.api!.loadMermaid(), theme || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'));
       await Promise.all([document.fonts?.ready, ...[...b.querySelectorAll('img')].map((im) => (im.complete ? null : im.decode().catch(() => null)))]);
       await new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r())));
       if (!off) setShownFor(cur);
@@ -98,7 +99,7 @@ export default function Theory() {
     (window as any).loadTheory = (n: number) => g.openChapter(n);
     return () => { stop(); io.disconnect(); g.api?.disposeDemos?.(); };
   }, [cur, ready]); // eslint-disable-line
-  useEffect(() => { if (body.current) runMermaid(body.current, () => g.api!.loadMermaid(), theme || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')); }, [cur, theme]); // eslint-disable-line
+  useEffect(() => { if (heavy && !finished) return; if (body.current) runMermaid(body.current, () => g.api!.loadMermaid(), theme || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')); }, [cur, theme, ready, finished]); // eslint-disable-line
   // cards that would leave an empty grid cell stretch to fill the row (re-run on every size change, like bootstrap's col-*)
   useEffect(() => {
     const sc = scroller.current, b = body.current; if (!sc || !b || !ready) return;

@@ -115,3 +115,17 @@ table.has-merge td[rowspan]{vertical-align:middle!important;background:color-mix
 .sk b,.sk-box,.pg-sk{display:block;background:linear-gradient(90deg,var(--surface2) 25%,color-mix(in srgb,var(--text) 9%,var(--surface2)) 50%,var(--surface2) 75%);background-size:200% 100%;animation:skshim 1.4s ease-in-out infinite}
 @keyframes skshim{0%{background-position:200% 0}100%{background-position:-200% 0}}
 .defer-hl{visibility:hidden;height:0;overflow:hidden}
+/* diagrams */
+pre.mermaid{padding:16px 12px!important;line-height:1.3;overflow-x:auto}
+pre.mermaid svg{height:auto;max-width:100%;display:block;margin:0 auto}
+pre.mermaid.mm-scroll{text-align:left}
+pre.mermaid.mm-scroll svg{max-width:none!important;margin:0}
+pre.mermaid .nodeLabel,pre.mermaid .edgeLabel,pre.mermaid .label{font-size:16px}
+pre.mermaid .edgeLabel{padding:2px 4px;border-radius:4px}
+@media(max-width:700px){pre.mermaid{padding:12px 8px!important}}
+
+.edgeLabel:empty,span.edgeLabel:empty,.edgeLabel p:empty{background:transparent!important;display:none}
+pre.mermaid p,pre.mermaid span.edgeLabel p,pre.mermaid .nodeLabel p,pre.mermaid .label p{margin:0!important;padding:0!important}
+pre.mermaid .edgeLabel p,pre.mermaid .labelBkg p{display:inline!important}
+pre.mermaid foreignObject{overflow:visible}
+pre.mermaid .edgeLabel,pre.mermaid .edgeLabel p{white-space:nowrap!important}
