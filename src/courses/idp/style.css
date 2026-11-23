@@ -1679,3 +1679,14 @@ ol.h10 li::before{content:counter(h);flex:none;width:24px;height:24px;border-rad
 .hx-good{color:#3fb950}.hx-poor{color:#f85149}.hx-note{color:var(--accent,#58a6ff)}
 .hx-ask{margin-top:auto;padding:7px 10px;border-radius:8px;background:color-mix(in srgb,var(--hc) 14%,transparent);font-size:12.5px;font-style:italic}
 .hx-ask b{font-style:normal;color:var(--hc);margin-right:4px;text-transform:uppercase;font-size:10.5px;letter-spacing:.05em}
+
+/* Latin square (ch18) */
+.ls{margin:.9rem 0;padding:.8rem 1rem;border:1px solid var(--line,#30363d);border-radius:12px;background:var(--panel,rgba(255,255,255,.03));max-width:30rem}
+.ls-t{font-weight:700;font-size:.85rem;margin-bottom:.6rem;opacity:.9}
+.ls table{border-collapse:separate;border-spacing:6px;width:100%;margin:0}
+.ls th{font-size:.75rem;font-weight:600;opacity:.7;text-align:center;border:0;background:none;padding:2px}
+.ls tbody th{text-align:left;white-space:nowrap}
+.ls td{padding:0;border:0;background:none;text-align:center}
+.ls-c{display:block;padding:.55rem 0;border-radius:8px;font-weight:800;font-size:1rem;color:#0b0e14}
+.ls-ka{background:#79c0ff}.ls-kb{background:#7ee787}.ls-kc{background:#d2a8ff}
+.ls-n{margin:.6rem 0 0;font-size:.82rem;opacity:.85}
