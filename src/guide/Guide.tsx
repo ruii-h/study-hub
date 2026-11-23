@@ -15,6 +15,8 @@ const TAB_DEF: Record<string, [string, string, string]> = {
   cheat: ['📌', 'Cheat', '-sheet'], ice: ['✏️', 'ICE', ' Exercises'], past: ['📝', 'Past', ' Exam'],
 };
 
+const tabDef = (D: Data, t: string): [string, string, string] => { const x = D.tabs?.find((y) => y.key === t); return x ? [x.ico, x.label, x.x] : TAB_DEF[t]; };
+
 function navItem(ico: string, num: string | number, title: string, on: boolean, act: () => void, badge?: React.ReactNode) {
   return (
     <button key={String(num) + title} className={`theory-item ${on ? 'active' : ''}`} aria-current={on ? 'true' : undefined} onClick={act}>
@@ -26,7 +28,7 @@ function navItem(ico: string, num: string | number, title: string, on: boolean, 
 /** Chapter lists, one per tab. Elements are stable React nodes, so clicking an item only changes classes and never rebuilds the list. */
 export function SideList() {
   const g = useG();
-  const { D, S, V, K, M, tab, cur, pqSel, pastSec, cch } = g;
+  const { D, S, V, K, M, ST, tab, cur, pqSel, pastSec, cch } = g;
   const grp = (groups: { t: string; ns: number[] }[] | [string, number[]][], fn: (n: number) => React.ReactNode) =>
     (groups as any[]).map((x, i) => { const t = Array.isArray(x) ? x[0] : x.t; const ns: number[] = Array.isArray(x) ? x[1] : x.ns; return (
       <div className="theory-group" key={i}><div className="theory-group-title static">{t}</div>{ns.map((n) => fn(n))}</div>); });
@@ -35,6 +37,19 @@ export function SideList() {
   const mCount = Object.keys(M).length;
   const cnt: Record<number, number> = {};
   D.cards.forEach((c) => { const k = cardChap(c); cnt[k] = (cnt[k] || 0) + 1; });
+  const sc = D.tabs?.find((x) => x.key === tab);
+  if (sc && sc.kind === 'play') {
+    const gs = [...new Set(D.play!.map((p: any) => p.g))] as string[];
+    return (<>
+      <div className="theory-nav-header">Live exercises</div>
+      {gs.map((gname) => (<div className="theory-group" key={gname}><div className="theory-group-title static">{gname}</div>
+        {D.play!.map((p: any, i: number) => p.g === gname ? navItem('▶', i + 1, p.title, (ST.play || D.play![0].id) === p.id, () => { g.patch('ST', (o) => ({ ...o, play: p.id })); g.setNavOpen(false); }) : null)}</div>))}
+    </>);
+  }
+  if (sc && sc.groups) return (<>
+    <div className="theory-nav-header">{sc.label}{sc.x}</div>
+    {grp(sc.groups, (n) => { const l = L(n); return navItem(l.icon, l.dn ?? n, l.title, cur === n, () => g.openChapter(n), V[n] ? <span className="rd" title="Read" aria-label="read">●</span> : null); })}
+  </>);
   if (tab === 'practice') return (<>
     <div className="theory-nav-header">Chapter quizzes</div>
     {navItem('🔁', '', 'Review my mistakes', pqSel === 'mx', () => g.setPqSel('mx'), mCount ? <span className="tq sc lo">{mCount}</span> : null)}
@@ -54,7 +69,7 @@ export function SideList() {
   </>);
   return (<>
     <div className="theory-nav-header">Chapters</div>
-    {grp(D.groups, (n) => { const l = L(n), s = S[n]; return navItem(l.icon, n, l.title, cur === n, () => g.openChapter(n), <>{V[n] ? <span className="rd" title="Read" aria-label="read">●</span> : null}{s ? <span className="tq sc" data-c={scoreClass(s)} title="Quiz score">{s.s}/{s.t}</span> : null}</>); })}
+    {grp(D.groups, (n) => { const l = L(n), s = S[n]; return navItem(l.icon, l.dn ?? n, l.title, cur === n, () => g.openChapter(n), <>{V[n] ? <span className="rd" title="Read" aria-label="read">●</span> : null}{s ? <span className="tq sc" data-c={scoreClass(s)} title="Quiz score">{s.s}/{s.t}</span> : null}</>); })}
   </>);
 }
 
@@ -116,6 +131,7 @@ function useTabs() {
     if (meta.tabs.includes('Practice')) t.push('practice');
     if (meta.tabs.includes('Flashcards')) t.push('cards');
     if (meta.tabs.includes('Cheat-sheet')) t.push('cheat');
+    D.tabs?.forEach((x) => { if (!t.includes(x.key)) t.push(x.key); });
     if (D.ice) t.push('ice');
     if ((D.exam.mcq.length || D.exam.wr.length) && D.secs) t.push('past');
     return t;
@@ -146,7 +162,7 @@ function Shell({ meta }: { meta: CourseMeta }) {
       else if (e.key === '?') dlg.current?.showModal();
       else if (e.key === 't') toggleTheme();
       else if (/^[1-9]$/.test(e.key) && tabs[+e.key - 1]) g.setTab(tabs[+e.key - 1]);
-      else if (tab === 'theory' && (e.key === 'ArrowRight' || e.key === 'ArrowLeft') && !tg.closest('.toc')) { const i = D.lessons.findIndex((x) => x.n === g.cur), j = i + (e.key === 'ArrowRight' ? 1 : -1); if (D.lessons[j]) g.openChapter(D.lessons[j].n); }
+      else if (g.tabOf(g.cur) === tab && (e.key === 'ArrowRight' || e.key === 'ArrowLeft') && !tg.closest('.toc')) { const sl = D.lessons.filter((x) => g.tabOf(x.n) === tab), i = sl.findIndex((x) => x.n === g.cur), j = i + (e.key === 'ArrowRight' ? 1 : -1); if (sl[j]) g.openChapter(sl[j].n); }
     };
     document.addEventListener('keydown', onKey); return () => document.removeEventListener('keydown', onKey);
   });
@@ -167,17 +183,18 @@ function Shell({ meta }: { meta: CourseMeta }) {
     <nav className="tab-bar" aria-label="Study sections"><div className="tablist" role="tablist">
       {tabs.map((t) => (
         <button key={t} className={`tab ${tab === t ? 'active' : ''}`} role="tab" aria-selected={tab === t} data-t={t} onClick={() => g.setTab(t)}>
-          <span className="ti">{TAB_DEF[t][0]}</span><span className="tl">{TAB_DEF[t][1]}<span className="x">{TAB_DEF[t][2]}</span></span>
+          <span className="ti">{tabDef(D, t)[0]}</span><span className="tl">{tabDef(D, t)[1]}<span className="x">{tabDef(D, t)[2]}</span></span>
         </button>))}
     </div></nav>
     <main id="main"><div id="content">
       <AnimatePresence mode="wait" initial={false}>
         <motion.div key={tab} className="tab-view active" role="tabpanel" id={'tab-' + tab} style={{ animation: 'none' }}
           {...tabSwap}>
-          {tab === 'theory' && <Theory />}
+          {(tab === 'theory' || !!D.tabs?.some((x) => x.key === tab && x.ns)) && <Theory />}
+          {tab === 'play' && g.api?.Playground && <g.api.Playground />}
           {tab === 'practice' && <Practice />}
           {tab === 'cards' && <Cards />}
-          {tab === 'cheat' && <Cheat />}
+          {tab === 'cheat' && !D.tabs?.some((x) => x.key === 'cheat') && <Cheat />}
           {tab === 'ice' && <div className="pane" id="icem" tabIndex={0}><h1 className="t-h1" style={{ fontSize: 26 }}>In-class exercises (ICE)</h1><div className="sub">Exercises from the weekly in-class sessions, grouped by chapter. Attempt each one first, then open the answer. Lab exercises are not included: they are meant to be run against test cases.</div><div dangerouslySetInnerHTML={{ __html: D.ice || '' }} /></div>}
           {tab === 'past' && <Past />}
         </motion.div>

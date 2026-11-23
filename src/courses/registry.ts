@@ -47,10 +47,10 @@ export const COURSES: CourseMeta[] = [
     tabs: ['Theory', 'Practice', 'Flashcards', 'ICE', 'Past Exam'],
   },
   {
-    id: 'wad2', code: 'WAD2', short: 'WAD2', title: 'Web Application Development 2',
-    blurb: 'HTML, JavaScript and APIs, CSS and Bootstrap, Vue, Axios, Express and MongoDB, with cheat sheets, live playgrounds and the full course code.',
-    chapters: 32, cards: 0, storageKey: 'wad2_', accent: ['#2ec4b6', '#0f766e'],
-    tabs: ['Theory'],
+    id: 'wad2', code: 'IS216', short: 'IS216', title: 'Web Application Development 2',
+    blurb: 'HTML, JavaScript and APIs, CSS and Bootstrap, Vue, Axios, Express and MongoDB, with scenario cheat sheets, a live playground and the full course code archive.',
+    chapters: 30, cards: 0, storageKey: 'wad2_', accent: ['#2ec4b6', '#0f766e'],
+    tabs: ['Theory', 'Cheat sheets', 'Live playground', 'Code archive'],
   },
 ];
 
@@ -71,6 +71,6 @@ export const loaders: Record<CourseId, () => Promise<Loaded>> = {
     return { D: D.default, css: katex + ' ' + css.default };
   },
   idp: async () => { const [D, css] = await Promise.all([import('./idp/data.json'), import('./idp/style.css?inline')]); return { D: D.default, css: css.default }; },
-  wad2: async () => { const [D, css, demos] = await Promise.all([import('./wad2/data.json'), import('./wad2/style.css?inline'), import('./wad2/demos')]); return { D: D.default, css: css.default, api: { mountDemos: demos.mountDemos, disposeDemos: demos.disposeDemos } }; },
+  wad2: async () => { const [D, css, pg] = await Promise.all([import('./wad2/data.json'), import('./wad2/style.css?inline'), import('./wad2/Playground')]); return { D: D.default, css: css.default, api: { Playground: pg.default } }; },
   ctp: async () => { const [D, css] = await Promise.all([import('./ctp/data.json'), import('./ctp/style.css?inline')]); return { D: D.default, css: css.default }; },
 };

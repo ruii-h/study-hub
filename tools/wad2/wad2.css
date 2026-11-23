@@ -1,11 +1,6 @@
 /* WAD2 extras: diagrams, code-file headings, details, sub-headings, live playground */
 .t-section h3{font-size:17px;font-weight:700;color:var(--ink);margin:22px 0 8px}
 .t-section h4{font-size:14.5px;font-weight:700;color:var(--cy);margin:20px 0 6px;letter-spacing:.01em}
-.t-section h4.file{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;margin:24px 0 6px;padding:7px 12px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px 8px 0 0;color:var(--ink);font-size:13.5px}
-.t-section h4.file .ftitle{font-weight:700}
-.t-section h4.file code{font-size:12px;color:var(--muted);background:none;padding:0}
-.t-section h4.file + .t-code{margin-top:0}
-.t-section h4.file + .t-code .t-code-header{border-radius:0}
 .t-section .sub{color:var(--muted);font-size:14px;margin:-4px 0 12px}
 /* flow diagrams: <div class="dg"><div class="row"><span class="nd">..</span><span class="ar">→</span>... */
 .dg{margin:14px 0;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;display:grid;gap:10px;overflow-x:auto}
@@ -23,11 +18,39 @@ details.wd > summary::before{content:'▸';display:inline-block;width:1.1em;colo
 details.wd[open] > summary::before{transform:rotate(90deg)}
 details.wd[open] > summary{border-bottom:1px solid var(--border);margin-bottom:10px}
 details.wd .t-code{margin-bottom:12px}
+/* code archive: one compact card per file (title and path live in the code header) */
+.t-code.filecode{margin:18px 0 0;border-left:3px solid var(--accent)}
+.t-code.filecode .t-code-header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;padding:8px 14px}
+.t-code.filecode .t-code-header span{order:3;margin-left:auto;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.t-code.filecode .ft{order:1;color:var(--ink);font-size:13.5px;font-weight:700;font-family:inherit}
+.t-code.filecode .fp{order:2;color:var(--muted);background:none;padding:0;font-size:12px}
+.t-code.filecode .t-code-body{padding:10px 14px 12px;font-size:13px;line-height:1.5}
+.t-section .t-code{margin-top:12px}
+.t-section .t-code-body{line-height:1.55}
+.t-section .t-code.filecode + .t-code.filecode{margin-top:14px}
 /* live playground */
-.demo-slot{margin:6px 0 14px;display:grid;gap:10px}
-.pg-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
-.pg-hint{font-size:12.5px;color:var(--muted)}
-.pg-ed{width:100%;min-height:160px;resize:vertical;background:#000;color:#F8F8F2;border:1px solid #1f1f1f;border-radius:10px;padding:12px 14px;font:13px/1.55 'JetBrains Mono','Cascadia Code','Fira Code',Consolas,monospace;tab-size:2;white-space:pre;overflow:auto}
-.pg-ed:focus{outline:2px solid var(--accent);outline-offset:1px}
-.pg-pv iframe{width:100%;height:340px;border:1px solid var(--border);border-radius:10px;background:#fff;display:block}
-@media(max-width:700px){.pg-pv iframe{height:280px}.pg-ed{font-size:12px}}
+.pgm{display:flex;flex-direction:column;gap:12px}
+.pg-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px}
+.pg-sp{flex:1}
+.pg-auto{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer}
+.pg-state{font-size:12.5px;color:var(--muted);min-width:96px;transition:color .2s}
+.pg-state.on{color:var(--accent)}
+.pg-seg{display:inline-flex;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.pg-seg button{background:var(--surface);color:var(--muted);border:0;padding:6px 11px;font-size:12.5px;cursor:pointer;transition:background .2s,color .2s}
+.pg-seg button.on{background:var(--accent);color:#06201d;font-weight:700}
+.pg-split{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+@media(min-width:1100px){.pg-split{grid-template-columns:minmax(0,1fr) minmax(0,1fr);height:calc(var(--app-h,100vh) - 330px);min-height:420px}}
+.pg-edwrap{position:relative;height:min(52vh,460px);border-radius:12px;background:#000;border:1px solid #1f1f1f;overflow:hidden}
+@media(min-width:1100px){.pg-edwrap{height:100%}}
+.pg-hl,.pg-ta{position:absolute;inset:0;margin:0;padding:14px 16px;border:0;font:13px/1.6 'JetBrains Mono','Cascadia Code','Fira Code',Consolas,monospace;tab-size:2;white-space:pre;overflow:auto;letter-spacing:0;word-spacing:0}
+.pg-hl{color:#F8F8F2;pointer-events:none;background:transparent}
+.pg-ta{background:transparent;color:transparent;caret-color:#F8F8F2;resize:none;outline:none;-webkit-text-fill-color:transparent}
+.pg-ta::selection{background:rgba(98,114,164,.45);-webkit-text-fill-color:transparent}
+.pg-edwrap:focus-within{outline:2px solid var(--accent);outline-offset:1px}
+.pg-pvwrap{height:min(52vh,460px);border-radius:12px;border:1px solid var(--border);background:var(--surface2);overflow:auto;display:flex;justify-content:center}
+@media(min-width:1100px){.pg-pvwrap{height:100%}}
+.pg-pvbox{position:relative;max-width:100%;min-height:100%;background:#fff;transition:width .3s cubic-bezier(.2,.8,.2,1);box-shadow:0 0 0 1px rgba(0,0,0,.08)}
+.pg-fr{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff;transition:opacity .18s ease}
+.pg-nav{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+.pg-nav .t-nav-btn:disabled{opacity:.4;cursor:default}
+@media(max-width:700px){.pg-hl,.pg-ta{font-size:12px}.pg-seg button{padding:6px 8px}.pg-nav{grid-template-columns:1fr}}

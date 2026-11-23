@@ -35,12 +35,11 @@ const BLURB = {
   'Appendix': 'Pinia, router guards, and what each file in the course archive was used for.',
 };
 const PLAN = [
-  ['🚀 Start', 'blue', [['Start here', '🧭']]],
+  ['🧭 Start & exam toolkit', 'yellow', [['Start here', '🧭'], ['Debugging & mistakes', '🐞'], ['Tooling & exam rules', '📋']]],
   ['🌐 Web foundations', 'blue', [['HTML', '🏷️'], ['JavaScript & web APIs', '⚙️']]],
   ['🎨 Styling', 'orange', [['CSS core', '🎯'], ['CSS layout', '📐'], ['CSS components & extras', '🧩'], ['Bootstrap: grid & utilities', '🧱'], ['Bootstrap: components & workflow', '🪟']]],
   ['💚 Vue', 'green', [['Vue basics', '🌱'], ['Vue directives', '🔀'], ['Vue logic & state', '🧠'], ['Vue components & routing', '🧭']]],
   ['🗄️ Data & servers', 'purple', [['Axios concepts', '📡'], ['Axios CRUD', '🔁'], ['Axios patterns', '🧰'], ['Express & MongoDB', '🍃']]],
-  ['🛠️ Exam toolkit', 'yellow', [['Debugging & mistakes', '🐞'], ['Tooling & exam rules', '📋']]],
 ];
 const CHEAT_GROUPS = [['1 · CSS', '🎨', 'CSS'], ['2 · Bootstrap', '🧱', 'Bootstrap'], ['3 · Vue', '💚', 'Vue'], ['4 · Axios & backend', '📡', 'Axios & backend'], ['5 · Debugging & exam day', '🐞', 'Debugging & exam day']];
 const CODE = [['Code · Index', '🗂️'], ['Code · Week 2 CSS', '🎨'], ['Code · Week 3 Bootstrap', '🧱'], ['Code · Week 4 Vue basics', '🌱'], ['Code · Week 5 Lists & Axios', '📡'], ['Code · Week 6 Components', '🧩'], ['Appendix', '📎']];
@@ -62,27 +61,35 @@ function lang(t, hint) {
 }
 
 // ---- links: topic id -> [chapter n, section id]
-const chapters = []; // {n,title,icon,tag,blurb,secs:[{id,title,html,sub}]}
+const chapters = []; // {n,dn,title,icon,tag,blurb,secs:[{id,title,html,sub}]}
 const topicLoc = {};
 let n = 0;
-const groups = [];
-const addChap = (c) => { c.n = ++n; chapters.push(c); c.secs.forEach((s, i) => { s.m = i + 1; s.id = `s${c.n}-${s.m}`; if (s.tid) topicLoc[s.tid] = [c.n, s.id]; }); return c.n; };
+const dnCount = {};
+const addChap = (c, scope) => { c.n = ++n; c.scope = scope; c.dn = dnCount[scope] = (dnCount[scope] || 0) + 1; chapters.push(c); c.secs.forEach((x, i) => { x.m = i + 1; x.id = `s${c.n}-${x.m}`; if (x.tid) topicLoc[x.tid] = [c.n, x.id]; }); return c.n; };
 const byGroup = (arr, g) => arr.filter((x) => x.group === g);
 const topicSec = (t) => ({ tid: t.id, title: t.title, sub: t.subtitle, html: t.html });
+const groups = [];
 for (const [tt, tag, gs] of PLAN) {
   const ns = [];
-  for (const [g, icon] of gs) ns.push(addChap({ title: g, icon, tag, blurb: BLURB[g], secs: byGroup(W.THEORY, g).map(topicSec) }));
+  for (const [g, icon] of gs) ns.push(addChap({ title: g, icon, tag, blurb: BLURB[g], secs: byGroup(W.THEORY, g).map(topicSec) }, 'theory'));
   groups.push({ t: tt, ns, tag });
 }
-{ const ns = CHEAT_GROUPS.map(([g, icon, nm]) => addChap({ title: 'Cheat sheet · ' + nm, icon, tag: 'orange', blurb: 'Scenario-to-code lookups for ' + nm + '. The basics live in the theory chapters.', secs: byGroup(W.CHEAT, g).map((t) => ({ tid: t.id, title: t.title, sub: t.subtitle, html: t.html })) })); groups.push({ t: '⚡ Cheat sheets', ns, tag: 'orange' }); }
-{
-  const ns = [];
-  for (const [g, icon, blurb] of [['Week 2 · CSS', '🎨', 'Ten Week 2 CSS exercises you can edit and run in the page.'], ['Week 3 · Bootstrap', '🧱', 'Four Week 3 Bootstrap exercises with Bootstrap 5.3 loaded offline.']]) {
-    ns.push(addChap({ title: 'Live playground · ' + g.replace(' · ', ' '), icon, tag: 'green', blurb, playground: true, secs: W.LESSONS.filter((l) => l.g === g).map((l) => ({ title: l.title, sub: '', html: `<p>${esc(l.desc)}</p><div class="demo-slot" data-bs="${/\{\{BS\}\}/.test(l.code) ? 1 : 0}"><textarea class="pg-src" hidden>${esc(l.code)}</textarea></div>` })) }));
-  }
-  groups.push({ t: '▶️ Live playground', ns, tag: 'green' });
+const cheatNs = CHEAT_GROUPS.map(([g, icon, nm]) => addChap({ title: nm, icon, tag: 'orange', blurb: 'Scenario-to-code lookups for ' + nm + '. The basics live in the theory chapters.', secs: byGroup(W.CHEAT, g).map(topicSec) }, 'cheat'));
+const codeGroups = [['📂 Index', ['Code · Index']], ['📝 Weekly code', ['Code · Week 2 CSS', 'Code · Week 3 Bootstrap', 'Code · Week 4 Vue basics', 'Code · Week 5 Lists & Axios', 'Code · Week 6 Components']], ['📎 Appendix', ['Appendix']]];
+const codeNs = [], codeGrp = [];
+for (const [t, gl] of codeGroups) { const ns = gl.map((g) => addChap({ title: g.replace(/^Code · /, ''), icon: CODE.find((c) => c[0] === g)[1], tag: 'purple', blurb: BLURB[g], secs: byGroup(W.THEORY, g).map(topicSec) }, 'code')); codeNs.push(...ns); codeGrp.push({ t, ns, tag: 'purple' }); }
+const play = W.LESSONS.map((l, i) => ({ id: 'p' + (i + 1), g: l.g, title: l.title, desc: l.desc, code: l.code }));
+
+// ---- code clean-up: tabs to two spaces, trim blank edges, collapse blank runs, drop the common indent (whitespace only)
+function tidy(escaped) {
+  let t = escaped.replace(/\r/g, '').replace(/\t/g, '  ').replace(/[ ]+$/gm, '').replace(/^\n+|\n+$/g, '').replace(/\n{3,}/g, '\n\n');
+  t = t.replace(/(&lt;(?:script|template|style)[^\n]*&gt;)\n\n+/g, '$1\n').replace(/\n\n+(&lt;\/(?:script|template|style)&gt;)/g, '\n$1');
+  const ind = t.split('\n').filter((l) => l.trim()).map((l) => l.match(/^ */)[0].length);
+  const m = ind.length ? Math.min(...ind) : 0;
+  if (m > 0) t = t.split('\n').map((l) => l.slice(Math.min(m, l.match(/^ */)[0].length))).join('\n');
+  return t;
 }
-{ const ns = CODE.map(([g, icon]) => addChap({ title: g, icon, tag: 'purple', blurb: BLURB[g], secs: byGroup(W.THEORY, g).map(topicSec) })); groups.push({ t: '📦 Code archive', ns, tag: 'purple' }); }
+const codeBox = (l, body, head) => '<div class="t-code' + (head ? ' filecode' : '') + '"' + (head && head.id ? ' id="' + head.id + '"' : '') + '><div class="t-code-header"><span>' + l + '</span>' + (head ? '<strong class="ft">' + head.title + '</strong><code class="fp">' + head.path + '</code>' : '') + '</div><div class="t-code-body" tabindex="0">' + tidy(body) + '</div></div>';
 
 // ---- html transforms
 const CALLOUT = { tip: 'success', warning: 'warn', mistake: 'danger', gap: 'info', fix: 'info' };
@@ -100,13 +107,13 @@ function fix(html) {
   });
   h = h.replace(/<a class="xl" onclick="go\('(?:pr|ch)','[^']*'\)">([\s\S]*?)<\/a>/g, '$1');
   // code blocks (the file heading before a block names the language)
-  h = h.replace(/(<h4 class="file"[^>]*>[\s\S]*?<\/h4>)?\s*<pre class="code"><code([^>]*)>([\s\S]*?)<\/code><\/pre>/g, (m, head, attr, code) => {
-    const hint = head ? (head.match(/<code>([^<]*)<\/code>/) || [])[1] : '';
-    const body = code.replace(/\n+$/, '');
-    return (head || '') + `<div class="t-code"><div class="t-code-header"><span>${(/data-p/.test(attr) ? 'bash' : lang(code, hint))}</span></div><div class="t-code-body" tabindex="0">${body}</div></div>`;
+  h = h.replace(/(<h4 class="file"([^>]*)>([\s\S]*?)<\/h4>)?\s*<pre class="code"><code([^>]*)>([\s\S]*?)<\/code><\/pre>/g, (m, h4, h4attr, h4in, attr, code) => {
+    let head = null;
+    if (h4) { const t = (h4in.match(/<span class="ftitle">([\s\S]*?)<\/span>/) || [])[1] || '', p = (h4in.match(/<code>([^<]*)<\/code>/) || [])[1] || ''; head = { id: (h4attr.match(/id="([^"]+)"/) || [])[1], title: t, path: p }; }
+    return codeBox(/data-p/.test(attr) ? 'bash' : lang(code, head ? head.path : ''), code, head);
   });
   h = h.replace(/<pre class="code"><code>([\s\S]*?)<\/code><\/pre>/g, (m, code) => `<div class="t-code"><div class="t-code-header"><span>${lang(code, '')}</span></div><div class="t-code-body" tabindex="0">${code.replace(/\n+$/, '')}</div></div>`);
-  h = h.replace(/<pre>([\s\S]*?)<\/pre>/g, (m, code) => `<div class="t-code"><div class="t-code-header"><span>${lang(code, '')}</span></div><div class="t-code-body" tabindex="0">${code.replace(/^<code>|<\/code>$/g, '').replace(/\n+$/, '')}</div></div>`);
+  h = h.replace(/<pre>([\s\S]*?)<\/pre>/g, (m, code) => codeBox(lang(code, ''), code.replace(/^<code>|<\/code>$/g, '')));
   // callouts and quotes
   h = h.replace(/<div class="callout ([a-z]+)">([\s\S]*?)<\/div>/g, (m, c, b) => `<div class="t-callout ${CALLOUT[c] || 'info'}">${b}</div>`);
   h = h.replace(/<blockquote>([\s\S]*?)<\/blockquote>/g, (m, b) => `<div class="t-callout ${/^\s*(<p>)?\s*💡/.test(b) ? 'success' : 'info'}">${b}</div>`);
@@ -118,14 +125,19 @@ function fix(html) {
 
 // ---- assemble lessons
 const lessons = chapters.map((c) => {
-  const sec = (s) => `<div class="t-section reveal" id="${s.id}"><div aria-level="2" class="t-h2" role="heading"><span class="t-num">${c.n}.${s.m}</span>${s.title}</div>${s.sub ? `<div class="sub">${s.sub}</div>` : ''}${fix(s.html)}</div>`;
-  const road = c.secs.length >= 3 ? `<div class="road"><div class="road-t">🗺️ In this chapter</div><div class="flow">${c.secs.map((s, i) => `${i ? '<i>→</i>' : ''}<span><b>${i + 1}</b>${s.title.replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').length > 46 ? esc(s.title.replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').slice(0, 44)) + '…' : s.title.replace(/<[^>]+>/g, '')}</span>`).join('')}</div></div>` : '';
-  return { n: c.n, title: c.title, tag: c.tag, icon: c.icon, goal: c.blurb, subtitle: c.blurb, html: `${road}${c.secs.map(sec).join('')}` };
+  const sec = (x) => `<div class="t-section reveal" id="${x.id}"><div aria-level="2" class="t-h2" role="heading"><span class="t-num">${c.dn}.${x.m}</span>${x.title}</div>${x.sub ? `<div class="sub">${x.sub}</div>` : ''}${fix(x.html)}</div>`;
+  const plain = (t) => t.replace(/<[^>]+>/g, '').replace(/&amp;/g, '&');
+  const road = c.secs.length >= 3 ? `<div class="road"><div class="road-t">🗺️ In this chapter</div><div class="flow">${c.secs.map((x, i) => `${i ? '<i>→</i>' : ''}<span><b>${i + 1}</b>${plain(x.title).length > 46 ? esc(plain(x.title).slice(0, 44)) + '…' : x.title.replace(/<[^>]+>/g, '')}</span>`).join('')}</div></div>` : '';
+  return { n: c.n, dn: c.dn, title: c.title, tag: c.tag, icon: c.icon, goal: c.blurb, subtitle: c.blurb, html: `${road}${c.secs.map(sec).join('')}` };
 });
 
-// the cheat-sheet chapters are rebuilt after all ids are known so cross-links resolve; re-run for safety
-const D = { fill: {}, ice: '', hard: {}, lessons, groups, quiz: {}, cards: [], selfq: '', exam: { mcq: [], wr: [] } };
+const D = { fill: {}, ice: '', hard: {}, lessons, groups, quiz: {}, cards: [], selfq: '', exam: { mcq: [], wr: [] }, play,
+  tabs: [
+    { key: 'cheat', ico: '📌', label: 'Cheat', x: ' sheets', ns: cheatNs, groups: [{ t: '⚡ Scenario lookups', ns: cheatNs, tag: 'orange' }] },
+    { key: 'play', ico: '▶️', label: 'Live', x: ' playground', kind: 'play' },
+    { key: 'code', ico: '📦', label: 'Code', x: ' archive', ns: codeNs, groups: codeGrp },
+  ] };
 fs.mkdirSync(out, { recursive: true });
 fs.writeFileSync(out + '/data.json', JSON.stringify(D));
 fs.writeFileSync(out + '/style.css', fs.readFileSync('src/courses/idp/style.css', 'utf8') + '\n' + fs.readFileSync('tools/newcourse/exr.css', 'utf8') + '\n' + fs.readFileSync('tools/wad2/wad2.css', 'utf8'));
-console.log('wad2 chapters', lessons.length, 'sections', chapters.reduce((a, c) => a + c.secs.length, 0), 'html KB', Math.round(lessons.reduce((a, l) => a + l.html.length, 0) / 1024));
+console.log('wad2 chapters', lessons.length, 'theory', dnCount.theory, 'cheat', dnCount.cheat, 'code', dnCount.code, 'play', play.length, 'html KB', Math.round(lessons.reduce((a, l) => a + l.html.length, 0) / 1024));

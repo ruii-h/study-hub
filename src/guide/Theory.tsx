@@ -30,10 +30,10 @@ export function WikiLayer() {
       e.preventDefault(); hide();
       const G = ref.current; const n = +a.dataset.n!, id = a.dataset.id || ''; const c = document.getElementById('theory-content');
       const l = G.D.lessons.find((x) => x.n === G.cur);
-      const back = G.tab !== 'theory'
+      const back = !(G.tab === 'theory' || G.D.tabs?.some((x) => x.key === G.tab && x.ns))
         ? { tab: G.tab, sel: G.cur, y: 0, label: 'Back to the ' + (G.tab === 'cheat' ? 'cheat-sheet' : 'flashcards'), up: null }
         : { tab: 'theory', sel: G.cur, y: c?.scrollTop || 0, label: 'Back to ' + (l ? G.wiki.wlChap(l) : 'the previous page'), up: G.back };
-      if (n === G.cur && G.tab === 'theory') { G.setBack(back); if (id) scrollToId(id); else c?.scrollTo({ top: 0, behavior: 'smooth' }); }
+      if (n === G.cur && G.tab === G.tabOf(n)) { G.setBack(back); if (id) scrollToId(id); else c?.scrollTo({ top: 0, behavior: 'smooth' }); }
       else G.openChapter(n, { back, sec: id || undefined });
     };
     document.addEventListener('mouseover', over); document.addEventListener('focusin', fin); document.addEventListener('focusout', fout);
@@ -47,7 +47,8 @@ export default function Theory() {
   const g = useG();
   const { D, cur, ST, meta } = g;
   const lesson = D.lessons.find((l) => l.n === cur)!;
-  const i = D.lessons.findIndex((l) => l.n === cur), pv = D.lessons[i - 1], nx = D.lessons[i + 1];
+  const scope = useMemo(() => D.lessons.filter((l) => g.tabOf(l.n) === g.tabOf(cur)), [D, cur]); // eslint-disable-line
+  const i = scope.findIndex((l) => l.n === cur), pv = scope[i - 1], nx = scope[i + 1];
   const body = useRef<HTMLDivElement>(null), scroller = useRef<HTMLDivElement>(null), rp = useRef<HTMLElement>(null);
   const [toc, setToc] = useState<{ id: string; num: string; t: string }[]>([]);
   const [active, setActive] = useState('');
@@ -103,17 +104,17 @@ export default function Theory() {
       <div className="theory-nav" id="nav" tabIndex={0} aria-label="Chapter list"><SideList /></div>
       <div ref={scroller} id="theory-content" className="theory-content" tabIndex={0} aria-label="Chapter content" onScroll={onScroll}>
         <motion.div key={cur} {...chapterSlide(dirRef.current)}>
-          <div className="t-hero"><div className={`t-tag ${lesson.tag}`}>Chapter {cur} of {D.lessons.length}</div><h1 className="t-h1" tabIndex={-1}>{lesson.title}</h1><div className="t-subtitle" dangerouslySetInnerHTML={{ __html: lesson.goal }} /><div className="meta">⏱ about {mins} min read{nq > 0 ? ` · ${nq} exam-style questions at the end` : ''}</div></div>
+          <div className="t-hero"><div className={`t-tag ${lesson.tag}`}>Chapter {lesson.dn ?? cur} of {scope.length}</div><h1 className="t-h1" tabIndex={-1}>{lesson.title}</h1><div className="t-subtitle" dangerouslySetInnerHTML={{ __html: lesson.goal }} /><div className="meta">⏱ about {mins} min read{nq > 0 ? ` · ${nq} exam-style questions at the end` : ''}</div></div>
           {toc.length > 0 && (
             <nav className="toc" aria-label="Sections in this chapter">
               <div className="tocs">{toc.map((s) => <a key={s.id} href={'#' + s.id} className={active === s.id ? 'on' : ''} aria-current={active === s.id ? 'true' : undefined} title={s.t} onClick={(e) => { e.preventDefault(); scrollToId(s.id); }}>{s.num ? s.num + ' ' : ''}{s.t}</a>)}</div>
               <i className="rp" ref={rp} />
             </nav>)}
           <div ref={body} onClick={onBodyClick} dangerouslySetInnerHTML={{ __html: htmlStr }} />
-          {meta.tabs.includes('Practice') ? <div className="endrow"><div className="endmsg">You have reached the end of Chapter {cur}. <b>Next step:</b> test yourself while it is fresh.</div><button className="btn" onClick={() => g.goQuiz(cur)}>🧠 Take the Chapter {cur} quiz</button></div> : null}
+          {meta.tabs.includes('Practice') ? <div className="endrow"><div className="endmsg">You have reached the end of Chapter {lesson.dn ?? cur}. <b>Next step:</b> test yourself while it is fresh.</div><button className="btn" onClick={() => g.goQuiz(cur)}>🧠 Take the Chapter {cur} quiz</button></div> : null}
           <div className="t-nav-footer">
             {pv ? <button className="t-nav-btn" onClick={() => g.openChapter(pv.n)}><small>Previous</small>← {pv.title}</button> : <div />}
-            {nx ? <button className="t-nav-btn next" onClick={() => g.openChapter(nx.n)}><small>Next chapter</small>{nx.title} →</button> : <button className="t-nav-btn next" onClick={() => g.setTab('practice')}><small>You finished the course notes</small>Go to the practice questions →</button>}
+            {nx ? <button className="t-nav-btn next" onClick={() => g.openChapter(nx.n)}><small>Next chapter</small>{nx.title} →</button> : meta.tabs.includes('Practice') ? <button className="t-nav-btn next" onClick={() => g.setTab('practice')}><small>You finished the course notes</small>Go to the practice questions →</button> : <div />}
           </div>
         </motion.div>
         <AnimatePresence>
