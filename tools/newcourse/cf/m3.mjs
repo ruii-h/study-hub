@@ -363,7 +363,7 @@ export default {
       ['Tracing a concept across tiers', 'A port number: 443 at tier 5, 22 at tier 4. An IP address: private at tiers 1-2, public at tier 3.', 6],
     ],
     warm: [
-      ['In the case study, which ports are opened in the security group to the whole Internet?', '80 and 443', ['22 only :: SSH is limited to admin IPs.', '8000 only :: That is for local testing.', 'All ports :: That would defeat the firewall.'], 'Web ports public, SSH admin-only.'],
+      ['An IoT startup runs an assisted-living platform on an Amazon EC2 instance, protected by a security group. Which ports does the security group open to the whole Internet?', '80 and 443', ['22 only :: SSH is limited to admin IPs.', '8000 only :: That is for local testing.', 'All ports :: That would defeat the firewall.'], 'Web ports public, SSH admin-only.'],
       ['Why does the developer first host the server on 127.0.0.1:8000?', 'To test rendering without exposing unfinished code', ['Because EC2 is not available :: EC2 is used later.', 'Because loopback is faster than the Internet :: The point is not exposing work.', 'Because DNS cannot resolve public names :: Not the reason.'], 'Loopback stays inside the device.'],
       ['What shares the home\'s single public IP among sensors and laptops?', 'NAT on the router', ['DHCP :: It leases private addresses.', 'DNS :: It resolves names.', 'The security group :: It sits in the cloud.'], 'NAT maps private addresses to the one public address.'],
       ['How do developers log in to the EC2 instance?', 'SSH with a .pem private key', ['A password over HTTP :: Not secure.', 'DHCP lease :: Unrelated.', 'Bluetooth pairing :: Used by wearables.'], 'Keypair login on port 22.'],

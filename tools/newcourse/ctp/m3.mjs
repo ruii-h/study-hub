@@ -282,7 +282,7 @@ export default {
       ['Which statements about `while ... else` are correct?',
         ['The `else` runs if the loop ends normally. :: Condition became false.', 'The `else` is skipped if `break` ran. :: Yes.', 'It belongs to the `while`, not to an `if`. :: Indentation shows it.', 'It always runs. :: Not after break.', 'It is useful for "all attempts used". :: Yes.'],
         'ABCE', 'Break skips the else.'],
-      ['In the to-do app, which statements are correct?',
+      ['A console to-do manager lets the user add tasks, list them with numbers and choose a task by its number. Which statements about how it is written are correct?',
         ['Tasks are stored as a list of dictionaries. :: name and done.', '`enumerate(tasks)` gives the number shown to the user. :: With `i + 1`.', 'Entering a task number needs `int(...) - 1` for the index. :: Convert to zero-based.', 'A non-numeric entry is handled with `except ValueError`. :: Yes.', 'Tasks are saved in a tuple that is updated. :: A list is used.'],
         'ABCD', 'List of dicts plus input validation.'],
       ['Which statements about loading tasks from a file are correct?',
