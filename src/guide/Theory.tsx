@@ -96,7 +96,10 @@ export default function Theory() {
     g.api?.mountDemos?.([...b.querySelectorAll('.demo-slot')]);
     if (p?.sec) setTimeout(() => scrollToId(p.sec!, true), 30); else if (p?.y) setTimeout(() => { sc.scrollTop = p.y!; }, 30);
     else if (ST.yn === cur && ST.y > 50) setTimeout(() => { sc.scrollTop = ST.y; }, 350);
-    (window as any).loadTheory = (n: number) => g.openChapter(n);
+    (window as any).loadTheory = (n: number) => {
+      const c = document.getElementById('theory-content');
+      g.openChapter(n, { back: { tab: g.tab, sel: cur, y: c?.scrollTop || 0, label: 'Back to ' + g.wiki.wlChap(lesson), up: g.back } });
+    };
     return () => { stop(); io.disconnect(); g.api?.disposeDemos?.(); };
   }, [cur, ready]); // eslint-disable-line
   useEffect(() => { if (heavy && !finished) return; if (body.current) runMermaid(body.current, () => g.api!.loadMermaid(), theme || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')); }, [cur, theme, ready, finished]); // eslint-disable-line

@@ -115,7 +115,7 @@ function openDiagram(el: HTMLElement) {
 
 /** Adds `.in` to `.reveal` blocks as they scroll into view (the CSS animates the rest). */
 export function reveal(root: HTMLElement, scroller: HTMLElement) {
-  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { root: scroller, threshold: 0.05 });
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { root: scroller, threshold: 0, rootMargin: '0px 0px -5% 0px' });
   root.querySelectorAll<HTMLElement>('.reveal').forEach((el, i) => { el.style.transitionDelay = Math.min(i, 4) * 60 + 'ms'; io.observe(el); });
   return () => io.disconnect();
 }
