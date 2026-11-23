@@ -1,3 +1,4 @@
+import { breakAny, breakText } from './paragraphs';
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { EXTRA } from './config';
@@ -26,7 +27,7 @@ function Mcq({ q, sec }: { q: any; sec: string }) {
   return (
     <div className="exq" id={'pq' + q.n}>
       <div className="qh"><h2 className="qn">Question {label}</h2><span className="ms">{D.pastSingle ? 'CHOOSE THE BEST ANSWER' : 'SELECT ALL THAT APPLY'}</span></div>
-      <div className="qt" dangerouslySetInnerHTML={{ __html: q.q }} />
+      <div className="qt" dangerouslySetInnerHTML={{ __html: breakAny(q.q) }} />
       <div role="group" aria-label={`Options for question ${label}`}>
         {q.o.map((o: string, i: number) => {
           const v = L5[i], isA = ans.includes(v), isS = sel.includes(v);
@@ -40,7 +41,7 @@ function Mcq({ q, sec }: { q: any; sec: string }) {
       {!sol && <div className="row"><button className="btn" disabled={checked || !sel.length} onClick={check}>Check answer</button>
         <button className="btn ghost" onClick={() => g.openChapter(q.ch, { back: { tab: 'past', sel: sec, sec, q: q.n, y: 0, label: 'Back to Past Exam Q' + label, up: null } })}>📖 Revise chapter {q.ch}</button></div>}
       <AnimatePresence>{done && (
-        <motion.div {...fade}><div className={`verdict ${sol || ok ? 'ok' : 'no'}`}><b>{sol ? 'Solution:' : ok ? '✅ Correct.' : '❌ Not quite.'}</b> {sol ? '' : 'Answer: '}<b>{ans.join(', ')}</b>. <span dangerouslySetInnerHTML={{ __html: q.e }} />
+        <motion.div {...fade}><div className={`verdict ${sol || ok ? 'ok' : 'no'}`}><b>{sol ? 'Solution:' : ok ? '✅ Correct.' : '❌ Not quite.'}</b> {sol ? '' : 'Answer: '}<b>{ans.join(', ')}</b>. <span dangerouslySetInnerHTML={{ __html: breakAny(q.e) }} />
           {!sol && <div className="row">{ok ? null : <JumpBtn ch={q.ch} text={q.q + ' ' + q.e} back={{ tab: 'past', sel: sec, sec, q: q.n, y: 0, label: 'Back to Past Exam Q' + label, up: null }} />}<button className="btn ghost" onClick={retry}>↺ Try again</button></div>}
         </div></motion.div>)}</AnimatePresence>
     </div>
@@ -52,11 +53,11 @@ function Written({ q, sec }: { q: any; sec: string }) {
   return (
     <div className="exq">
       <div className="qh"><h2 className="qn">Question {q.no || q.n}</h2><span className="ms">{q.pts} POINTS</span></div>
-      <div className="qt" dangerouslySetInnerHTML={{ __html: q.q }} />
+      <div className="qt" dangerouslySetInnerHTML={{ __html: breakAny(q.q) }} />
       <label className="sr" htmlFor={'ta' + q.n}>Your answer</label>
       <textarea id={'ta' + q.n} placeholder="Write your own answer first (saved on this device)…" value={g.PW[q.n] || ''} onChange={(e) => g.patch('PW', (o) => ({ ...o, [q.n]: e.target.value }))} />
       <div className="row"><button className="btn ghost" onClick={() => g.openChapter(q.ch, { back: { tab: 'past', sel: sec, sec, q: 0, y: 0, label: 'Back to Past Exam', up: null } })}>📖 Revise chapter {q.ch}</button></div>
-      <AnimatePresence initial={false}>{sol && <motion.details className="model" open {...fade}><summary>Model answer</summary><div className="ma" dangerouslySetInnerHTML={{ __html: q.a }} /></motion.details>}</AnimatePresence>
+      <AnimatePresence initial={false}>{sol && <motion.details className="model" open {...fade}><summary>Model answer</summary><div className="ma" dangerouslySetInnerHTML={{ __html: breakText(q.a) }} /></motion.details>}</AnimatePresence>
     </div>
   );
 }

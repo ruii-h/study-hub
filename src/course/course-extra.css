@@ -140,3 +140,13 @@ pre.mermaid[data-rendered]::after{content:"⤢ tap to enlarge";position:absolute
 .dg-bar span{color:#c9d1d9;font:600 13px system-ui,sans-serif;min-width:48px;text-align:center}
 .dg-view{flex:1;overflow:auto;padding:12px;display:flex}
 .dg-view .dg-svg{margin:auto;flex:none;max-width:none!important}
+
+/* paragraph chunks (see src/guide/paragraphs.ts) */
+.pb{display:block}
+.pb+.pb{margin-top:.7em}
+td .pb+.pb,li .pb+.pb{margin-top:.45em}
+.pb-li{position:relative;padding-left:1.2em}
+.pb-li::before{content:"•";position:absolute;left:.2em;color:var(--accent,#58a6ff)}
+.pb-li+.pb-li{margin-top:.25em!important}
+.pb-num{padding-left:.2em}
+.pb-num::before{content:none}

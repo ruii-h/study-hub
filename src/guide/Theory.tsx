@@ -4,6 +4,7 @@ import { SideList } from './Guide';
 import { ChapterLoader } from './Loader';
 import { highlightChunked } from '../course/highlight';
 import { useG } from './state';
+import { breakText } from './paragraphs';
 import { balanceUnits, mergeCells, transposeTables, reveal, runMermaid, snakeChains, stackTables } from './enhance';
 import { chapterSlide, ease, flipTiming, floatUp } from './motion';
 
@@ -59,7 +60,7 @@ export default function Theory() {
   const theme = ST.theme;
   const nq = (D.hard[cur]?.length || 0) + (D.fill?.[cur]?.length || 0) + ((D as any).mixed ? D.quiz[cur]?.length || 0 : 0);
   const mins = useMemo(() => Math.max(1, Math.round(lesson.html.replace(/<[^>]+>/g, ' ').split(/\s+/).length / 200)), [lesson]);
-  const htmlStr = useMemo(() => lesson.html.replace(/ onclick="this\.classList\.toggle\('flip'\)"/g, ''), [lesson]);
+  const htmlStr = useMemo(() => breakText(lesson.html.replace(/ onclick="this\.classList\.toggle\('flip'\)"/g, '')), [lesson]);
 
   // very large chapters are laid out one frame later so a loading state can paint first
   const heavy = lesson.html.length > 15000;
