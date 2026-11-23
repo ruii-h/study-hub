@@ -50,6 +50,7 @@ const vbWidth = (svg: string) => { const m = /viewBox="[-\d.]+ [-\d.]+ ([\d.]+) 
  * Blocks keep their source in data-src so they re-render when the theme changes.
  */
 export function runMermaid(root: HTMLElement, load: () => Promise<MermaidLike>, theme: string): Promise<void> {
+  if (!root.dataset.dgClick) { root.dataset.dgClick = '1'; root.addEventListener('click', (e) => { const p = (e.target as HTMLElement).closest?.('pre.mermaid') as HTMLElement | null; if (p && p.querySelector('svg')) openDiagram(p); }); }
   const all = [...root.querySelectorAll<HTMLElement>('pre.mermaid')].filter((x) => x.dataset.rendered !== theme);
   if (!all.length) return Promise.resolve();
   return load().then(async (mermaid) => {
@@ -85,6 +86,31 @@ export function runMermaid(root: HTMLElement, load: () => Promise<MermaidLike>, 
       } catch (err) { console.warn('mermaid render failed', err); }
     }
   }).catch((err) => console.warn('mermaid load failed', err));
+}
+
+/** Full-screen diagram viewer: scrollable both ways with zoom buttons, so even the widest diagram can be read at full size. */
+function openDiagram(el: HTMLElement) {
+  const svg = el.querySelector('svg'); if (!svg) return;
+  const vb = svg.viewBox.baseVal, W = vb.width || svg.getBoundingClientRect().width, H = vb.height || svg.getBoundingClientRect().height;
+  const ov = document.createElement('div'); ov.className = 'dg-ov'; ov.setAttribute('role', 'dialog');
+  const bar = document.createElement('div'); bar.className = 'dg-bar';
+  const view = document.createElement('div'); view.className = 'dg-view';
+  const c = svg.cloneNode(true) as SVGSVGElement; c.removeAttribute('style'); c.removeAttribute('width'); c.removeAttribute('height'); c.classList.add('dg-svg');
+  view.appendChild(c);
+  let z = Math.min(1.4, Math.max(0.3, (innerWidth - 24) / W));
+  const apply = () => { c.style.width = Math.round(W * z) + 'px'; c.style.height = Math.round(H * z) + 'px'; label.textContent = Math.round(z * 100) + '%'; };
+  const mk = (t: string, f: () => void, cls = '') => { const b = document.createElement('button'); b.type = 'button'; b.textContent = t; b.className = cls; b.onclick = f; bar.appendChild(b); return b; };
+  const label = document.createElement('span');
+  mk('−', () => { z = Math.max(0.2, z / 1.25); apply(); });
+  bar.appendChild(label);
+  mk('+', () => { z = Math.min(4, z * 1.25); apply(); });
+  mk('Fit', () => { z = Math.min(1.4, Math.max(0.2, (innerWidth - 24) / W)); apply(); });
+  mk('100%', () => { z = 1; apply(); });
+  const close = () => { ov.remove(); removeEventListener('keydown', key); };
+  const key = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
+  mk('✕ Close', close, 'dg-x');
+  addEventListener('keydown', key);
+  ov.append(bar, view); document.body.appendChild(ov); apply();
 }
 
 /** Adds `.in` to `.reveal` blocks as they scroll into view (the CSS animates the rest). */

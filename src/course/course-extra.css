@@ -129,3 +129,14 @@ pre.mermaid p,pre.mermaid span.edgeLabel p,pre.mermaid .nodeLabel p,pre.mermaid 
 pre.mermaid .edgeLabel p,pre.mermaid .labelBkg p{display:inline!important}
 pre.mermaid foreignObject{overflow:visible}
 pre.mermaid .edgeLabel,pre.mermaid .edgeLabel p{white-space:nowrap!important}
+
+/* diagram viewer */
+pre.mermaid{cursor:zoom-in;position:relative}
+pre.mermaid[data-rendered]::after{content:"⤢ tap to enlarge";position:absolute;right:8px;top:6px;font:600 11px system-ui,sans-serif;color:var(--muted,#8b949e);opacity:.7;pointer-events:none}
+.dg-ov{position:fixed;inset:0;z-index:100000;background:#0b0f14;display:flex;flex-direction:column}
+.dg-bar{display:flex;gap:6px;align-items:center;justify-content:center;padding:10px;background:#161b22;border-bottom:1px solid #30363d;flex-wrap:wrap}
+.dg-bar button{font:600 14px system-ui,sans-serif;color:#e6edf3;background:#21262d;border:1px solid #3b4654;border-radius:8px;padding:6px 12px;cursor:pointer;min-width:40px}
+.dg-bar .dg-x{background:#da3633;border-color:#da3633}
+.dg-bar span{color:#c9d1d9;font:600 13px system-ui,sans-serif;min-width:48px;text-align:center}
+.dg-view{flex:1;overflow:auto;padding:12px;display:flex}
+.dg-view .dg-svg{margin:auto;flex:none;max-width:none!important}
