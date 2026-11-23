@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, animate, motion } from 'framer-motion';
 import { SideList } from './Guide';
+import { ChapterLoader } from './Loader';
 import { useG } from './state';
 import { balanceUnits, mergeCells, transposeTables, reveal, runMermaid, snakeChains, stackTables } from './enhance';
 import { chapterSlide, ease, flipTiming, floatUp } from './motion';
@@ -59,8 +60,14 @@ export default function Theory() {
   const mins = useMemo(() => Math.max(1, Math.round(lesson.html.replace(/<[^>]+>/g, ' ').split(/\s+/).length / 200)), [lesson]);
   const htmlStr = useMemo(() => lesson.html.replace(/ onclick="this\.classList\.toggle\('flip'\)"/g, ''), [lesson]);
 
+  // very large chapters are laid out one frame later so a loading state can paint first
+  const heavy = lesson.html.length > 15000;
+  const [doneFor, setDoneFor] = useState(0);
+  const ready = !heavy || doneFor === cur;
+  useEffect(() => { if (ready) return; let a = requestAnimationFrame(() => { a = requestAnimationFrame(() => setDoneFor(cur)); }); return () => cancelAnimationFrame(a); }, [cur, ready]);
+
   useLayoutEffect(() => {
-    const b = body.current, sc = scroller.current; if (!b || !sc) return;
+    const b = body.current, sc = scroller.current; if (!b || !sc || !ready) return;
     const p = g.pendingScroll.current; g.pendingScroll.current = null;
     sc.scrollTop = 0;
     transposeTables(b); stackTables(b); mergeCells(b); snakeChains(b); g.wiki.autolink(sc, cur); balanceUnits(b); g.wiki.fillRows(sc);
@@ -74,15 +81,15 @@ export default function Theory() {
     else if (ST.yn === cur && ST.y > 50) setTimeout(() => { sc.scrollTop = ST.y; }, 350);
     (window as any).loadTheory = (n: number) => g.openChapter(n);
     return () => { stop(); io.disconnect(); g.api?.disposeDemos?.(); };
-  }, [cur]); // eslint-disable-line
+  }, [cur, ready]); // eslint-disable-line
   useEffect(() => { if (body.current) runMermaid(body.current, () => g.api!.loadMermaid(), theme || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')); }, [cur, theme]); // eslint-disable-line
   // cards that would leave an empty grid cell stretch to fill the row (re-run on every size change, like bootstrap's col-*)
   useEffect(() => {
-    const sc = scroller.current, b = body.current; if (!sc || !b) return;
+    const sc = scroller.current, b = body.current; if (!sc || !b || !ready) return;
     let t = 0; const run = () => { clearTimeout(t); t = window.setTimeout(() => { balanceUnits(b); g.wiki.fillRows(sc); }, 100); };
     const ro = new ResizeObserver(run); ro.observe(sc); ro.observe(b); document.fonts?.ready.then(run); run();
     return () => { ro.disconnect(); clearTimeout(t); };
-  }, [cur]); // eslint-disable-line
+  }, [cur, ready]); // eslint-disable-line
   useEffect(() => { const h = scroller.current?.querySelector('h1') as HTMLElement | null; h?.focus({ preventScroll: true }); }, [cur]);
 
   const tmr = useRef(0);
@@ -110,7 +117,8 @@ export default function Theory() {
               <div className="tocs">{toc.map((s) => <a key={s.id} href={'#' + s.id} className={active === s.id ? 'on' : ''} aria-current={active === s.id ? 'true' : undefined} title={s.t} onClick={(e) => { e.preventDefault(); scrollToId(s.id); }}>{s.num ? s.num + ' ' : ''}{s.t}</a>)}</div>
               <i className="rp" ref={rp} />
             </nav>)}
-          <div ref={body} onClick={onBodyClick} dangerouslySetInnerHTML={{ __html: htmlStr }} />
+          {!ready && <ChapterLoader />}
+          <div ref={body} onClick={onBodyClick} dangerouslySetInnerHTML={{ __html: ready ? htmlStr : '' }} />
           {meta.tabs.includes('Practice') ? <div className="endrow"><div className="endmsg">You have reached the end of Chapter {lesson.dn ?? cur}. <b>Next step:</b> test yourself while it is fresh.</div><button className="btn" onClick={() => g.goQuiz(cur)}>🧠 Take the Chapter {cur} quiz</button></div> : null}
           <div className="t-nav-footer">
             {pv ? <button className="t-nav-btn" onClick={() => g.openChapter(pv.n)}><small>Previous</small>← {pv.title}</button> : <div />}

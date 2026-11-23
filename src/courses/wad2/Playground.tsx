@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useG } from '../../guide/state';
+import { SideList } from '../../guide/Guide';
 import { html as hl } from '../../course/highlight-web';
 import { bundle, phSub } from './play';
 
@@ -11,11 +12,11 @@ export default function Playground() {
   const list = D.play as { id: string; g: string; title: string; desc: string; code: string }[];
   const id = list.find((p) => p.id === ST.play) ? (ST.play as string) : list[0].id;
   const ex = list.find((p) => p.id === id)!;
-  const idx = list.indexOf(ex);
   const [code, setCode] = useState<string>(() => PW['pg_' + id] ?? ex.code);
   const [auto, setAuto] = useState(true);
   const [wi, setWi] = useState(2);
   const [busy, setBusy] = useState(false);
+  const [shown, setShown] = useState(false);
   const box = useRef<HTMLDivElement>(null), pre = useRef<HTMLPreElement>(null), ta = useRef<HTMLTextAreaElement>(null);
   const seq = useRef(0), loaded = useRef('');
 
@@ -29,7 +30,7 @@ export default function Playground() {
     f.className = 'pg-fr'; f.title = 'Live preview'; f.setAttribute('sandbox', 'allow-scripts allow-modals'); f.style.opacity = '0';
     f.onload = () => {
       if (my !== seq.current) { f.remove(); return; }
-      f.style.opacity = '1'; setBusy(false);
+      f.style.opacity = '1'; setBusy(false); setShown(true);
       setTimeout(() => b.querySelectorAll('iframe').forEach((o) => { if (o !== f) o.remove(); }), 200);
     };
     f.srcdoc = phSub(c); b.appendChild(f);
@@ -54,11 +55,12 @@ export default function Playground() {
     if (e.key === 'Tab') { e.preventDefault(); el.setRangeText('  ', el.selectionStart, el.selectionEnd, 'end'); setCode(el.value); }
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); run(code); }
   };
-  const go = (d: number) => { const p = list[idx + d]; if (p) patch('ST', (o) => ({ ...o, play: p.id })); };
   const modified = code !== ex.code;
 
   return (
-    <div className="pane pgm" id="playm" tabIndex={0}>
+    <>
+    <div className="theory-nav" id="nav" tabIndex={0} aria-label="Exercise list"><SideList /></div>
+    <div className="theory-content pgm" id="playm" tabIndex={0}>
       <h1 className="t-h1" style={{ fontSize: 24 }}>{ex.title}</h1>
       <div className="sub">{ex.desc}</div>
       <div className="pg-bar">
@@ -75,12 +77,9 @@ export default function Playground() {
           <textarea ref={ta} className="pg-ta" value={code} spellCheck={false} autoCapitalize="off" autoComplete="off" aria-label="Editable source code"
             onChange={(e) => setCode(e.target.value)} onScroll={sync} onKeyDown={onKey} />
         </div>
-        <div className="pg-pvwrap"><div className="pg-pvbox" ref={box} style={{ width: WIDTHS[wi][1] }} /></div>
-      </div>
-      <div className="pg-nav">
-        <button className="t-nav-btn" disabled={!list[idx - 1]} onClick={() => go(-1)}><small>Previous</small>{list[idx - 1] ? '← ' + list[idx - 1].title : '—'}</button>
-        <button className="t-nav-btn next" disabled={!list[idx + 1]} onClick={() => go(1)}><small>Next</small>{list[idx + 1] ? list[idx + 1].title + ' →' : '—'}</button>
+        <div className="pg-pvwrap">{busy && !shown && <div className="pg-wait" role="status"><i className="ld-ring" aria-hidden="true" /><span>Loading preview…</span></div>}<div className="pg-pvbox" ref={box} style={{ width: WIDTHS[wi][1] }} /></div>
       </div>
     </div>
+    </>
   );
 }
