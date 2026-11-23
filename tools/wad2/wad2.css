@@ -1,0 +1,33 @@
+/* WAD2 extras: diagrams, code-file headings, details, sub-headings, live playground */
+.t-section h3{font-size:17px;font-weight:700;color:var(--ink);margin:22px 0 8px}
+.t-section h4{font-size:14.5px;font-weight:700;color:var(--cy);margin:20px 0 6px;letter-spacing:.01em}
+.t-section h4.file{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;margin:24px 0 6px;padding:7px 12px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px 8px 0 0;color:var(--ink);font-size:13.5px}
+.t-section h4.file .ftitle{font-weight:700}
+.t-section h4.file code{font-size:12px;color:var(--muted);background:none;padding:0}
+.t-section h4.file + .t-code{margin-top:0}
+.t-section h4.file + .t-code .t-code-header{border-radius:0}
+.t-section .sub{color:var(--muted);font-size:14px;margin:-4px 0 12px}
+/* flow diagrams: <div class="dg"><div class="row"><span class="nd">..</span><span class="ar">→</span>... */
+.dg{margin:14px 0;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;display:grid;gap:10px;overflow-x:auto}
+.dg .row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.dg .nd,.t-section .nd{display:inline-block;padding:6px 12px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);color:var(--ink);font-size:13.5px;line-height:1.35}
+.dg .nd.q,.t-section .nd.q{border-color:var(--ye);background:color-mix(in srgb,var(--ye) 12%,transparent)}
+.dg .nd.ok,.t-section .nd.ok{border-color:var(--gr);background:color-mix(in srgb,var(--gr) 12%,transparent)}
+.dg .ar,.t-section .ar{color:var(--muted);font-size:13px;font-weight:600}
+.dg table{margin:0}
+.t-section ul > li > .nd{margin-bottom:4px}
+/* details / source lists */
+details.wd{margin:8px 0;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:0 12px}
+details.wd > summary{cursor:pointer;padding:9px 0;font-size:13.5px;color:var(--ink);list-style:none}
+details.wd > summary::before{content:'▸';display:inline-block;width:1.1em;color:var(--accent);transition:transform .2s}
+details.wd[open] > summary::before{transform:rotate(90deg)}
+details.wd[open] > summary{border-bottom:1px solid var(--border);margin-bottom:10px}
+details.wd .t-code{margin-bottom:12px}
+/* live playground */
+.demo-slot{margin:6px 0 14px;display:grid;gap:10px}
+.pg-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.pg-hint{font-size:12.5px;color:var(--muted)}
+.pg-ed{width:100%;min-height:160px;resize:vertical;background:#000;color:#F8F8F2;border:1px solid #1f1f1f;border-radius:10px;padding:12px 14px;font:13px/1.55 'JetBrains Mono','Cascadia Code','Fira Code',Consolas,monospace;tab-size:2;white-space:pre;overflow:auto}
+.pg-ed:focus{outline:2px solid var(--accent);outline-offset:1px}
+.pg-pv iframe{width:100%;height:340px;border:1px solid var(--border);border-radius:10px;background:#fff;display:block}
+@media(max-width:700px){.pg-pv iframe{height:280px}.pg-ed{font-size:12px}}

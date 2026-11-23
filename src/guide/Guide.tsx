@@ -112,7 +112,9 @@ function Help({ dlg }: { dlg: React.RefObject<HTMLDialogElement | null> }) {
 function useTabs() {
   const { D, meta } = useG();
   return useMemo(() => {
-    const t = ['theory', 'practice', 'cards'];
+    const t = ['theory'];
+    if (meta.tabs.includes('Practice')) t.push('practice');
+    if (meta.tabs.includes('Flashcards')) t.push('cards');
     if (meta.tabs.includes('Cheat-sheet')) t.push('cheat');
     if (D.ice) t.push('ice');
     if ((D.exam.mcq.length || D.exam.wr.length) && D.secs) t.push('past');

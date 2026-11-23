@@ -80,7 +80,7 @@ export default function Hub() {
 
                   <dl className="mt-4 flex gap-4 text-xs text-muted">
                     <div><dt className="sr-only">Chapters</dt><dd><b className="text-ink">{c.chapters}</b> chapters</dd></div>
-                    <div><dt className="sr-only">Flashcards</dt><dd><b className="text-ink">{c.cards}</b> cards</dd></div>
+                    {c.cards > 0 && <div><dt className="sr-only">Flashcards</dt><dd><b className="text-ink">{c.cards}</b> cards</dd></div>}
                     <div><dt className="sr-only">Tabs</dt><dd><b className="text-ink">{c.tabs.length}</b> modes</dd></div>
                   </dl>
 

@@ -1,6 +1,6 @@
 # Study Hub
 
-IS114, IS115, IS210, IS211 and IS1704 study guides combined into one app (routes: `cf`, `algo`, `bpas`, `idp`, `ctp`).
+IS114, IS115, IS210, IS211 and IS1704 and WAD2 study guides combined into one app (routes: `cf`, `algo`, `bpas`, `idp`, `ctp`, `wad2`).
 Vite + React + TypeScript + Tailwind v4. Progress lives in `localStorage` (same keys as the original files, so existing progress carries over).
 
 ```
@@ -133,3 +133,6 @@ These are the owner's standing preferences. Follow them for every change, in all
 - Tabs: no Final Exam tab anywhere; no cheat-sheet for IS1704. Type-the-answer questions belong inside the Exam-style quiz.
 - Check desktop and mobile (375px) after UI changes; no empty containers, no content landing in the wrong grid column, rounded corners everywhere.
 - Commit and push after each finished change. Keep replies short and do not elaborate unless asked.
+
+## WAD2 (generated)
+`node tools/wad2/build.mjs` rebuilds `src/courses/wad2` from `tools/wad2/data.json`, which `tools/wad2/extract.mjs` pulled out of the standalone offline WAD2 page (theory, cheat sheets, live-playground lessons; Bootstrap 5.3 is bundled in `src/courses/wad2/bs.*`). The 104 theory topics are grouped into chapters by track, the 17 cheat sheets and 14 playground lessons become chapters of their own, and content is otherwise unchanged. Practice questions, past papers and the exam-question index are left out on purpose for now. The WAD2 course has only the Theory tab (`tabs` in `registry.ts`).

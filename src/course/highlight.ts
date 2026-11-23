@@ -2,6 +2,7 @@
  * Obsidian code colours for every `.t-code-body` block (python, powershell/bash). Runs after the guide renders
  * and again whenever new blocks appear (questions, ICE answers, search jumps). Palette: see course-extra.css (.tk-*).
  */
+import { javascript, css, html, json } from './highlight-web';
 const KW = new Set('def return if elif else for while break continue pass import from as class try except finally raise with lambda global nonlocal yield del assert async await'.split(' '));
 const LOGIC = new Set(['and', 'or', 'not', 'in', 'is']);
 const CONST = new Set(['True', 'False', 'None']);
@@ -64,7 +65,7 @@ function shell(src: string): string {
   }).join('\n');
 }
 
-const LANG: Record<string, (s: string) => string> = { python: python, powershell: shell, bash: shell, sh: shell, shell: shell };
+const LANG: Record<string, (s: string) => string> = { python: python, powershell: shell, bash: shell, sh: shell, shell: shell, javascript, js: javascript, css, html, vue: html, json };
 
 export function highlightAll(root: ParentNode = document): void {
   root.querySelectorAll<HTMLElement>('.t-code-body:not([data-hl])').forEach((el) => {

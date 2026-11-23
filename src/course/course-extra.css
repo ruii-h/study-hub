@@ -101,3 +101,6 @@ blockquote{border-radius:0 10px 10px 0}
 .glance td:last-child:not(:first-child){color:var(--muted);font-style:italic}
 table.has-merge td[rowspan]{vertical-align:middle!important;background:color-mix(in srgb,var(--surface) 94%,var(--text))!important}
 .qt .qctx{margin:0 0 10px;padding:8px 12px;border-left:3px solid var(--ye,#e0af68);background:color-mix(in srgb,var(--ye,#e0af68) 8%,transparent);font-size:.92em;line-height:1.6}
+:root[data-course=wad2][data-theme=dark]{--accent:#2ec4b6}
+:root[data-course=wad2][data-theme=light]{--accent:#0f766e}
+:root[data-course=wad2] .t-code-body,:root[data-course=wad2] code,:root[data-course=wad2] pre{font-family:'JetBrains Mono','Cascadia Code','Fira Code',Consolas,monospace}
