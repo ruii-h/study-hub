@@ -20,6 +20,24 @@ export const WhyRow = ({ ok, r }: { ok: boolean; r?: string | null }) => (r ? <d
 
 export function Ring({ p }: { p: number }) { return <div className="ring" style={{ ['--p' as any]: p }}><span>{p}%</span></div>; }
 
+/** A mistake corrected in "Review my mistakes" is also marked correct in the quiz it came from (chapter quiz, mixed quiz or past exam), including that chapter's score. */
+export function syncSource(g: any, src: any) {
+  const id = String(src.id); const ans: string[] = String(src.a).split('');
+  const past = /^p(.+)$/.exec(id);
+  if (past) {
+    g.patch('PS', (o: any) => ({ ...o, [past[1]]: ans.slice().sort().join('') }));
+    g.patch('P', (o: any) => ({ ...o, [past[1]]: 1 }));
+    return;
+  }
+  const m = /^(h|x)(\d+)-/.exec(id); if (!m) return;
+  const n = +m[2], key = m[1] === 'h' ? String(n) : 'x' + n;
+  const old = g.QP[key]?.ord?.find((r: any) => r.id === id); if (!old) return;
+  const idx = ans.map((l) => L5.indexOf(l));
+  const wasWrong = !!old.chk && !(old.ok !== undefined ? old.ok : old.sel.length === idx.length && old.sel.every((p: number) => idx.includes(old.perm[p])));
+  g.patch('QP', (o: any) => ({ ...o, [key]: { ...o[key], ord: o[key].ord.map((r: any) => (r.id === id ? { ...r, sel: r.perm.map((old2: number, pos: number) => (idx.includes(old2) ? pos : -1)).filter((p: number) => p >= 0), chk: 1, ...(m[1] === 'x' ? { ok: 1 } : {}) } : r)) } }));
+  if (wasWrong) g.patch('S', (s: any) => (s[n] ? { ...s, [n]: { ...s[n], s: Math.min(s[n].t, s[n].s + 1) } } : s));
+}
+
 /* ---------- multi-select quiz ---------- */
 type MQ = { title: string; qs: any[]; qkey: string; pills?: React.ReactNode; ch?: number };
 function MultiQuiz(props: MQ) {
@@ -43,6 +61,7 @@ function MultiBody({ title, qs, qkey, pills, ch }: MQ) {
   const check = (q: any) => {
     setRec(q.rec.id, (r) => ({ ...r, chk: 1 }));
     const ok = isOk(q);
+    if (ok && qkey === 'mx') syncSource(g, q.src);
     patch('M', (m) => { const n = { ...m }; if (ok) delete n[q.src.id]; else n[q.src.id] = { q: q.src.q, o: q.src.o, a: q.src.a, e: q.src.e, w: q.src.w, ch: q.src.ch, id: q.src.id }; return n; });
   };
   const key = qkey; const n = /^\d+$/.test(key) ? +key : 0;
