@@ -1661,3 +1661,12 @@ a.wl::after{content:"";position:absolute;inset:-7px -3px}
 @media(hover:hover){.backbar .bb-go:hover{background:rgba(103,212,245,.12)!important}.backbar .bb-x:hover{background:rgba(255,255,255,.08)!important;color:var(--text,#e6edf3)!important}}
 .backbar .bb-go:active,.backbar .bb-x:active{background:rgba(103,212,245,.2)!important}
 @media(max-width:900px){.theory-content>.backbar{bottom:calc(14px + env(safe-area-inset-bottom))}}
+
+/* Beginner explainer boxes */
+.nb{margin:14px 0;padding:12px 16px;border-radius:12px;background:rgba(63,185,80,.08);border:1px solid rgba(63,185,80,.35);font-size:14.5px;line-height:1.7;color:var(--text)}
+.nb>b:first-child{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:6px}
+.nb p{margin:6px 0}
+.nb .t-table-wrap{margin:8px 0}
+.nb .t-rule-list{margin:6px 0}
+html[data-theme=light] .nb{background:rgba(26,127,55,.07);border-color:rgba(26,127,55,.35)}
+html[data-theme=light] .nb>b:first-child{color:#1a7f37}
