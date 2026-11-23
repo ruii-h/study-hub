@@ -150,3 +150,16 @@ td .pb+.pb,li .pb+.pb{margin-top:.45em}
 .pb-li+.pb-li{margin-top:.25em!important}
 .pb-num{padding-left:.2em}
 .pb-num::before{content:none}
+
+/* Phone (S24 Ultra ~412px): let the search box shrink so the top bar never overflows */
+@media(max-width:860px){
+  .topbar{min-width:0}
+  .searchbox{min-width:0}
+  .topbar-right{flex:0 0 auto;gap:6px}
+}
+
+/* Phone: tables with 4+ columns scroll sideways instead of squeezing every cell to ~70px */
+@media(max-width:640px){
+  .t-table-wrap:not(.stack) table:has(tr>*:nth-child(4)){min-width:540px}
+  .t-table-wrap{-webkit-overflow-scrolling:touch}
+}
