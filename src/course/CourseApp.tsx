@@ -57,9 +57,11 @@ export default function CourseApp() {
   if (!ready) {
     return (
       <div className="grid min-h-dvh place-items-center bg-bg text-muted" role="status" aria-live="polite">
-        <div className="animate-fade-in text-center">
-          <div className="animate-glow mx-auto mb-3 h-10 w-10 rounded-full border-2 border-accent/60" />
-          Loading {meta.short}…
+        <div className="animate-fade-in w-[min(560px,88vw)] space-y-3" aria-label={`Loading ${meta.short}`}>
+          <span className="sr-only">Loading {meta.short}…</span>
+          {[40, 100, 92, 70].map((w, i) => <div key={i} className="h-4 animate-pulse rounded-md bg-surface2" style={{ width: w + '%' }} />)}
+          <div className="h-40 animate-pulse rounded-xl bg-surface2" />
+          {[88, 55].map((w, i) => <div key={i} className="h-4 animate-pulse rounded-md bg-surface2" style={{ width: w + '%' }} />)}
         </div>
       </div>
     );

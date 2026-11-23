@@ -77,7 +77,7 @@ export default function Playground() {
           <textarea ref={ta} className="pg-ta" value={code} spellCheck={false} autoCapitalize="off" autoComplete="off" aria-label="Editable source code"
             onChange={(e) => setCode(e.target.value)} onScroll={sync} onKeyDown={onKey} />
         </div>
-        <div className="pg-pvwrap">{busy && !shown && <div className="pg-wait" role="status"><i className="ld-ring" aria-hidden="true" /><span>Loading preview…</span></div>}<div className="pg-pvbox" ref={box} style={{ width: WIDTHS[wi][1] }} /></div>
+        <div className="pg-pvwrap">{busy && !shown && <div className="pg-sk" role="status" aria-label="Loading preview" />}<div className="pg-pvbox" ref={box} style={{ width: WIDTHS[wi][1] }} /></div>
       </div>
     </div>
     </>

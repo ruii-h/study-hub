@@ -1,12 +1,21 @@
 import { motion } from 'framer-motion';
 import { fade } from './motion';
 
-/** Shown while a big chapter (e.g. a code-archive file list) is being laid out, so the page never looks frozen. */
-export function ChapterLoader({ label = 'Loading chapter…' }: { label?: string }) {
+/** Grey placeholder bars and boxes shown until a big chapter is completely in (text, code colours, fonts, images). */
+export function ChapterLoader() {
+  const line = (w: string, k: number) => <b key={k} className="sk-l" style={{ width: w }} />;
+  const block = (k: number) => (
+    <div className="sk-sec" key={k}>
+      <b className="sk-h" style={{ width: k % 2 ? '44%' : '58%' }} />
+      {[96, 90, 72].map((w, i) => line(w + '%', i))}
+      <div className="sk-box" style={{ height: 150 + (k % 3) * 40 }} />
+      {[94, 60].map((w, i) => line(w + '%', i + 5))}
+    </div>);
   return (
-    <motion.div className="ld" role="status" aria-live="polite" {...fade}>
-      <div className="ld-row"><i className="ld-ring" aria-hidden="true" /><span>{label}</span></div>
-      <div className="ld-sk" aria-hidden="true"><b style={{ width: '38%' }} /><b style={{ width: '92%' }} /><b style={{ width: '78%' }} /><b style={{ width: '86%' }} /><b style={{ width: '54%' }} /></div>
+    <motion.div className="sk" role="status" aria-label="Loading chapter" aria-live="polite" {...fade}>
+      <span className="sr-only">Loading chapter…</span>
+      <div className="sk-chips"><b /><b /><b /><b /></div>
+      {[0, 1, 2].map(block)}
     </motion.div>
   );
 }

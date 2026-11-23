@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, animate, motion } from 'framer-motion';
 import { SideList } from './Guide';
 import { ChapterLoader } from './Loader';
+import { highlightChunked } from '../course/highlight';
 import { useG } from './state';
 import { balanceUnits, mergeCells, transposeTables, reveal, runMermaid, snakeChains, stackTables } from './enhance';
 import { chapterSlide, ease, flipTiming, floatUp } from './motion';
@@ -63,8 +64,23 @@ export default function Theory() {
   // very large chapters are laid out one frame later so a loading state can paint first
   const heavy = lesson.html.length > 15000;
   const [doneFor, setDoneFor] = useState(0);
+  const [shownFor, setShownFor] = useState(0);
   const ready = !heavy || doneFor === cur;
+  const finished = !heavy || shownFor === cur; // true once everything is in: html, enhancements, code colours, fonts, images
   useEffect(() => { if (ready) return; let a = requestAnimationFrame(() => { a = requestAnimationFrame(() => setDoneFor(cur)); }); return () => cancelAnimationFrame(a); }, [cur, ready]);
+
+  useEffect(() => {
+    if (!heavy || !ready || finished) return;
+    let off = false;
+    (async () => {
+      const b = body.current; if (!b) return;
+      await highlightChunked(b);
+      await Promise.all([document.fonts?.ready, ...[...b.querySelectorAll('img')].map((im) => (im.complete ? null : im.decode().catch(() => null)))]);
+      await new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r())));
+      if (!off) setShownFor(cur);
+    })();
+    return () => { off = true; };
+  }, [cur, ready, finished, heavy]); // eslint-disable-line
 
   useLayoutEffect(() => {
     const b = body.current, sc = scroller.current; if (!b || !sc || !ready) return;
@@ -117,8 +133,8 @@ export default function Theory() {
               <div className="tocs">{toc.map((s) => <a key={s.id} href={'#' + s.id} className={active === s.id ? 'on' : ''} aria-current={active === s.id ? 'true' : undefined} title={s.t} onClick={(e) => { e.preventDefault(); scrollToId(s.id); }}>{s.num ? s.num + ' ' : ''}{s.t}</a>)}</div>
               <i className="rp" ref={rp} />
             </nav>)}
-          {!ready && <ChapterLoader />}
-          <div ref={body} onClick={onBodyClick} dangerouslySetInnerHTML={{ __html: ready ? htmlStr : '' }} />
+          {!finished && <ChapterLoader />}
+          <div ref={body} className={finished ? '' : 'defer-hl'} onClick={onBodyClick} dangerouslySetInnerHTML={{ __html: ready ? htmlStr : '' }} />
           {meta.tabs.includes('Practice') ? <div className="endrow"><div className="endmsg">You have reached the end of Chapter {lesson.dn ?? cur}. <b>Next step:</b> test yourself while it is fresh.</div><button className="btn" onClick={() => g.goQuiz(cur)}>🧠 Take the Chapter {cur} quiz</button></div> : null}
           <div className="t-nav-footer">
             {pv ? <button className="t-nav-btn" onClick={() => g.openChapter(pv.n)}><small>Previous</small>← {pv.title}</button> : <div />}

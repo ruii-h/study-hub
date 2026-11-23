@@ -67,8 +67,23 @@ function shell(src: string): string {
 
 const LANG: Record<string, (s: string) => string> = { python: python, powershell: shell, bash: shell, sh: shell, shell: shell, javascript, js: javascript, css, html, vue: html, json };
 
+const frame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
+/** Colours one block. */
+function paint(el: HTMLElement): void {
+  el.dataset.hl = '1';
+  const lang = (el.parentElement?.querySelector('.t-code-header span')?.textContent || '').trim().toLowerCase();
+  const fn = LANG[lang];
+  if (fn) el.innerHTML = fn(el.textContent || '');
+}
+/** Async version for very large chapters: colours the blocks a few at a time so the page stays responsive; resolves when all are done. */
+export async function highlightChunked(root: ParentNode, per = 4): Promise<void> {
+  const els = [...root.querySelectorAll<HTMLElement>('.t-code-body:not([data-hl])')];
+  for (let i = 0; i < els.length; i += per) { els.slice(i, i + per).forEach(paint); await frame(); }
+}
+
 export function highlightAll(root: ParentNode = document): void {
   root.querySelectorAll<HTMLElement>('.t-code-body:not([data-hl])').forEach((el) => {
+    if (el.closest('.defer-hl')) return; // a big chapter is colouring these itself (highlightChunked)
     el.dataset.hl = '1';
     const lang = (el.parentElement?.querySelector('.t-code-header span')?.textContent || '').trim().toLowerCase();
     const fn = LANG[lang];

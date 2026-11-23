@@ -1717,6 +1717,5 @@ details.wd .t-code{margin-bottom:12px}
 .pg-fr{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff;transition:opacity .18s ease}
 @media(max-width:700px){.pg-hl,.pg-ta{font-size:12px}.pg-seg button{padding:6px 8px}}
 .pg-pvwrap{position:relative}
-.pg-wait{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;gap:10px;background:color-mix(in srgb,var(--surface2) 80%,transparent);color:var(--muted);font-size:13.5px;pointer-events:none;animation:pgfade .2s ease both}
-@keyframes pgfade{from{opacity:0}to{opacity:1}}
+.pg-sk{position:absolute;inset:0;z-index:2;border-radius:0;pointer-events:none}
 .pgm{padding-bottom:40px}

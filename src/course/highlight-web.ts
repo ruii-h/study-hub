@@ -9,13 +9,14 @@ const JSBI = new Set('console document window Math JSON Object Array String Numb
 export function javascript(src: string): string {
   const re = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*'|`(?:\\.|[^`\\])*`)|(\b\d+(?:\.\d+)?\b)|([A-Za-z_$][\w$]*)|(=>|[-+*/%<>=!&|?:]+)|(\s+)|([\s\S])/g;
   let out = '', m: RegExpExecArray | null, afterFn = false, prev = '';
+  const callRe = /\s*\(/y;
   while ((m = re.exec(src))) {
     const [t, com, str, num, id, op, ws] = m;
     if (com) out += span('c', t);
     else if (str) out += span('s', t);
     else if (num) out += span('n', t);
     else if (id) {
-      const call = /^\s*\(/.test(src.slice(re.lastIndex));
+      callRe.lastIndex = re.lastIndex; const call = callRe.test(src);
       if (JSCONST.has(id)) out += span('b', t);
       else if (JSKW.has(id) && prev !== '.') { out += span('k', t); afterFn = id === 'function' || id === 'class'; }
       else if (afterFn) { out += span('f', t); afterFn = false; }
@@ -51,6 +52,7 @@ export function html(src: string): string {
   const re = /(<!--[\s\S]*?-->)|(<\/?)([A-Za-z][\w:-]*)((?:\s+[^\s=<>"'/]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+))?)*)(\s*\/?>)|(\{\{[\s\S]*?\}\})/g;
   const attrs = (a: string) => a.replace(/(\s+)([^\s=<>"'/]+)(?:(\s*=\s*)("[^"]*"|'[^']*'|[^\s>]+))?/g, (_, sp, n, eq, v) => sp + span('bi', n) + (v !== undefined ? esc(eq) + span('s', v) : ''));
   let out = '', i = 0, m: RegExpExecArray | null;
+  const low = src.toLowerCase();
   while ((m = re.exec(src))) {
     if (m.index > i) out += esc(src.slice(i, m.index));
     i = re.lastIndex;
@@ -61,7 +63,7 @@ export function html(src: string): string {
       out += esc(open) + span('k', name) + attrs(a) + esc(close);
       const nm = name.toLowerCase();
       if (open === '<' && (nm === 'style' || nm === 'script') && !/\/>$/.test(close)) {
-        const end = src.toLowerCase().indexOf('</' + nm, i);
+        const end = low.indexOf('</' + nm, i);
         const body = src.slice(i, end < 0 ? src.length : end);
         out += nm === 'style' ? css(body) : javascript(body);
         i = re.lastIndex = end < 0 ? src.length : end;

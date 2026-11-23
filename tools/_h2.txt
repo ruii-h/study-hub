@@ -1,0 +1,6 @@
+import fs from 'fs';
+let s=RD('src/course/highlight.ts');
+const a="export function highlightAll(root: ParentNode = document): void {\n  root.querySelectorAll<HTMLElement>('.t-code-body:not([data-hl])').forEach((el) => {\n    el.dataset.hl = '1';";
+if(!s.includes(a)) throw new Error('anchor');
+s=s.replace(a,`const frame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
+/** Colours

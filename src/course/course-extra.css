@@ -104,11 +104,14 @@ table.has-merge td[rowspan]{vertical-align:middle!important;background:color-mix
 :root[data-course=wad2][data-theme=dark]{--accent:#2ec4b6}
 :root[data-course=wad2][data-theme=light]{--accent:#0f766e}
 :root[data-course=wad2] .t-code-body,:root[data-course=wad2] code,:root[data-course=wad2] pre{font-family:'JetBrains Mono','Cascadia Code','Fira Code',Consolas,monospace}
-/* loading states */
-.ld{margin:26px 0;padding:18px;border:1px solid var(--border);border-radius:14px;background:var(--surface)}
-.ld-row{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:14px}
-.ld-ring{width:20px;height:20px;border-radius:50%;border:3px solid color-mix(in srgb,var(--accent) 25%,transparent);border-top-color:var(--accent);animation:ldspin .8s linear infinite}
-.ld-sk{display:grid;gap:10px;margin-top:16px}
-.ld-sk b{display:block;height:12px;border-radius:6px;background:linear-gradient(90deg,var(--surface2) 25%,color-mix(in srgb,var(--accent) 16%,var(--surface2)) 50%,var(--surface2) 75%);background-size:200% 100%;animation:ldshim 1.3s ease-in-out infinite}
-@keyframes ldspin{to{transform:rotate(360deg)}}
-@keyframes ldshim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+/* loading states: grey bars and boxes (skeleton) */
+.sk{margin:22px 0 40px;display:grid;gap:30px}
+.sk-chips{display:flex;flex-wrap:wrap;gap:10px}
+.sk-chips b{width:150px;height:34px;border-radius:999px}
+.sk-sec{display:grid;gap:11px}
+.sk-h{height:22px;border-radius:7px}
+.sk-l{height:13px;border-radius:6px}
+.sk-box{border-radius:12px;width:100%}
+.sk b,.sk-box,.pg-sk{display:block;background:linear-gradient(90deg,var(--surface2) 25%,color-mix(in srgb,var(--text) 9%,var(--surface2)) 50%,var(--surface2) 75%);background-size:200% 100%;animation:skshim 1.4s ease-in-out infinite}
+@keyframes skshim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.defer-hl{visibility:hidden;height:0;overflow:hidden}
