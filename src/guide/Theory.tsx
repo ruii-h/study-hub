@@ -140,10 +140,10 @@ export default function Theory() {
             </nav>)}
           {!finished && <ChapterLoader />}
           <div ref={body} className={finished ? '' : 'defer-hl'} onClick={onBodyClick} dangerouslySetInnerHTML={{ __html: ready ? htmlStr : '' }} />
-          {meta.tabs.includes('Practice') ? <div className="endrow"><div className="endmsg">You have reached the end of Chapter {lesson.dn ?? cur}. <b>Next step:</b> test yourself while it is fresh.</div><button className="btn" onClick={() => g.goQuiz(cur)}>🧠 Take the Chapter {cur} quiz</button></div> : null}
+          {meta.tabs.includes('Practice') && (D.hard[cur]?.length || D.quiz[cur]?.length) ? <div className="endrow"><div className="endmsg">You have reached the end of Chapter {lesson.dn ?? cur}. <b>Next step:</b> test yourself while it is fresh.</div><button className="btn" onClick={() => g.goQuiz(cur)}>🧠 Take the Chapter {cur} quiz</button></div> : null}
           <div className="t-nav-footer">
             {pv ? <button className="t-nav-btn" onClick={() => g.openChapter(pv.n)}><small>Previous</small>← {pv.title}</button> : <div />}
-            {nx ? <button className="t-nav-btn next" onClick={() => g.openChapter(nx.n)}><small>Next chapter</small>{nx.title} →</button> : meta.tabs.includes('Practice') ? <button className="t-nav-btn next" onClick={() => g.setTab('practice')}><small>You finished the course notes</small>Go to the practice questions →</button> : <div />}
+            {nx ? <button className="t-nav-btn next" onClick={() => g.openChapter(nx.n)}><small>Next chapter</small>{nx.title} →</button> : meta.tabs.includes('Practice') && g.tabOf(cur) === 'theory' ? <button className="t-nav-btn next" onClick={() => g.setTab('practice')}><small>You finished the course notes</small>Go to the practice questions →</button> : <div />}
           </div>
         </motion.div>
         <AnimatePresence>

@@ -1690,3 +1690,21 @@ ol.h10 li::before{content:counter(h);flex:none;width:24px;height:24px;border-rad
 .ls-c{display:block;padding:.55rem 0;border-radius:8px;font-weight:800;font-size:1rem;color:#0b0e14}
 .ls-ka{background:#79c0ff}.ls-kb{background:#7ee787}.ls-kc{background:#d2a8ff}
 .ls-n{margin:.6rem 0 0;font-size:.82rem;opacity:.85}
+
+/* Exam review: question cards (Kotaro + Claude tabs) */
+.t-section>.xq,.t-section>.t-h3{grid-column:1/-1}
+.xq{background:var(--surface);border:1px solid var(--border);border-radius:var(--r3,14px);padding:16px 18px;margin:12px 0}
+.xq-h{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin-bottom:8px}
+.xq-n{font-weight:800;color:var(--purple);letter-spacing:.02em}
+.xq-m{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--muted)}
+.xq-q{font-size:16px;line-height:1.75;color:var(--text);margin:0 0 10px}
+.xq-o{list-style:none;margin:0 0 8px;padding:0;display:grid;gap:6px}
+.xq-o li{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--border);border-radius:10px;padding:8px 12px;background:var(--surface2);line-height:1.6}
+.xq-l{flex:none;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;background:var(--surface3);color:var(--text)}
+.xq-p{margin:0 0 8px;padding-left:22px}.xq-p li{margin:6px 0;line-height:1.7}
+.xq-pt{color:var(--purple)}
+.xq-w{list-style:none;padding:0;margin:8px 0}
+.xq-w li{border-left:3px solid var(--border);padding:4px 10px;margin:6px 0}
+.xq-w li.y{border-color:var(--green)}.xq-w li.n{border-color:var(--red)}
+.xq-flip{border-left:3px solid var(--purple);background:rgba(188,140,255,.10);padding:8px 12px;border-radius:0 8px 8px 0;margin-top:10px}
+@media(max-width:600px){.xq{padding:14px 12px}.xq-o li{padding:8px}}
