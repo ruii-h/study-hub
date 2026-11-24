@@ -125,28 +125,20 @@ function Ex2() {
 
 /* ---------- Ex3: cheapest insertion ---------- */
 function insertionSteps() {
-  let best: [string, string] = ['C', 'P'];
+  let best: [string, string] = ['C', 'J'];
   for (const a of IDS) for (const b of IDS) if (a < b && d(a, b) < d(best[0], best[1])) best = [a, b];
   const tour = [best[0], best[1]];
-  const steps: { tour: string[]; cur?: string; note: string }[] = [{ tour: [...tour], note: `Start with the <b>closest pair</b>: ${tour[0]}–${tour[1]} (${d(tour[0], tour[1])} km). Treat it as a tiny loop.` }];
-  const left = IDS.filter((v) => !tour.includes(v));
-  while (left.length) {
-    let pick: { v: string; pos: number; delta: number; opts: string } | null = null;
-    for (const v of left) {
-      let bp = 0, bd = Infinity;
-      const opts: string[] = [];
-      for (let i = 0; i < tour.length; i++) {
-        const a = tour[i], b = tour[(i + 1) % tour.length];
-        const dl = d(a, v) + d(v, b) - d(a, b);
-        opts.push(`${a}–${v}–${b}: ${dl}`);
-        if (dl < bd) { bd = dl; bp = i + 1; }
-      }
-      if (!pick || bd < pick.delta) pick = { v, pos: bp, delta: bd, opts: opts.join('; ') };
-    }
-    const p = pick!;
-    tour.splice(p.pos, 0, p.v);
-    left.splice(left.indexOf(p.v), 1);
-    steps.push({ tour: [...tour], cur: p.v, note: `Cheapest extra cost is adding <b>${p.v}</b>, extra <b>Δ = ${p.delta}</b> km (options for ${p.v}: ${p.opts}). Insert it. Tour length now ${len(tour)} km.` });
+  const steps: { tour: string[]; cur?: string; note: string }[] = [{ tour: [...tour], note: `Start with the <b>closest pair</b> in the whole table: ${tour[0]}–${tour[1]} (${d(tour[0], tour[1])} km). Treat it as a tiny two-place loop.` }];
+  const out = IDS.filter((v) => !tour.includes(v));
+  while (out.length) {
+    let bx = '', by = '', bd = Infinity;
+    for (const x of out) for (const y of tour) if (d(x, y) < bd) { bd = d(x, y); bx = x; by = y; }
+    const i = tour.indexOf(by), n = tour.length;
+    const bef = tour[(i - 1 + n) % n], aft = tour[(i + 1) % n];
+    const ab = d(bef, bx) + d(bx, by) - d(bef, by), aa = d(by, bx) + d(bx, aft) - d(by, aft);
+    tour.splice(ab <= aa ? i : i + 1, 0, bx);
+    out.splice(out.indexOf(bx), 1);
+    steps.push({ tour: [...tour], cur: bx, note: `Outside place closest to any place on the tour: <b>${bx}</b>, ${bd} km from <b>${by}</b>. Try both sides of ${by}. Before (between ${bef} and ${by}): Δ = ${d(bef, bx)} + ${d(bx, by)} − ${d(bef, by)} = <b>${ab}</b>. After (between ${by} and ${aft}): Δ = ${d(by, bx)} + ${d(bx, aft)} − ${d(by, aft)} = <b>${aa}</b>. Insert on the ${ab <= aa ? 'before' : 'after'} side (ties go to before). Tour length now <b>${len(tour)} km</b>.` });
   }
   return steps;
 }
@@ -155,14 +147,15 @@ function Ex3() {
   const s = useSteps(S.length), c = S[s.k];
   return (
     <>
-      <Ask q="Build a tour by cheapest insertion, starting from the closest pair of places." ask="Instead of walking, you grow a small loop. Each round, find the unvisited place that adds the least extra distance when squeezed between two neighbours on the loop, and splice it in." />
+      <Ask q="Build a tour of the six places by cheapest-side insertion and compare it with nearest neighbour." ask="You grow a small loop. Each round, pick the outside place that is closest to any place already on the loop, then try squeezing it in on either side of that place and keep the side that adds less distance." />
       <Words>
         <W t="insertion">putting a new place between two places that are already next to each other on the tour.</W>
         <W t="Δ (delta)">“the change”. Here: extra distance from inserting v between a and b = d(a,v) + d(v,b) − d(a,b). We remove the direct leg a–b and replace it with two legs via v.</W>
         <W t="closest pair">the two places with the smallest distance of all pairs (that is the starting loop).</W>
-        <W t="cheapest">the insertion with the smallest Δ, across every unvisited place and every gap.</W>
+        <W t="outside place">a place not yet on the loop. Each round you pick the outside place with the shortest distance to any place on the loop.</W>
+        <W t="both sides">once you know which loop place y the newcomer x attaches to, you can put x just before y or just after y. Compute Δ for each and keep the smaller.</W>
       </Words>
-      <Hand steps={['Find the smallest number in the distance table. Those two places are your starting loop.', 'For each unvisited place and each gap on the loop, compute Δ = d(a,v) + d(v,b) − d(a,b).', 'Take the smallest Δ over everything. Insert that place in that gap.', 'Repeat until every place is on the loop.']} />
+      <Hand steps={['Find the smallest number in the distance table. Those two places are your starting loop.', 'Among outside places and loop places, find the shortest distance d(x, y). x is the newcomer, y is its anchor on the loop.', 'Compute Δ for both sides of y: Δ = d(neighbour, x) + d(x, y) − d(neighbour, y) using the loop neighbour on that side.', 'Insert x on the side with the smaller Δ (ties: before). Repeat until every place is on the loop.']} />
       <Transport s={s} />
       <Map tour={c.tour} cur={c.cur} label="Cheapest insertion tour" />
       <Msg live><H html={c.note} /></Msg>
