@@ -1714,3 +1714,20 @@ html[data-theme=light] .nb>b:first-child{color:#1a7f37}
 .vz-draw{stroke-dasharray:var(--len,300);stroke-dashoffset:var(--len,300);animation:vzDash .6s ease-out forwards}
 .vz-move{transition:transform .55s cubic-bezier(.4,.1,.2,1)}
 @media (prefers-reduced-motion:reduce){.vz-drop,.vz-in,.vz-rise,.vz-out,.vz-pulse,.vz-blink,.vz-draw{animation:none!important;stroke-dashoffset:0}.vz-move{transition:none}}
+
+/* ---- step-by-step graph filmstrips (chapter 9) ---- */
+.film{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin:12px 0 18px}
+.frame{margin:0;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:8px 8px 10px;display:flex;flex-direction:column;gap:6px}
+.frame-h{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13.5px}
+.frame-n{display:inline-grid;place-items:center;min-width:24px;height:24px;border-radius:999px;background:var(--accent);color:#06101f;font-size:12.5px;font-weight:800}
+.frame figcaption,.film-tree figcaption{font-size:12.5px;line-height:1.5;color:var(--muted)}
+.frame figcaption b{color:var(--text)}
+.film-svg{width:100%;height:auto;display:block}
+.film-key{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted);margin:6px 0}
+.film-key span{display:inline-flex;align-items:center;gap:6px}
+.film-key i{display:inline-block;width:12px;height:12px;border-radius:999px}
+.film-key i.ln{width:18px;height:4px;border-radius:2px}
+.film-tree{margin:10px auto 16px;max-width:360px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:8px}
+.film-pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.film-pair .film-tree{margin:6px 0 12px;max-width:none}
+@media (max-width:520px){.film{grid-template-columns:1fr}}
