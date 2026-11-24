@@ -10,6 +10,11 @@ import TreeLab from './TreeLab';
 import GraphTracer from './GraphTracer';
 import TspLab from './TspLab';
 import BruteForceLab from './BruteForceLab';
+import CountingLab from './CountingLab';
+import ComplexityLab from './ComplexityLab';
+import HeapLab from './HeapLab';
+import HashLab from './HashLab';
+import PvsNPLab from './PvsNPLab';
 
 const DEMOS: Record<string, () => React.JSX.Element> = {
   bsearch: BinarySearch,
@@ -25,6 +30,11 @@ const DEMOS: Record<string, () => React.JSX.Element> = {
   trace10: () => <GraphTracer ids={['wt']} />,
   tsp: TspLab,
   brute: BruteForceLab,
+  count: CountingLab,
+  cplx: ComplexityLab,
+  heap: HeapLab,
+  hash: HashLab,
+  pnp: PvsNPLab,
 };
 
 const roots = new Map<Element, Root>();
