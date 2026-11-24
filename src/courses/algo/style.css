@@ -1670,3 +1670,29 @@ a.wl::after{content:"";position:absolute;inset:-7px -3px}
 .nb .t-rule-list{margin:6px 0}
 html[data-theme=light] .nb{background:rgba(26,127,55,.07);border-color:rgba(26,127,55,.35)}
 html[data-theme=light] .nb>b:first-child{color:#1a7f37}
+
+/* Extra diagram palette (chapters 5-12) */
+.dg-ar{stroke:var(--muted);stroke-width:1.6;fill:none}
+.dg-ara{stroke:var(--accent);stroke-width:2.4;fill:none}
+.dg-arr{stroke:var(--red);stroke-width:2;fill:none;stroke-dasharray:6 4}
+.dg-ah{fill:var(--muted)}.dg-aha{fill:var(--accent)}.dg-ahr{fill:var(--red)}
+.dg-dim{opacity:.35}
+.dg-dash{stroke-dasharray:5 4}
+.dg-g{fill:rgba(63,185,80,.24);stroke:var(--green);stroke-width:2}
+.dg-w{fill:rgba(210,153,34,.24);stroke:var(--yellow);stroke-width:2}
+.dg-r{fill:rgba(248,81,73,.2);stroke:var(--red);stroke-width:2}
+.dg-q{fill:none;stroke:var(--border);stroke-width:1.5;stroke-dasharray:4 4}
+.dg-hd{fill:var(--text);font:700 13px system-ui,Segoe UI,sans-serif;text-anchor:middle}
+.dg-lt{fill:var(--muted);font:500 12px system-ui,Segoe UI,sans-serif;text-anchor:start}
+.dg-sn{fill:var(--text);font:700 10px system-ui,Segoe UI,sans-serif;text-anchor:middle;dominant-baseline:central}
+.dg-cg{stroke:var(--green);fill:none;stroke-width:2.5}.dg-cy{stroke:var(--yellow);fill:none;stroke-width:2.5}
+.dg-co{stroke:var(--orange);fill:none;stroke-width:2.5}.dg-cr{stroke:var(--red);fill:none;stroke-width:2.5}
+.dg-xg,.dg-xy,.dg-xo,.dg-xr{font:700 12px system-ui,Segoe UI,sans-serif;text-anchor:start}
+.dg-xg{fill:var(--green)}.dg-xy{fill:var(--yellow)}.dg-xo{fill:var(--orange)}.dg-xr{fill:var(--red)}
+.dg-fa{fill:rgba(88,166,255,.14);stroke:var(--accent);stroke-width:1.5}
+.dg-fg{fill:rgba(63,185,80,.18);stroke:var(--green);stroke-width:1.5}
+.dg-fo{fill:rgba(255,123,114,.14);stroke:var(--orange);stroke-width:1.5}
+@media(max-width:640px){
+  figure.diagram{padding:8px}
+  .dg-t{font-size:15px}.dg-s{font-size:13.5px}.dg-hd{font-size:14.5px}.dg-lt{font-size:13.5px}.dg-sn{font-size:11px}
+}
