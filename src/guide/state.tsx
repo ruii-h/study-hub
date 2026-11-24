@@ -9,7 +9,7 @@ export interface Data {
   lessons: Lesson[]; groups: { t: string; ns: number[]; tag: string }[]; cards: { t: string; d: string; f: string }[];
   quiz: Record<string, any[]>; hard: Record<string, any[]>; fill?: Record<string, any[]>; exam: { mcq: any[]; wr: any[] };
   selfq?: string; selfn?: number; ice?: string; pqg?: [string, number[]][]; secs?: Record<string, [number, number, string, string?]>;
-  pastNote?: string; pastSingle?: boolean; tabs?: TabDef[]; play?: any[];
+  pastNote?: string; cmock?: any[]; pastSingle?: boolean; tabs?: TabDef[]; play?: any[];
 }
 export type Back = { tab: string; sel: string | number; y: number; label: string; up: Back | null; sec?: string; q?: number } | null;
 type Json = Record<string, any>;

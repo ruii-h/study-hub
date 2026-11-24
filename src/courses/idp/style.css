@@ -1708,3 +1708,15 @@ ol.h10 li::before{content:counter(h);flex:none;width:24px;height:24px;border-rad
 .xq-w li.y{border-color:var(--green)}.xq-w li.n{border-color:var(--red)}
 .xq-flip{border-left:3px solid var(--purple);background:rgba(188,140,255,.10);padding:8px 12px;border-radius:0 8px 8px 0;margin-top:10px}
 @media(max-width:600px){.xq{padding:14px 12px}.xq-o li{padding:8px}}
+.cmock{max-width:860px;margin:0 auto}
+.cm-nav{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.cm-nav button{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-weight:700;cursor:pointer}
+.cm-nav button.done{border-color:var(--cy);color:var(--cy);background:rgba(103,212,245,.1)}
+.cm-nav button.right{border-color:var(--gr);color:var(--gr);background:rgba(74,222,128,.14)}
+.cm-nav button.wrong{border-color:var(--rd);color:var(--rd);background:rgba(255,107,107,.14)}
+.cm-res{display:flex;flex-wrap:wrap;gap:14px 20px;align-items:center;border:1px solid var(--border);border-radius:12px;background:var(--surface);padding:16px 18px;margin:10px 0}
+.cm-big{font-size:34px;font-weight:800;color:var(--pk)}
+.cm-hist span{display:inline-block;margin-right:10px;color:var(--muted)}
+.cm-badge{font-size:11px;font-weight:800;border-radius:99px;padding:0 8px;border:1px solid}
+.cm-badge.ok{color:var(--gr);border-color:var(--gr)}.cm-badge.no{color:var(--rd);border-color:var(--rd)}
+.cmock .btn.on{border-color:var(--pk)}

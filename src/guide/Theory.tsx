@@ -1,4 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import MockExam from './Mock';
 import { AnimatePresence, animate, motion } from 'framer-motion';
 import { SideList } from './Guide';
 import { ChapterLoader } from './Loader';
@@ -55,6 +57,7 @@ export default function Theory() {
   const body = useRef<HTMLDivElement>(null), scroller = useRef<HTMLDivElement>(null), rp = useRef<HTMLElement>(null);
   const [toc, setToc] = useState<{ id: string; num: string; t: string }[]>([]);
   const [active, setActive] = useState('');
+  const [slot, setSlot] = useState<HTMLElement | null>(null);
   const dirRef = useRef(0); const prev = useRef(cur);
   if (prev.current !== cur) { dirRef.current = cur > prev.current ? 1 : -1; prev.current = cur; }
   const theme = ST.theme;
@@ -91,7 +94,7 @@ export default function Theory() {
     transposeTables(b); stackTables(b); mergeCells(b); snakeChains(b); g.wiki.autolink(sc, cur); balanceUnits(b); g.wiki.fillRows(sc);
     const stop = reveal(b, sc);
     const list = [...b.querySelectorAll<HTMLElement>('.t-section[id]')].map((s) => { const n = s.querySelector('.t-num'); const t = s.querySelector('.t-h2')!.textContent!.replace(n ? n.textContent! : '', '').trim(); return { id: s.id, num: n ? n.textContent! : '', t }; });
-    setToc(list.length >= 2 ? list : []); setActive('');
+    setToc(list.length >= 2 ? list : []); setActive(''); setSlot(b.querySelector<HTMLElement>('#cmock-slot'));
     const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) setActive(e.target.id); }), { root: sc, rootMargin: '-10% 0px -75% 0px' });
     if (list.length >= 2) b.querySelectorAll('.t-section[id]').forEach((s) => io.observe(s));
     g.api?.mountDemos?.([...b.querySelectorAll('.demo-slot')]);
@@ -101,7 +104,7 @@ export default function Theory() {
       const c = document.getElementById('theory-content');
       g.openChapter(n, { back: { tab: g.tab, sel: cur, y: c?.scrollTop || 0, label: 'Back to ' + g.wiki.wlChap(lesson), up: g.back } });
     };
-    return () => { stop(); io.disconnect(); g.api?.disposeDemos?.(); };
+    return () => { stop(); io.disconnect(); g.api?.disposeDemos?.(); setSlot(null); };
   }, [cur, ready]); // eslint-disable-line
   useEffect(() => { if (heavy && !finished) return; if (body.current) runMermaid(body.current, () => g.api!.loadMermaid(), theme || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')); }, [cur, theme, ready, finished]); // eslint-disable-line
   // cards that would leave an empty grid cell stretch to fill the row (re-run on every size change, like bootstrap's col-*)
@@ -140,6 +143,7 @@ export default function Theory() {
             </nav>)}
           {!finished && <ChapterLoader />}
           <div ref={body} className={finished ? '' : 'defer-hl'} onClick={onBodyClick} dangerouslySetInnerHTML={{ __html: ready ? htmlStr : '' }} />
+          {slot && D.cmock ? createPortal(<MockExam qs={D.cmock} />, slot) : null}
           {meta.tabs.includes('Practice') && (D.hard[cur]?.length || D.quiz[cur]?.length) ? <div className="endrow"><div className="endmsg">You have reached the end of Chapter {lesson.dn ?? cur}. <b>Next step:</b> test yourself while it is fresh.</div><button className="btn" onClick={() => g.goQuiz(cur)}>🧠 Take the Chapter {cur} quiz</button></div> : null}
           <div className="t-nav-footer">
             {pv ? <button className="t-nav-btn" onClick={() => g.openChapter(pv.n)}><small>Previous</small>← {pv.title}</button> : <div />}
