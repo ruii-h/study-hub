@@ -17,6 +17,8 @@ import HashLab from './HashLab';
 import PvsNPLab from './PvsNPLab';
 import ExerciseLab from './ExerciseLab';
 import W11Lab from './W11Lab';
+import { initDiagramZoom } from './zoom';
+initDiagramZoom();
 
 const DEMOS: Record<string, () => React.JSX.Element> = {
   bsearch: BinarySearch,
