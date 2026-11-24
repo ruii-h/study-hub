@@ -3,12 +3,28 @@ import BinarySearch from './BinarySearch';
 import SortCompare from './SortCompare';
 import GraphSearch from './GraphSearch';
 import UniformCost from './UniformCost';
+import IterationLab from './IterationLab';
+import RecursionLab from './RecursionLab';
+import StackQueueLab from './StackQueueLab';
+import TreeLab from './TreeLab';
+import GraphTracer from './GraphTracer';
+import TspLab from './TspLab';
+import BruteForceLab from './BruteForceLab';
 
 const DEMOS: Record<string, () => React.JSX.Element> = {
   bsearch: BinarySearch,
   sort: SortCompare,
   graph: GraphSearch,
   ucs: UniformCost,
+  iter: IterationLab,
+  recur: RecursionLab,
+  stackq: StackQueueLab,
+  tree: TreeLab,
+  trace9: () => <GraphTracer ids={['run', 'dag']} />,
+  mrt: () => <GraphTracer ids={['mrt']} />,
+  trace10: () => <GraphTracer ids={['wt']} />,
+  tsp: TspLab,
+  brute: BruteForceLab,
 };
 
 const roots = new Map<Element, Root>();
