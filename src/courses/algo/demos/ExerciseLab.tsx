@@ -1,6 +1,7 @@
 import { useId, useMemo, useState } from 'react';
 import { COL, Key, Tabs, Transport, useSteps } from './kit';
 import { Btn, DemoCard, Msg, Row } from './ui';
+import { QueuePipe, StackTower } from './viz';
 import { allTopo, ek, GRAPHS, QUESTIONS, runSpec, verts, type Box, type Mark, type XGraph, type XQuestion } from './exerciseEngine';
 
 /* ---------- plain-English help for every phrase the exercises use ---------- */
@@ -109,13 +110,11 @@ function GraphSvg({ g, mark, tree = [], act = [], skip = [], path = [], badge = 
 }
 
 function BoxView({ b }: { b: Box }) {
+  const items = b.items.map((x, i) => ({ id: i + x, label: x }));
   return (
-    <div className="min-w-[110px] flex-1">
-      <div className="mb-1 text-[11.5px] uppercase tracking-wide text-muted">{b.label}{b.hint ? <span className="normal-case"> · {b.hint}</span> : null}</div>
-      <div className={`flex min-h-[44px] gap-1.5 rounded-lg border border-line bg-bg p-1.5 ${b.kind === 'stack' ? 'flex-col-reverse justify-start' : 'flex-wrap items-center'}`}>
-        {b.items.length === 0 && <span className="m-auto text-[13px] text-muted">empty</span>}
-        {b.items.map((x, i) => <span key={i} className={`rounded-md border px-2 py-0.5 text-center font-mono text-[13px] ${b.kind === 'stack' && i === b.items.length - 1 ? 'border-accent bg-accent/20' : b.kind === 'queue' && i === 0 ? 'border-accent bg-accent/20' : b.kind === 'pq' && i === 0 ? 'border-accent bg-accent/20' : 'border-line bg-surface2'}`}>{x}</span>)}
-      </div>
+    <div className="min-w-[150px] flex-1">
+      {b.hint && <div className="mb-1 text-[11.5px] text-muted">{b.hint}</div>}
+      {b.kind === 'stack' ? <StackTower compact min={3} label={b.label} items={items} /> : <QueuePipe items={items} priority={b.kind === 'pq'} label={b.label} />}
     </div>
   );
 }

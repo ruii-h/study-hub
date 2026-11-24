@@ -1,41 +1,57 @@
 import { useMemo, useState } from 'react';
 import { Arr, Pseudo, Stat, Stats, Tabs, Transport, useSteps, type Tone } from './kit';
-import { Btn, DemoCard, Msg, Row } from './ui';
+import { Btn, DemoCard, Label, Msg, NumberInput, Row } from './ui';
+import { QueuePipe, Returned, StackTower, type Item } from './viz';
 
-type Mode = 'stack' | 'queue' | 'brackets';
+type Mode = 'stack' | 'queue' | 'pq' | 'brackets';
 const WORDS = ['kiwi', 'fig', 'plum', 'pear', 'lime', 'date', 'peach', 'mango'];
+let uid = 100;
 
-function Playground({ kind }: { kind: 'stack' | 'queue' }) {
-  const [a, setA] = useState<string[]>(['fig', 'plum']);
-  const [next, setNext] = useState(2);
+function Playground({ kind }: { kind: 'stack' | 'queue' | 'pq' }) {
+  const [a, setA] = useState<Item[]>(kind === 'pq' ? [{ id: 1, label: 'fig', sub: 'p4' }, { id: 2, label: 'plum', sub: 'p2' }] : [{ id: 1, label: 'fig' }, { id: 2, label: 'plum' }]);
+  const [next, setNext] = useState(3);
   const [moved, setMoved] = useState(0);
-  const [msg, setMsg] = useState(kind === 'stack' ? 'Push and pop. Only the top (the right end) is reachable.' : 'Enqueue at the back, dequeue from the front.');
-  const isS = kind === 'stack';
+  const [ret, setRet] = useState<string | null>(null);
+  const [tick, setTick] = useState(0);
+  const [pri, setPri] = useState(3);
+  const [msg, setMsg] = useState(kind === 'stack' ? 'Push and pop. Only the top is reachable: the last plate you put on is the first one you can take off.' : kind === 'queue' ? 'Enqueue at the back, dequeue from the front: like a canteen line.' : 'Each item has a priority number: LOWER = MORE URGENT. dequeue always serves the lowest number, whatever order they arrived in.');
+  const isS = kind === 'stack', isP = kind === 'pq';
+  const best = (x: Item[]) => x.reduce((m, it, i) => (parseInt((it.sub ?? 'p0').slice(1)) < parseInt((x[m].sub ?? 'p0').slice(1)) ? i : m), 0);
   const push = () => {
     if (a.length >= 8) { setMsg('Full for this demo (8 items).'); return; }
-    const w = WORDS[next % WORDS.length]; setNext(next + 1); setA([...a, w]);
-    setMsg(isS ? `push("${w}"): placed on top.` : `enqueue("${w}"): joins the back of the line.`);
+    const w = WORDS[next % WORDS.length]; setNext(next + 1);
+    const it: Item = { id: uid++, label: w, sub: isP ? 'p' + pri : undefined };
+    setA([...a, it]);
+    setMsg(isS ? 'push("' + w + '"): the new plate lands ON TOP. Nothing underneath moves.' : isP ? 'enqueue("' + w + '", priority ' + pri + '): it joins the collection. Its position does not matter; only its number does.' : 'enqueue("' + w + '"): joins the BACK of the line.');
   };
   const take = () => {
-    if (!a.length) { setMsg(isS ? 'pop on an empty stack: nothing to return.' : 'dequeue on an empty queue: nothing to return.'); return; }
-    if (isS) { setMsg(`pop() returns "${a[a.length - 1]}", the most recent item (last in, first out).`); setA(a.slice(0, -1)); }
-    else { setMsg(`dequeue() returns "${a[0]}", the earliest item (first in, first out). With a plain list, the other ${a.length - 1} item(s) shift left.`); setMoved(moved + a.length - 1); setA(a.slice(1)); }
+    if (!a.length) { setMsg(isS ? 'pop on an empty stack: nothing to return (an error in real code).' : 'dequeue on an empty structure: nothing to return.'); return; }
+    let i = isS ? a.length - 1 : isP ? best(a) : 0;
+    const it = a[i];
+    setRet(it.label + (it.sub ? ' (' + it.sub + ')' : '')); setTick(tick + 1);
+    if (isS) setMsg('pop() returns "' + it.label + '": the most recent item. LIFO = last in, first out.');
+    else if (isP) setMsg('dequeue() returns "' + it.label + '" because ' + it.sub + ' is the lowest number in the collection' + (i !== 0 ? ' (even though ' + a[0].label + ' arrived first).' : '.'));
+    else { setMsg('dequeue() returns "' + it.label + '": the earliest item. FIFO = first in, first out. In a plain list the other ' + (a.length - 1) + ' item(s) must shift left.'); setMoved(moved + a.length - 1); }
+    setA(a.filter((_, k) => k !== i));
   };
-  const peek = () => setMsg(a.length ? `peek() looks at "${isS ? a[a.length - 1] : a[0]}" without removing it.` : 'peek on an empty structure: nothing to see.');
-  const tone: Record<number, Tone> = a.length ? { [isS ? a.length - 1 : 0]: 'on' } : {};
-  const under: Record<number, string> = {};
-  a.forEach((_, i) => (under[i] = String(i)));
-  if (a.length) { if (isS) under[a.length - 1] = `${a.length - 1} · top`; else { under[0] = '0 · front'; if (a.length > 1) under[a.length - 1] = `${a.length - 1} · back`; } }
+  const peek = () => setMsg(a.length ? 'peek() looks at "' + a[isS ? a.length - 1 : isP ? best(a) : 0].label + '" without removing it.' : 'peek on an empty structure: nothing to see.');
+  const shown = isP ? [...a].sort((x, y) => parseInt(x.sub!.slice(1)) - parseInt(y.sub!.slice(1))) : a;
+  const hot = isP && a.length ? shown[0].id : null;
+  const marked = isP ? shown.map((it) => ({ ...it, tone: it.id === hot ? undefined : undefined })) : a;
   return (
     <>
       <Row>
         <Btn onClick={push}>{isS ? 'push' : 'enqueue'}</Btn>
+        {isP && <><Label htmlFor="pq-p">priority</Label><NumberInput id="pq-p" min={1} max={9} value={pri} onChange={(e) => setPri(Math.max(1, Math.min(9, e.target.valueAsNumber || 1)))} /></>}
         <Btn onClick={take}>{isS ? 'pop' : 'dequeue'}</Btn>
         <Btn ghost onClick={peek}>peek</Btn>
-        <Btn ghost onClick={() => { setA([]); setMoved(0); setMsg('Cleared.'); }}>Clear</Btn>
+        <Btn ghost onClick={() => { setA([]); setMoved(0); setRet(null); setMsg('Cleared.'); }}>Clear</Btn>
       </Row>
-      {a.length ? <Arr a={a} tone={tone} under={under} /> : <div className="my-2.5 flex min-h-[62px] items-center rounded-lg border border-dashed border-line px-3 text-[13px] text-muted">empty</div>}
-      <Stats><Stat k="Size" v={a.length} />{!isS && <Stat k="Items shifted" v={moved} />}</Stats>
+      <div className="my-3 rounded-lg border border-line bg-surface2/40 p-3">
+        {isS ? <StackTower items={a} /> : <QueuePipe items={isP ? marked : a} priority={isP} label={isP ? 'priority queue (sorted so you can see who is next)' : 'queue'} />}
+      </div>
+      <Returned v={ret} tick={tick} note={isS ? 'came off the top' : isP ? 'was the most urgent' : 'was at the front'} />
+      <Stats><Stat k="Size" v={a.length} />{kind === 'queue' && <Stat k="Items shifted" v={moved} />}</Stats>
       <Msg live>{msg}</Msg>
     </>
   );
@@ -82,10 +98,7 @@ function Brackets() {
       </Row>
       <Transport s={s} label="Character" />
       <Arr a={txt.split('')} tone={Object.fromEntries(txt.split('').map((_, i): [number, Tone] => [i, i === cur.i ? (cur.verdict === false ? 'bad' : 'on') : i < cur.i ? 'hit' : 'out']))} />
-      <div className="my-2 flex min-h-[44px] items-center gap-1.5 rounded-lg border border-line bg-bg px-2">
-        <span className="text-[12px] uppercase tracking-wide text-muted">stack →</span>
-        {cur.stack.length ? cur.stack.map((c, i) => <b key={i} className={`rounded border px-2 py-0.5 font-mono ${i === cur.stack.length - 1 ? 'border-accent bg-accent/20' : 'border-line bg-surface2'}`}>{c}</b>) : <span className="text-[13px] text-muted">empty</span>}
-      </div>
+      <div className="my-2 rounded-lg border border-line bg-surface2/40 p-3"><StackTower compact min={3} label="stack" items={cur.stack.map((c, i) => ({ id: i + c, label: c }))} /></div>
       <Pseudo lines={CODE} active={cur.line} />
       <Msg live>{cur.note}{cur.verdict != null && <b className={cur.verdict ? ' text-ok' : ' text-[var(--red)]'}> {cur.verdict ? '✔ Balanced' : '✘ Not balanced'}</b>}</Msg>
     </>
@@ -96,7 +109,7 @@ export default function StackQueueLab() {
   const [mode, setMode] = useState<Mode>('stack');
   return (
     <DemoCard title="Stacks and queues: operate them yourself">
-      <Tabs value={mode} onChange={setMode} items={[['stack', 'Stack (LIFO)'], ['queue', 'Queue (FIFO)'], ['brackets', 'Balanced brackets']]} />
+      <Tabs value={mode} onChange={setMode} items={[['stack', 'Stack (LIFO)'], ['queue', 'Queue (FIFO)'], ['pq', 'Priority queue'], ['brackets', 'Balanced brackets']]} />
       {mode === 'brackets' ? <Brackets /> : <Playground key={mode} kind={mode} />}
     </DemoCard>
   );

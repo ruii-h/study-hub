@@ -1696,3 +1696,21 @@ html[data-theme=light] .nb>b:first-child{color:#1a7f37}
   figure.diagram{padding:8px}
   .dg-t{font-size:15px}.dg-s{font-size:13.5px}.dg-hd{font-size:14.5px}.dg-lt{font-size:13.5px}.dg-sn{font-size:11px}
 }
+
+/* ---- animated visualisation primitives (demos) ---- */
+@keyframes vzDrop{from{opacity:0;transform:translateY(-34px) scale(.92)}to{opacity:1;transform:none}}
+@keyframes vzSlideIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+@keyframes vzRise{0%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-44px) scale(1.06)}}
+@keyframes vzOut{0%{opacity:1;transform:none}100%{opacity:0;transform:translateX(-52px)}}
+@keyframes vzPulse{0%,100%{box-shadow:0 0 0 0 rgba(210,153,34,.0)}50%{box-shadow:0 0 0 5px rgba(210,153,34,.35)}}
+@keyframes vzBlink{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes vzDash{to{stroke-dashoffset:0}}
+.vz-drop{animation:vzDrop .38s cubic-bezier(.2,.9,.3,1.2) both}
+.vz-in{animation:vzSlideIn .38s ease-out both}
+.vz-rise{animation:vzRise .7s ease-in forwards}
+.vz-out{animation:vzOut .7s ease-in forwards}
+.vz-pulse{animation:vzPulse 1.1s ease-in-out 2}
+.vz-blink{animation:vzBlink 1s ease-in-out infinite}
+.vz-draw{stroke-dasharray:var(--len,300);stroke-dashoffset:var(--len,300);animation:vzDash .6s ease-out forwards}
+.vz-move{transition:transform .55s cubic-bezier(.4,.1,.2,1)}
+@media (prefers-reduced-motion:reduce){.vz-drop,.vz-in,.vz-rise,.vz-out,.vz-pulse,.vz-blink,.vz-draw{animation:none!important;stroke-dashoffset:0}.vz-move{transition:none}}

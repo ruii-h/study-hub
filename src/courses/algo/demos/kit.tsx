@@ -5,17 +5,18 @@ import { Btn, Row } from './ui';
 export function useSteps(n: number) {
   const [k, setK] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const [speed, setSpeed] = useState(1);
   const last = Math.max(0, n - 1);
   const timer = useRef<ReturnType<typeof setInterval>>(undefined);
   useEffect(() => {
     if (!playing) return;
-    timer.current = setInterval(() => setK((x) => (x >= last ? x : x + 1)), 850);
+    timer.current = setInterval(() => setK((x) => (x >= last ? x : x + 1)), 1100 / speed);
     return () => clearInterval(timer.current);
-  }, [playing, last]);
+  }, [playing, last, speed]);
   useEffect(() => { if (k >= last && playing) setPlaying(false); }, [k, last, playing]);
   useEffect(() => { setK((x) => Math.min(x, last)); }, [last]);
   return {
-    k: Math.min(k, last), last, playing,
+    k: Math.min(k, last), last, playing, speed, setSpeed,
     next: () => setK((x) => Math.min(last, x + 1)),
     prev: () => { setPlaying(false); setK((x) => Math.max(0, x - 1)); },
     reset: () => { setPlaying(false); setK(0); },
@@ -31,6 +32,7 @@ export function Transport({ s, label }: { s: ReturnType<typeof useSteps>; label?
       <Btn ghost aria-pressed={s.playing} onClick={s.toggle}>{s.playing ? 'Pause' : 'Play'}</Btn>
       <Btn ghost disabled={s.k === 0 && !s.playing} onClick={s.reset}>Reset</Btn>
       <span className="text-[12.5px] text-muted">{label ?? 'Step'} {s.k} / {s.last}</span>
+      <Btn ghost aria-label="Playback speed" onClick={() => s.setSpeed(s.speed === 1 ? 2 : s.speed === 2 ? 0.5 : 1)}>{s.speed === 1 ? 'Speed 1×' : s.speed === 2 ? 'Speed 2×' : 'Speed 0.5×'}</Btn>
     </Row>
   );
 }

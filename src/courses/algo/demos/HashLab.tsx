@@ -60,21 +60,31 @@ export default function HashLab() {
         <input aria-label="Key" value={word} onChange={(e) => setWord(e.target.value)} maxLength={8} className="min-h-11 w-36 rounded-lg border border-line bg-bg px-2.5 font-mono text-ink" />
         <Btn onClick={insert}>Insert</Btn><Btn ghost onClick={find}>Search</Btn><Btn ghost onClick={remove}>Delete</Btn><Btn ghost onClick={fill}>Load cat, dog, cow</Btn><Btn ghost onClick={reset}>Clear</Btn>
       </Row>
-      <Msg><b>Hash:</b> <code>{w ? calc : '–'}</code></Msg>
+      <div className="my-2 overflow-x-auto rounded-lg border border-line bg-surface2/40 p-3" aria-label="How the key becomes a row number">
+        <div className="flex min-w-max items-center gap-2 text-[13px]">
+          <div className="text-center"><div className="mb-1 text-[11px] uppercase tracking-wide text-muted">1 · letters → numbers</div><div className="flex gap-1">{[...w].map((c, i) => <div key={i + c} className="vz-drop flex w-9 flex-col items-center rounded-md border border-line bg-bg py-0.5" style={{ animationDelay: i * 60 + 'ms' }}><b className="font-mono">{c}</b><span className="font-mono text-[12px] text-[var(--yellow)]">{c.charCodeAt(0) - 96}</span></div>)}{!w && <span className="text-muted">type a key</span>}</div></div>
+          <span className="text-lg text-muted">→</span>
+          <div className="text-center"><div className="mb-1 text-[11px] uppercase tracking-wide text-muted">2 · add them</div><div className="rounded-md border border-line bg-bg px-3 py-1.5 font-mono font-bold">{[...w].map((c) => c.charCodeAt(0) - 96).join(' + ') || '0'} = {code(w)}</div></div>
+          <span className="text-lg text-muted">→</span>
+          <div className="text-center"><div className="mb-1 text-[11px] uppercase tracking-wide text-muted">3 · remainder after ÷ {N}</div><div className="rounded-md border border-line bg-bg px-3 py-1.5 font-mono font-bold">{code(w)} mod {N} = <span className="text-[var(--yellow)]">{h(w)}</span></div></div>
+          <span className="text-lg text-muted">→</span>
+          <div className="text-center"><div className="mb-1 text-[11px] uppercase tracking-wide text-muted">4 · go to row</div><div className="vz-pulse rounded-md border-2 border-[var(--yellow)] bg-[var(--yellow)]/20 px-3 py-1.5 font-mono text-[15px] font-bold" key={w}>row {h(w)}</div></div>
+        </div>
+      </div>
       <div className="my-2 grid gap-1">
         {Array.from({ length: N }, (_, i) => (
           <div key={i} className={`grid grid-cols-[34px_1fr] items-center gap-2 rounded-md border px-1.5 py-1 ${hot.includes(i) ? 'border-[var(--yellow)] bg-[var(--yellow)]/15' : 'border-line bg-surface2'}`}>
-            <b className="text-center font-mono text-muted">{i}</b>
+            <b className="relative text-center font-mono text-muted">{i}{hot.includes(i) && <span className="absolute -right-1 -top-2 rounded-full bg-[var(--yellow)] px-1 text-[10px] font-bold text-black">{hot.indexOf(i) + 1}</span>}</b>
             <div className="flex min-h-9 flex-wrap items-center gap-1.5">
-              {mode === 'chain' ? chain[i].map((x, k) => <span key={x} className="flex items-center gap-1.5">{k > 0 && <span className="text-muted">→</span>}<span className="rounded border border-accent bg-accent/20 px-2 py-0.5 font-mono">{x}</span></span>)
-                : probe[i] && <span className={`rounded border px-2 py-0.5 font-mono ${probe[i] === DEL ? 'border-line text-muted' : 'border-accent bg-accent/20'}`}>{probe[i]}</span>}
+              {mode === 'chain' ? chain[i].map((x, k) => <span key={x} className="vz-in flex items-center gap-1.5">{k > 0 && <span className="text-muted">→</span>}<span className="rounded border border-accent bg-accent/20 px-2 py-0.5 font-mono">{x}</span></span>)
+                : probe[i] && <span key={probe[i]} className={`vz-drop rounded border px-2 py-0.5 font-mono ${probe[i] === DEL ? 'border-line text-muted' : 'border-accent bg-accent/20'}`}>{probe[i]}</span>}
               {((mode === 'chain' && !chain[i].length) || (mode === 'probe' && !probe[i])) && <span className="text-[12.5px] text-muted">empty</span>}
             </div>
           </div>
         ))}
       </div>
       <Stats><Stat k="Items" v={load} /><Stat k="Rows N" v={N} /><Stat k="Load factor" v={(load / N).toFixed(2)} /></Stats>
-      <Row><Key c={COL.warn}>rows touched by the last operation</Key></Row>
+      <Row><Key c={COL.warn}>rows touched by the last operation (number = order visited)</Key></Row>
       <Msg live>{msg}</Msg>
     </DemoCard>
   );

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { COL, Key, Pseudo, Tabs, Transport, useSteps } from './kit';
+import { QueuePipe, StackTower, type Item } from './viz';
 import { DemoCard, Msg, Row, Select } from './ui';
 
 type Algo = 'dfs' | 'bfs' | 'topo' | 'ucs';
@@ -162,7 +163,7 @@ export default function GraphTracer({ ids }: { ids: string[] }) {
             const c = onPath ? COL.warn : inTree ? COL.ok : COL.s3;
             return (
               <g key={x + y}>
-                <line x1={sx} y1={sy} x2={ex} y2={ey} stroke={c} strokeWidth={onPath ? 3.5 : inTree ? 2.5 : 1.6} markerEnd={g.directed ? `url(#ar-${gid})` : undefined} />
+                <line key={inTree ? 't' + k : 'n' + k} className={inTree ? 'vz-draw' : undefined} style={{ ['--len' as string]: 400 }} x1={sx} y1={sy} x2={ex} y2={ey} stroke={c} strokeWidth={onPath ? 3.5 : inTree ? 2.5 : 1.6} markerEnd={g.directed ? `url(#ar-${gid})` : undefined} />
                 {w != null && <text x={(x1 + x2) / 2 + ox * 2 - uy * 8} y={(y1 + y2) / 2 + oy * 2 + ux * 8 + 4} textAnchor="middle" fontSize={11} fontWeight={700} fill={COL.warn}>{w}</text>}
               </g>
             );
@@ -171,6 +172,7 @@ export default function GraphTracer({ ids }: { ids: string[] }) {
             const [x, y] = g.pos[v];
             return (
               <g key={v}>
+                {cur.cur === v && <circle cx={x} cy={y} r={24} fill="none" stroke={COL.accent} strokeWidth={2} className="vz-blink" />}
                 <circle cx={x} cy={y} r={17} fill={FILL[cur.mark[v]]} stroke={cur.cur === v ? COL.accent : COL.line} strokeWidth={cur.cur === v ? 3 : 1.5} />
                 <text x={x} y={y + 5} textAnchor="middle" fontSize={14} fontWeight={700} fill={COL.ink}>{v}</text>
                 {cur.order.includes(v) && <text x={x + 15} y={y - 15} fontSize={10.5} fontWeight={700} fill={COL.warn}>{cur.order.indexOf(v) + 1}</text>}
@@ -181,7 +183,14 @@ export default function GraphTracer({ ids }: { ids: string[] }) {
       </div>
       {g.names && <div className="my-1 text-[12px] leading-relaxed text-muted">{Object.entries(g.names).map(([k, v]) => <span key={k} className="mr-3 inline-block"><b className="text-ink">{k}</b> {v}</span>)} · schematic, minutes illustrative</div>}
       <Row><Key c={COL.s3}>not seen</Key><Key c="rgba(210,153,34,.8)">waiting in the container</Key><Key c={COL.accent}>current</Key><Key c="rgba(63,185,80,.9)">finished</Key><Key c={COL.warn}>numbers = visit order</Key></Row>
-      <Msg><b>{cur.frontLabel}:</b> <code>{cur.front}</code></Msg>
+      <div className="my-2 rounded-lg border border-line bg-surface2/40 p-3">
+        <div className="mb-2 flex flex-wrap items-center gap-2 text-[13px]"><b>{cur.frontLabel}</b>{cur.cur && <span className="rounded-md border border-accent bg-accent/20 px-2 py-0.5 font-mono">now: {cur.cur}</span>}</div>
+        {(() => {
+          const inner = cur.front.slice(1, -1).trim(); const raw = inner ? inner.split(', ') : [];
+          const items: Item[] = raw.map((x, i) => { const [v, c] = x.split(':'); return { id: i + x, label: v, sub: c != null ? 'cost ' + c : undefined }; });
+          return a === 'dfs' || a === 'topo' ? <StackTower compact min={3} label={a === 'topo' ? 'finish stack' : 'stack'} items={items} /> : <QueuePipe items={items} priority={a === 'ucs'} label={a === 'ucs' ? 'priority queue' : 'queue'} />;
+        })()}
+      </div>
       <Pseudo lines={CODE[a]} active={cur.line} />
       <div className="my-2 max-h-48 overflow-auto rounded-lg border border-line">
         <table className="w-full border-collapse text-left text-[12.5px]">

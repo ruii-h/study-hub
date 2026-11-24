@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Arr, Key, Pseudo, Stat, Stats, Transport, useSteps, COL, type Tone } from './kit';
 import { Btn, DemoCard, Label, Msg, NumberInput, Row } from './ui';
 
@@ -65,6 +65,23 @@ function buildSteps(a0: number[]): St[] {
   return out;
 }
 
+/** Gives every value an identity that survives swaps, so nodes can slide to their new place instead of jumping. */
+function computeIds(arrs: number[][]): number[][] {
+  let next = 1000; const out: number[][] = [];
+  let prevA: number[] = [], prevI: number[] = [];
+  arrs.forEach((a, k) => {
+    if (k === 0) { prevI = a.map(() => next++); out.push(prevI); prevA = a; return; }
+    const used = new Set<number>(); const ids: (number | null)[] = a.map((v, i) => (i < prevA.length && prevA[i] === v ? (used.add(prevI[i]), prevI[i]) : null));
+    const ids2 = ids.map((x, i) => {
+      if (x != null) return x;
+      const c = prevI.map((id, j) => ({ id, j })).filter((o) => !used.has(o.id) && prevA[o.j] === a[i]).sort((p, q) => Math.abs(p.j - i) - Math.abs(q.j - i))[0];
+      if (c) { used.add(c.id); return c.id; }
+      return next++;
+    });
+    prevI = ids2; prevA = a; out.push(ids2);
+  });
+  return out;
+}
 const START = [3, 8, 5, 12, 9, 7, 6];
 const isHeap = (a: number[]) => a.every((v, i) => i === 0 || a[Math.floor((i - 1) / 2)] <= v);
 
@@ -80,6 +97,8 @@ export default function HeapLab() {
   const start = (o: Op, p: St[]) => { setOp(o); setPlan(p); s.reset(); setSel(null); };
   const fin = () => { if (plan) { setBase(commit()); setPlan(null); s.reset(); } };
   const a = view.a; const n = a.length;
+  const idList = useMemo(() => computeIds(plan ? plan.map((p) => p.a) : [base]), [plan, base]);
+  const ids = idList[plan ? s.k : 0] ?? [];
 
   const lvl = (i: number) => Math.floor(Math.log2(i + 1));
   const H = Math.max(1, n ? lvl(n - 1) + 1 : 1);
@@ -102,12 +121,18 @@ export default function HeapLab() {
       {plan && <Row><Transport s={s} /><Btn ghost onClick={fin}>Skip to the end</Btn></Row>}
       <div className="my-2 overflow-x-auto rounded-lg border border-line bg-bg">
         <svg viewBox={`0 0 420 ${H * 52 + 8}`} role="img" aria-label="Heap as a tree" style={{ width: '100%', maxWidth: 520, display: 'block', margin: '0 auto' }}>
-          {a.map((_, i) => { if (!i) return null; const [x1, y1] = pos((i - 1) >> 1), [x2, y2] = pos(i); return <line key={'e' + i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={COL.s3} strokeWidth={2} />; })}
+          {a.map((_, i) => { if (!i) return null; const [x1, y1] = pos((i - 1) >> 1), [x2, y2] = pos(i); const isH = view.hi.length === 2 && view.hi.includes(i) && view.hi.includes((i - 1) >> 1); return <line key={'e' + i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={isH ? COL.warn : COL.s3} strokeWidth={isH ? 4 : 2} />; })}
           {a.map((v, i) => { const [x, y] = pos(i); const t = tone[i]; const f = t === 'hit' ? COL.ok : t === 'warn' ? COL.warn : t === 'on' ? COL.accent : t === 'run' ? COL.purple : COL.s2;
-            return <g key={i} onClick={() => setSel(sel === i ? null : i)} style={{ cursor: 'pointer' }}><circle cx={x} cy={y} r={17} fill={f} fillOpacity={t ? 0.55 : 1} stroke={t ? f : COL.line} strokeWidth={2} /><text x={x} y={y + 5} textAnchor="middle" fontSize={13.5} fontWeight={700} fill={COL.ink}>{v}</text><text x={x + 15} y={y - 14} fontSize={10} fill={COL.muted}>{i}</text></g>; })}
+            return <g key={ids[i] ?? i} className="vz-move" style={{ transform: `translate(${x}px, ${y}px)`, cursor: 'pointer' }} onClick={() => setSel(sel === i ? null : i)}><circle r={18} fill={f} fillOpacity={t ? 0.6 : 1} stroke={t ? f : COL.line} strokeWidth={2} /><text y={5} textAnchor="middle" fontSize={14} fontWeight={700} fill={COL.ink}>{v}</text><text x={16} y={-15} fontSize={10} fill={COL.muted}>{i}</text></g>; })}
         </svg>
       </div>
-      <div onClick={(e) => { const c = (e.target as HTMLElement).closest('[role=listitem]'); if (c) { const i = [...c.parentElement!.children].indexOf(c); setSel(sel === i ? null : i); } }}><Arr a={a} tone={tone} under={under} /></div>
+      <div className="my-2 overflow-x-auto rounded-lg border border-line bg-bg px-2 py-2" aria-label="The same heap stored as a list">
+        <div className="relative" style={{ height: 66, width: Math.max(n, 1) * 50 + 4, minWidth: 300 }}>
+          {Array.from({ length: Math.max(n, 6) }, (_, i) => <div key={'s' + i} className="absolute top-0 flex h-[42px] w-[46px] items-center justify-center rounded-md border border-dashed border-line/60" style={{ left: i * 50 }}><span className="absolute -bottom-[18px] text-[11px] text-muted">{i}</span></div>)}
+          {a.map((v, i) => { const t = tone[i]; const f = t === 'hit' ? 'border-ok bg-ok/30' : t === 'warn' ? 'border-[var(--yellow)] bg-[var(--yellow)]/35' : t === 'on' ? 'border-accent bg-accent/30' : t === 'run' ? 'border-[var(--purple)] bg-[var(--purple)]/30' : 'border-line bg-surface2';
+            return <button key={ids[i] ?? i} onClick={() => setSel(sel === i ? null : i)} aria-label={`index ${i} value ${v}`} className={`vz-move absolute top-0 flex h-[42px] w-[46px] items-center justify-center rounded-md border-2 font-mono text-[14px] font-bold text-ink ${f}`} style={{ transform: `translateX(${i * 50}px)` }}>{v}</button>; })}
+        </div>
+      </div>
       {sel != null && <Msg>Index <b>{sel}</b> (value {a[sel]}): {sel > 0 ? <>parent = ⌊({sel}−1)/2⌋ = <b>{(sel - 1) >> 1}</b>; </> : 'it is the root; '}children = 2·{sel}+1 = <b>{2 * sel + 1}</b>{2 * sel + 1 >= n ? ' (none)' : ''} and 2·{sel}+2 = <b>{2 * sel + 2}</b>{2 * sel + 2 >= n ? ' (none)' : ''}.</Msg>}
       <Stats><Stat k="Size" v={n} /><Stat k="Height" v={n ? lvl(n - 1) + 1 : 0} /><Stat k="Heap order ok" v={isHeap(a) ? 'yes' : 'no'} /></Stats>
       <Row><Key c={COL.warn}>being compared / swapped</Key><Key c={COL.ok}>settled</Key><Key c={COL.accent}>selected</Key><Key c={COL.purple}>its parent and children</Key></Row>
