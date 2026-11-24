@@ -15,6 +15,8 @@ import ComplexityLab from './ComplexityLab';
 import HeapLab from './HeapLab';
 import HashLab from './HashLab';
 import PvsNPLab from './PvsNPLab';
+import ExerciseLab from './ExerciseLab';
+import W11Lab from './W11Lab';
 
 const DEMOS: Record<string, () => React.JSX.Element> = {
   bsearch: BinarySearch,
@@ -35,6 +37,8 @@ const DEMOS: Record<string, () => React.JSX.Element> = {
   heap: HeapLab,
   hash: HashLab,
   pnp: PvsNPLab,
+  xlab: () => <ExerciseLab />,
+  w11: W11Lab,
 };
 
 const roots = new Map<Element, Root>();
