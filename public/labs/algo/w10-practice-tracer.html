@@ -1,0 +1,668 @@
+﻿<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>W10 Graph Practice Tracer</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,750&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<style>
+/* Layout: classroom projector console. Question rail on top, graph + live data structure side by side, narration bar, then the trace table growing row by row. Navy/green come from the IS115 exercise slides. */
+:root{
+  --bg:#f3f6fa; --surface:#ffffff; --sunk:#e9eef5; --ink:#132033; --muted:#5a6676; --line:#d3dbe6; --line-strong:#9fb0c4;
+  --accent:#003B71; --accent-soft:#e3eef8; --on-accent:#ffffff;
+  --go:#176B3A; --go-soft:#dff0e5; --warn:#c8161d; --warn-soft:#fbe5e6;
+  --hold:#fff3c4; --hold-ink:#8a6400; --hot:#d2690a; --edge:#8d9aab;
+  --f-display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --f-body:"Public Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e151f; --surface:#162130; --sunk:#1c2939; --ink:#e5ecf4; --muted:#9aa9ba; --line:#2a3a4e; --line-strong:#4c6079;
+  --accent:#86b8ee; --accent-soft:#1b324d; --on-accent:#0b1522;
+  --go:#5fcb8d; --go-soft:#163626; --warn:#ff7d82; --warn-soft:#3e1c20;
+  --hold:#3b3216; --hold-ink:#f1cd68; --hot:#ffa24f; --edge:#6c7d92; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e151f; --surface:#162130; --sunk:#1c2939; --ink:#e5ecf4; --muted:#9aa9ba; --line:#2a3a4e; --line-strong:#4c6079;
+  --accent:#86b8ee; --accent-soft:#1b324d; --on-accent:#0b1522;
+  --go:#5fcb8d; --go-soft:#163626; --warn:#ff7d82; --warn-soft:#3e1c20;
+  --hold:#3b3216; --hold-ink:#f1cd68; --hot:#ffa24f; --edge:#6c7d92; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5}
+.wrap{max-width:1280px;margin:0 auto;padding-block:22px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:8px 24px}
+.eyebrow{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+h1{font-family:var(--f-display);font-weight:750;font-size:clamp(1.6rem,3.2vw,2.3rem);line-height:1.1;margin:2px 0 0;text-wrap:balance;letter-spacing:-.01em}
+.keys{font-size:.82rem;color:var(--muted)}
+kbd{font-family:var(--f-mono);font-size:.75rem;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 5px;background:var(--surface);color:var(--ink)}
+
+/* question rail */
+nav.rail{display:flex;flex-wrap:wrap;gap:10px 18px;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.rail-group{display:flex;flex-direction:column;gap:5px}
+.rail-label{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.rail-btns{display:flex;flex-wrap:wrap;gap:5px}
+.qbtn{font:600 .85rem var(--f-body);color:var(--ink);background:var(--sunk);border:1px solid transparent;border-radius:7px;padding:5px 10px;cursor:pointer;display:flex;gap:6px;align-items:baseline}
+.qbtn small{font-weight:500;color:var(--muted);font-size:.75rem}
+.qbtn:hover{border-color:var(--line-strong)}
+.qbtn[aria-current="true"]{background:var(--accent);color:var(--on-accent)}
+.qbtn[aria-current="true"] small{color:var(--on-accent);opacity:.8}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--hot);outline-offset:2px}
+
+/* question head */
+.qhead{display:flex;flex-direction:column;gap:8px}
+.qtitle{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+h2{font-family:var(--f-display);font-weight:750;font-size:clamp(1.3rem,2.4vw,1.75rem);margin:0;line-height:1.15;text-wrap:balance}
+h2 .qn{color:var(--accent)}
+.team{font-size:.8rem;font-weight:600;background:var(--hold);color:var(--hold-ink);border-radius:999px;padding:2px 10px}
+.problem{margin:0;max-width:78ch;color:var(--ink)}
+.rules{display:flex;flex-wrap:wrap;gap:6px}
+.rule{font:500 .78rem var(--f-mono);border:1px solid var(--line);border-radius:6px;padding:2px 8px;color:var(--muted);background:var(--surface)}
+.params{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px 12px;background:var(--accent-soft);border-radius:8px;font-size:.9rem}
+.params label{font-weight:600}
+.params input,.params select{font:500 .95rem var(--f-mono);padding:5px 8px;border:1px solid var(--line-strong);border-radius:6px;background:var(--surface);color:var(--ink);min-width:0}
+.params input[type=text]{width:min(260px,100%)}
+.params input[type=number]{width:72px}
+.params .err{color:var(--warn);font-weight:600}
+.sbtn{font:600 .82rem var(--f-body);padding:5px 10px;border-radius:6px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);cursor:pointer}
+.sbtn:hover{border-color:var(--accent)}
+
+/* stage */
+.stage{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:16px;align-items:start}
+.lower{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:880px){.stage,.lower{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;min-width:0;display:flex;flex-direction:column;gap:10px}
+.card-title{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;display:flex;justify-content:space-between;gap:8px}
+.graph-box{overflow-x:auto}
+.graph-box svg{display:block;width:100%;height:auto;max-height:430px;min-width:340px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.78rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend svg{flex:none}
+
+/* svg graph */
+.node circle{stroke-width:2.2;transition:fill .25s,stroke .25s}
+.node text{font:700 15px var(--f-body);text-anchor:middle;dominant-baseline:central;transition:fill .25s;pointer-events:none}
+.n-idle circle{fill:var(--surface);stroke:var(--line-strong)} .n-idle text{fill:var(--ink)}
+.n-wait circle{fill:var(--hold);stroke:var(--hold-ink)} .n-wait text{fill:var(--ink)}
+.n-cur circle{fill:var(--accent);stroke:var(--accent);stroke-width:4} .n-cur text{fill:var(--on-accent)}
+.n-vis circle{fill:var(--go-soft);stroke:var(--go)} .n-vis text{fill:var(--ink)}
+.n-fin circle{fill:var(--go);stroke:var(--go)} .n-fin text{fill:var(--on-accent)}
+.n-disc circle{fill:var(--warn-soft);stroke:var(--warn);stroke-dasharray:5 3;stroke-width:3} .n-disc text{fill:var(--warn)}
+.n-out circle{fill:var(--sunk);stroke:var(--muted);stroke-dasharray:4 3} .n-out text{fill:var(--muted)}
+.edge path{fill:none;stroke-linecap:round;transition:stroke .25s,stroke-width .25s}
+.edge polygon{transition:fill .25s}
+.e-idle path{stroke:var(--edge);stroke-width:1.7} .e-idle polygon{fill:var(--edge)}
+.e-tree path{stroke:var(--accent);stroke-width:3.2} .e-tree polygon{fill:var(--accent)}
+.e-act path{stroke:var(--hot);stroke-width:3.6} .e-act polygon{fill:var(--hot)}
+.e-skip path{stroke:var(--warn);stroke-width:2;stroke-dasharray:5 4} .e-skip polygon{fill:var(--warn)}
+.e-path path{stroke:var(--go);stroke-width:4} .e-path polygon{fill:var(--go)}
+.wlabel{font:700 13px var(--f-mono);fill:var(--ink);text-anchor:middle;dominant-baseline:central;paint-order:stroke;stroke:var(--surface);stroke-width:5px;stroke-linejoin:round}
+.badge rect{fill:var(--ink)} .badge text{fill:var(--surface);font:700 11px var(--f-mono);text-anchor:middle;dominant-baseline:central}
+
+/* data structures */
+.ds{display:flex;flex-direction:column;gap:8px}
+.ds-row{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start}
+.ds-col{display:flex;flex-direction:column;gap:6px;min-width:0}
+.ds-name{font-weight:700;font-size:.85rem}
+.ds-sub{font-size:.75rem;color:var(--muted)}
+.cell{font:700 1rem var(--f-mono);min-width:44px;height:36px;padding:0 10px;display:flex;align-items:center;justify-content:center;border:2px solid var(--line-strong);border-radius:7px;background:var(--surface);color:var(--ink);white-space:nowrap}
+.cell.new{background:var(--hold);border-color:var(--hold-ink)}
+.cell.upd{background:var(--accent-soft);border-color:var(--accent)}
+.cell.cur{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.cell.ok{background:var(--go-soft);border-color:var(--go)}
+.cell.bad{background:var(--warn-soft);border-color:var(--warn);color:var(--warn)}
+.cell.dim{opacity:.4}
+.cell.empty{border-style:dashed;color:var(--muted);font:500 .8rem var(--f-body)}
+.stack{display:flex;flex-direction:column;gap:4px;align-items:stretch;width:max-content;min-width:90px}
+.end-label{font:600 .68rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:center}
+.queue{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.popped{display:inline-flex;align-items:center;gap:8px;font-size:.85rem}
+.popped .cell{min-width:40px;height:32px}
+.pill{font:600 .75rem var(--f-body);border-radius:999px;padding:2px 9px;background:var(--sunk);color:var(--muted)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.go{background:var(--go-soft);color:var(--go)}
+.pq{display:flex;flex-direction:column;gap:4px}
+.pq .cell{justify-content:space-between;gap:12px;min-width:160px}
+.pq .cell em{font-style:normal;font-weight:500;font-size:.85rem;color:inherit;opacity:.8}
+.big{font:750 1.7rem var(--f-display);line-height:1.2}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font:600 .82rem var(--f-mono);padding:3px 8px;border-radius:6px;background:var(--sunk);color:var(--ink)}
+.chip.hl{background:var(--accent);color:var(--on-accent)}
+.chip.x{text-decoration:line-through;color:var(--muted);background:var(--warn-soft)}
+.chip.ok{background:var(--go-soft);color:var(--go)}
+.slots{display:flex;flex-wrap:wrap;gap:4px}
+.slot{display:flex;flex-direction:column;align-items:center;gap:2px}
+.slot small{font:500 .68rem var(--f-mono);color:var(--muted)}
+.tape{display:flex;flex-wrap:wrap;gap:4px}
+.tape .cell{min-width:34px;padding:0 6px}
+.idx{display:flex;flex-direction:column;align-items:center;gap:2px}
+.idx small{font:500 .7rem var(--f-mono);color:var(--muted)}
+
+.seq{display:flex;flex-wrap:wrap;align-items:center;gap:4px;min-height:30px}
+.seq .chip{font-size:.9rem}
+.seq .arrow{color:var(--muted);font-size:.8rem}
+
+/* controls */
+.player{display:flex;flex-direction:column;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+.ctrl{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.btns{display:flex;gap:6px}
+.pbtn{font:700 .9rem var(--f-body);min-width:44px;height:40px;padding:0 12px;border-radius:8px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);cursor:pointer}
+.pbtn:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.pbtn:disabled{opacity:.4;cursor:default}
+.pbtn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);min-width:96px}
+.pbtn.primary:hover:not(:disabled){color:var(--on-accent);filter:brightness(1.1)}
+.scrub{flex:1 1 200px;display:flex;align-items:center;gap:10px;min-width:0}
+.scrub input{flex:1;min-width:0;accent-color:var(--accent)}
+.counter{font:600 .9rem var(--f-mono);white-space:nowrap;font-variant-numeric:tabular-nums}
+.reveal{display:flex;align-items:center;gap:6px;font-size:.85rem;color:var(--muted)}
+.note{font-size:1.08rem;line-height:1.55;padding:12px 14px;background:var(--accent-soft);border-radius:8px;min-height:3.4em;max-width:none}
+.note b{color:var(--accent)}
+
+/* table */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:.86rem;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:6px 9px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--sunk);font-weight:700;white-space:nowrap}
+td.mono{font-family:var(--f-mono);white-space:nowrap}
+tr.now td{background:var(--hold)}
+tr:last-child td{border-bottom:0}
+.more{font-size:.82rem;color:var(--muted);padding:8px 12px}
+.answer{border:2px solid var(--go);background:var(--surface);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.answer h3{margin:0;font:750 1.05rem var(--f-display);color:var(--go)}
+.answer p{margin:0;max-width:85ch}
+.answer.locked{border-style:dashed;border-color:var(--line-strong);color:var(--muted)}
+.answer.locked h3{color:var(--muted)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">IS115 · Week 10 · Extra practice</div>
+      <h1>More graph questions, one step at a time</h1>
+    </div>
+    <div class="keys"><kbd>←</kbd> <kbd>→</kbd> step · <kbd>Space</kbd> play · <kbd>Home</kbd> <kbd>End</kbd> jump</div>
+  </header>
+
+  <nav class="rail" id="rail" aria-label="Questions"></nav>
+
+  <section class="qhead">
+    <div class="qtitle"><h2 id="qtitle"></h2><span class="team" id="qteam"></span></div>
+    <p class="problem" id="qproblem"></p>
+    <div class="rules" id="qrules"></div>
+    <div class="params" id="qparams" hidden></div>
+  </section>
+
+  <section class="stage">
+    <div class="card">
+      <div class="card-title"><span id="leftTitle">Graph</span><span id="leftSub"></span></div>
+      <div class="graph-box" id="graphBox"></div>
+      <div class="legend" id="legend"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span>Trace table</span><span id="tblSub"></span></div>
+      <div class="tbl-wrap"><table id="tbl"><thead></thead><tbody></tbody></table><div class="more" id="more"></div></div>
+    </div>
+  </section>
+
+  <section class="player" aria-label="Step controls">
+    <div class="ctrl">
+      <div class="btns">
+        <button class="pbtn" id="bFirst" title="First step (Home)" aria-label="First step">⏮</button>
+        <button class="pbtn" id="bPrev" title="Previous step (←)" aria-label="Previous step">◀</button>
+        <button class="pbtn primary" id="bPlay" title="Play / pause (Space)">Play</button>
+        <button class="pbtn" id="bNext" title="Next step (→)" aria-label="Next step">▶</button>
+        <button class="pbtn" id="bLast" title="Last step (End)" aria-label="Last step">⏭</button>
+      </div>
+      <div class="scrub"><input type="range" id="scrub" min="0" max="0" value="0" aria-label="Step"><span class="counter" id="counter"></span></div>
+      <label class="reveal"><input type="checkbox" id="revealAll"> Show the full table</label>
+    </div>
+    <div class="note" id="note" aria-live="polite"></div>
+  </section>
+
+  <section class="lower">
+    <div class="card">
+      <div class="card-title"><span id="dsTitle">State</span></div>
+      <div id="dsBox"></div>
+      <div class="ds-col">
+        <div class="ds-sub" id="seqLabel"></div>
+        <div class="seq" id="seqBox"></div>
+      </div>
+    </div>
+    <section class="answer" id="answer"></section>
+  </section>
+</div>
+
+<script>
+/* ===================== new graphs (all edges directed) ===================== */
+const GRAPHS={
+  campus:{name:'Campus one-way paths',nodes:{A:[0,1],B:[2,2.5],C:[2,-.5],D:[4,2.5],E:[4,1],F:[4,-.5],G:[6,1.8],H:[6,0]},
+    edges:[['A','B'],['A','C'],['B','D'],['B','E'],['C','E'],['C','F'],['D','G'],['E','G'],['E','H'],['F','H'],['H','C',null,{c:[4.3,-2.3]}]]},
+  network:{name:'Server network',nodes:{A:[0,0],B:[1.8,1.6],C:[1.8,-1.6],D:[3.6,0],E:[5.4,1.6],F:[5.4,-1.6],G:[7.2,0],H:[7.2,-2.4]},
+    edges:[['A','B'],['A','C'],['A','D'],['B','D'],['C','D'],['B','E'],['D','E'],['D','F'],['C','F'],['F','E'],['E','G'],['F','G'],['H','F'],['H','G']]},
+  courses:{name:'Course prerequisites',nodes:{A:[0,2],B:[0,0],C:[2,3],D:[2,1],E:[2,-1],F:[4,2],G:[4,0],H:[6,1]},
+    edges:[['A','C'],['A','D'],['B','D'],['B','E'],['C','F'],['D','F'],['D','G'],['E','G'],['F','H'],['G','H']]},
+  pipeline:{name:'Build pipeline',nodes:{G:[0,1],E:[2,2.2],C:[2,-.2],F:[4,2.2],A:[4,-.2],D:[6,1],B:[8,1]},
+    edges:[['G','E'],['G','C'],['E','F'],['C','F'],['C','A'],['F','D'],['A','D'],['D','B'],['E','A']]},
+  schedule:{name:'Project schedule',nodes:{A:[0,1],B:[2,2],C:[2,0],D:[4,2],E:[4,0],F:[6,1]},
+    edges:[['A','B'],['A','C'],['B','D'],['C','E'],['D','F'],['E','F'],['D','C'],['E','B']]},
+  twoparts:{name:'Two separate projects',nodes:{A:[0,2],C:[2,2],E:[4,2],G:[6,2],B:[0,0],D:[2,0],F:[4,0]},
+    edges:[['A','C'],['C','E'],['E','G'],['A','E',null,{c:[2,3.3]}],['B','D'],['D','F'],['B','F',null,{c:[2,-1.3]}]]},
+  delivery:{name:'Delivery routes (weighted)',nodes:{S:[0,1],A:[2,2.4],B:[2,-.4],C:[4,2.4],D:[4,-.4],T:[6,1]},
+    edges:[['S','A',4],['S','B',1],['B','A',2],['A','C',5],['B','D',8],['A','D',2,{pos:.4}],['C','T',3],['D','T',1]]},
+  trap:{name:'Cheap first step, expensive finish',nodes:{S:[0,1],A:[2,2.4],B:[2,-.4],C:[4,2.4],D:[4,-.4],T:[6,1]},
+    edges:[['S','A',1],['S','B',4],['A','C',1],['C','T',10],['B','D',1],['D','T',1],['A','B',2]]},
+  flights:{name:'Flight connections (weighted)',nodes:{A:[0,1],B:[2,2.4],C:[2,-.4],D:[4,2.4],E:[4,-.4],F:[6,1],G:[8,1]},
+    edges:[['A','B',3],['A','C',1],['C','B',1],['B','D',4],['C','E',6],['D','E',1,{side:'right'}],['D','F',5],['E','F',2],['F','G',1],['E','G',6,{c:[6.2,-1.8]}],['B','E',5,{pos:.3}]]}
+};
+
+
+/* ===================== helpers ===================== */
+const cmp=(a,b)=>(isNaN(a)||isNaN(b))?String(a).localeCompare(String(b)):a-b;
+const ek=(u,v)=>u+'>'+v;
+const fmtL=a=>'['+a.join(', ')+']';
+const isAre=a=>a.length===1?`${a[0]} is`:`${a.join(', ')} are`;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function adjOf(g){const a={};for(const v in g.nodes)a[v]=[];for(const e of g.edges)a[e[0]].push({to:e[1],w:e[2]});for(const v in a)a[v].sort((x,y)=>cmp(x.to,y.to));return a}
+function verts(g){return Object.keys(g.nodes).sort(cmp)}
+function allTopo(g,limit=1e6){
+  const adj=adjOf(g),V=verts(g),indeg={};V.forEach(v=>indeg[v]=0);g.edges.forEach(e=>indeg[e[1]]++);
+  const out=[],cur=[],used=new Set();
+  (function rec(){if(out.length>=limit)return;if(cur.length===V.length){out.push([...cur]);return}
+    for(const v of V){if(!used.has(v)&&indeg[v]===0){used.add(v);cur.push(v);adj[v].forEach(x=>indeg[x.to]--);rec();adj[v].forEach(x=>indeg[x.to]++);cur.pop();used.delete(v)}}})();
+  return out;
+}
+function countTopo(g){return allTopo(g).length}
+const ord=n=>n+(['th','st','nd','rd'][(n%100-20)%10]||['th','st','nd','rd'][n%100]||'th');
+
+/* ---- data-structure HTML ---- */
+function cell(t,cls=''){return `<div class="cell ${cls}">${esc(t)}</div>`}
+function stackHtml(items,{newCount=0,name='Stack',sub='',flags=null}={}){
+  const n=items.length;let h=`<div class="ds-col"><div class="ds-name">${name}</div>${sub?`<div class="ds-sub">${sub}</div>`:''}<div class="stack"><div class="end-label">top</div>`;
+  if(!n)h+=`<div class="cell empty">empty</div>`;
+  for(let i=n-1;i>=0;i--)h+=cell(items[i],flags?flags[i]||'':(i>=n-newCount?'new':''));
+  return h+`<div class="end-label">bottom</div></div></div>`;
+}
+function queueHtml(items,newCount=0){
+  const n=items.length;let h=`<div class="ds-col"><div class="ds-name">Queue</div><div class="queue"><span class="end-label">head</span>`;
+  if(!n)h+=`<div class="cell empty">empty</div>`;
+  items.forEach((x,i)=>h+=cell(x,i>=n-newCount?'new':''));
+  return h+`<span class="end-label">tail</span></div></div>`;
+}
+function poppedHtml(label,v,tag){return `<div class="popped"><span class="ds-sub">${label}</span>${cell(v,tag==='discard'?'bad':'cur')}${tag==='discard'?'<span class="pill warn">already visited, discarded</span>':''}</div>`}
+function seqHtml(a){return a.length?a.map(v=>`<span class="chip">${esc(v)}</span>`).join('<span class="arrow">→</span>'):'<span class="ds-sub">none yet</span>'}
+
+const LEG={
+  'n-idle':'Not seen yet','n-wait':'Waiting','n-cur':'Current','n-vis':'Visited','n-fin':'Finished','n-disc':'Discarded pop','n-out':'Never reached',
+  'e-tree':'Edge that reached a vertex','e-act':'Edge being used now','e-skip':'Edge to a vertex already handled','e-path':'Result'
+};
+
+/* ===================== Stack DFS (visit on pop, copies allowed) ===================== */
+function stackDFS(gid,start,rev,extra={}){
+  const g=GRAPHS[gid],adj=adjOf(g),V=verts(g),order=rev?'reverse alphabetical':'alphabetical';
+  const visited=new Set(),seq=[],tree=new Set(),rows=[],steps=[];
+  const stack=[{v:start,from:null}];
+  const snap=o=>{
+    const ns={},es={};
+    V.forEach(v=>ns[v]=visited.has(v)?'n-vis':stack.some(s=>s.v===v)?'n-wait':'n-idle');
+    (o.out||[]).forEach(v=>ns[v]='n-out');
+    if(o.cur)ns[o.cur]=o.discard?'n-disc':'n-cur';
+    tree.forEach(k=>es[k]='e-tree');(o.act||[]).forEach(k=>es[k]='e-act');(o.skip||[]).forEach(k=>es[k]='e-skip');
+    const ds=`<div class="ds">${o.cur?poppedHtml('Popped',o.cur,o.discard?'discard':''):''}${stackHtml(stack.map(s=>s.v),{newCount:o.newCount||0,sub:'Yellow = pushed this step'})}</div>`;
+    steps.push({ns,es,ds,seq:[...seq],note:o.note,rows:rows.length});
+  };
+  rows.push(['—','—',start,fmtL([start]),'start']);
+  snap({newCount:1,note:`Push the start vertex <b>${start}</b> onto the empty stack. Nothing is visited yet: in stack DFS a vertex is visited when it is <b>popped</b>.`});
+  let allNoted=false;
+  while(stack.length){
+    const top=stack.pop(),u=top.v;
+    if(visited.has(u)){
+      rows.push([u,'—','—',fmtL(stack.map(s=>s.v)),'already visited: discard']);
+      snap({cur:u,discard:true,note:`Pop <b>${u}</b>. ${u} is already visited, so this copy is <b>discarded</b> and nothing is pushed.`});
+      continue;
+    }
+    visited.add(u);seq.push(u);if(top.from)tree.add(ek(top.from,u));
+    const nb=adj[u].map(x=>x.to),pushOrd=rev?[...nb].reverse():nb,pushed=[],skipped=[],dup=[];
+    for(const w of pushOrd){if(visited.has(w))skipped.push(w);else{if(stack.some(s=>s.v===w))dup.push(w);stack.push({v:w,from:u});pushed.push(w)}}
+    let note=`Pop <b>${u}</b>. It is unvisited, so <b>visit ${u}</b>${top.from?` (pushed by ${top.from})`:''}.`;const sh=[];
+    if(!nb.length){note+=` ${u} has no out-neighbours, so nothing is pushed.`;sh.push(`${u} has no out-neighbours`)}
+    else{
+      if(pushed.length){note+=` Push its unvisited out-neighbours in ${order} order: ${pushed.join(', ')}.`;
+        if(pushed.length>1){note+=` <b>${pushed.at(-1)}</b> goes in last, so it is on top and leaves first.`;sh.push(`${pushed[0]} pushed first, so ${pushed.at(-1)} is on top`)}}
+      if(skipped.length){note+=` ${isAre(skipped)} already visited, so not pushed.`;sh.push(`${isAre(skipped)} already visited`)}
+      if(dup.length){note+=` ${isAre(dup)} already waiting in the stack. Push another copy anyway.`;sh.push(`another copy of ${dup.join(', ')} pushed`)}
+    }
+    if(!allNoted&&seq.length===V.length&&stack.length){allNoted=true;note+=` All ${V.length} vertices are now visited, but the algorithm keeps popping until the stack is empty.`;sh.push(`all ${V.length} vertices now visited`)}
+    rows.push([u,u,pushed.join(', ')||'—',fmtL(stack.map(s=>s.v)),sh.join('; ')]);
+    snap({cur:u,newCount:pushed.length,act:pushed.map(w=>ek(u,w)),skip:skipped.map(w=>ek(u,w)),note});
+  }
+  const out=V.filter(v=>!visited.has(v));
+  snap({out,note:`The stack is empty, so DFS stops after ${rows.length-1} pops and ${seq.length} visits. Visit sequence: <b>${seq.join(', ')}</b>.${out.length?' '+(extra.unreached||''):''}`});
+  return {columns:['Popped','Visited','Pushed','Stack after (bottom → top)','Note'],mono:[0,1,2,3],rows,steps,seqLabel:'Visit sequence',
+    dsTitle:'Stack',legend:['n-idle','n-wait','n-cur','n-vis','n-disc',...(out.length?['n-out']:[]),'e-tree','e-act','e-skip'],legendText:{'n-wait':'In the stack, not visited'},
+    answer:`<p><b>Visit sequence:</b> ${seq.join(', ')}</p>${extra.answer||''}`};
+}
+
+/* ===================== BFS (visit on enqueue) ===================== */
+function bfs(gid,start,rev,extra={}){
+  const g=GRAPHS[gid],adj=adjOf(g),V=verts(g),order=rev?'reverse alphabetical':'alphabetical';
+  const visited=new Set([start]),done=new Set(),seq=[start],tree=new Set(),rows=[],steps=[];
+  const q=[start];
+  const snap=o=>{
+    const ns={},es={};
+    V.forEach(v=>ns[v]=done.has(v)?'n-vis':visited.has(v)?'n-wait':'n-idle');
+    (o.out||[]).forEach(v=>ns[v]='n-out');
+    if(o.cur)ns[o.cur]='n-cur';
+    tree.forEach(k=>es[k]='e-tree');(o.act||[]).forEach(k=>es[k]='e-act');(o.skip||[]).forEach(k=>es[k]='e-skip');
+    const ds=`<div class="ds">${o.cur?poppedHtml('Dequeued',o.cur):''}${queueHtml(q,o.newCount||0)}<div class="ds-sub">Yellow = enqueued this step</div></div>`;
+    steps.push({ns,es,ds,seq:[...seq],note:o.note,rows:rows.length});
+  };
+  rows.push(['—',start,fmtL(q),'start']);
+  snap({newCount:1,note:`Visit the start vertex <b>${start}</b> and enqueue it. In BFS a vertex is visited when it is <b>enqueued</b>, so no vertex enters the queue twice.`});
+  let allNoted=false;
+  while(q.length){
+    const u=q.shift();done.add(u);
+    const nb=adj[u].map(x=>x.to),o2=rev?[...nb].reverse():nb,added=[],skipped=[];
+    for(const w of o2){if(visited.has(w))skipped.push(w);else{visited.add(w);seq.push(w);q.push(w);added.push(w);tree.add(ek(u,w))}}
+    let note=`Dequeue <b>${u}</b> from the head.`;const sh=[];
+    if(!nb.length){note+=` ${u} has no out-neighbours.`;sh.push(`${u} has no out-neighbours`)}
+    else{
+      if(added.length){note+=` Visit and enqueue its unvisited out-neighbours in ${order} order: <b>${added.join(', ')}</b>.`;if(added.length>1)sh.push(`${added[0]} enqueued before ${added.slice(1).join(', ')}`)}
+      if(skipped.length){note+=` ${isAre(skipped)} already visited, so not enqueued.`;sh.push(`${isAre(skipped)} already visited`)}
+    }
+    if(!allNoted&&seq.length===V.length&&q.length){allNoted=true;note+=` Every vertex is now visited. The remaining dequeues add nothing new.`;sh.push('all vertices now visited')}
+    rows.push([u,added.join(', ')||'—',fmtL(q),sh.join('; ')]);
+    snap({cur:u,newCount:added.length,act:added.map(w=>ek(u,w)),skip:skipped.map(w=>ek(u,w)),note});
+  }
+  const out=V.filter(v=>!visited.has(v));
+  snap({out,note:`The queue is empty, so BFS stops. Visit sequence (enqueue order): <b>${seq.join(', ')}</b>.${out.length?' '+(extra.unreached||''):''}`});
+  return {columns:['Dequeued','Visited / enqueued','Queue after (head → tail)','Note'],mono:[0,1,2],rows,steps,seqLabel:'Visit sequence',
+    dsTitle:'Queue',legend:['n-idle','n-wait','n-cur','n-vis',...(out.length?['n-out']:[]),'e-tree','e-act','e-skip'],legendText:{'n-wait':'Visited, waiting in the queue','n-vis':'Visited and dequeued'},
+    answer:`<p><b>Visit sequence:</b> ${seq.join(', ')}</p>${extra.answer||''}`};
+}
+
+/* ===================== DFS topological sort (explore in stack-pop order) ===================== */
+function topoDFS(gid,rev,extra={}){
+  const g=GRAPHS[gid],adj=adjOf(g),V=verts(g),order=rev?'reverse alphabetical':'alphabetical';
+  const color={},path=[],finish=[],tree=new Set(),rows=[],steps=[],fin={};let cycle=null;
+  const snap=o=>{
+    const ns={},es={},badges={};
+    V.forEach(v=>ns[v]=color[v]==='b'?'n-fin':color[v]==='g'?'n-wait':'n-idle');
+    if(o.cur)ns[o.cur]='n-cur';
+    tree.forEach(k=>es[k]='e-tree');(o.act||[]).forEach(k=>es[k]='e-act');(o.skip||[]).forEach(k=>es[k]='e-skip');
+    for(const v in fin)badges[v]='f'+fin[v];
+    const ds=`<div class="ds-row">${stackHtml([...path],{name:'DFS path',sub:'Vertices still being explored',flags:path.map((v,i)=>i===path.length-1&&o.cur===v?'cur':'')})}${stackHtml([...finish],{name:'Finish stack',sub:'Pushed when a vertex finishes',newCount:o.fin?1:0})}</div>`;
+    steps.push({ns,es,badges,ds,seq:[...finish],note:o.note,rows:rows.length});
+  };
+  function visit(u,parent,rootNote,restart){
+    color[u]='g';path.push(u);if(parent)tree.add(ek(parent,u));
+    const nb=adj[u].map(x=>x.to),pushOrd=rev?[...nb].reverse():nb,explore=[...pushOrd].reverse();
+    let note=rootNote||`From <b>${parent}</b>, explore <b>${u}</b>. It joins the DFS path.`;
+    if(nb.length>1)note+=` Its out-neighbours are pushed in ${order} order (${pushOrd.join(', ')}), so they leave the stack as <b>${explore.join(', ')}</b>. That is the order ${u} explores them.`;
+    else if(nb.length===1)note+=` Its only out-neighbour is ${nb[0]}.`;
+    else note+=` ${u} has no out-neighbours.`;
+    snap({cur:u,act:parent?[ek(parent,u)]:[],note});
+    for(const w of explore){
+      if(!color[w]){visit(w,u);if(cycle)return;}
+      else if(color[w]==='g'){
+        cycle=[...path.slice(path.indexOf(w)),w];
+        rows.push(['!',u,'cycle: '+cycle.join(' → '),fmtL(finish)]);
+        snap({cur:u,skip:[ek(u,w)],note:`Edge <b>${u} → ${w}</b> returns to an active DFS call. This is a directed cycle: <b>${cycle.join(' → ')}</b>. Stop: no topological order exists.`});return;
+      }
+      else snap({cur:u,skip:[ek(u,w)],note:`Back at <b>${u}</b>. The next out-neighbour, <b>${w}</b>, is already ${color[w]==='b'?'finished':'on the DFS path (that would be a cycle)'}, so skip it.`});
+    }
+    color[u]='b';path.pop();finish.push(u);fin[u]=finish.length;
+    rows.push([finish.length,u,(restart?'outer loop; ':'')+(nb.length?`${nb.join(', ')} finished`:'no out-neighbours'),fmtL(finish)]);
+    snap({cur:u,fin:true,note:`${nb.length?`All out-neighbours of <b>${u}</b> (${nb.join(', ')}) are finished`:`<b>${u}</b> has no out-neighbours`}, so <b>${u} finishes</b>. Push it onto the finish stack (finish #${finish.length}).`});
+  }
+  snap({note:`Every vertex starts unvisited. The outer loop goes through the vertices in alphabetical order and starts a DFS from each one that is still unvisited.`});
+  let first=true,lastRoot=-1;
+  V.forEach((v,i)=>{
+    if(cycle||color[v])return;
+    const passed=V.slice(lastRoot+1,i).filter(x=>color[x]);
+    const rn=first?`Outer loop: <b>${v}</b> is unvisited, so start a DFS from ${v}.`
+      :`The DFS from ${V[lastRoot]} is done. Outer loop: ${passed.length?`${isAre(passed)} already finished. `:''}<b>${v}</b> is not, so start a new DFS from ${v}.`;
+    visit(v,null,rn,!first);first=false;lastRoot=i;
+  });
+  if(cycle)return {columns:['#','Finish / current','Reason','Finish stack (bottom → top)'],mono:[0,1,3],rows,steps,seqLabel:'Partial finish order (not a topological order)',dsTitle:'Cycle detected',legend:['n-idle','n-wait','n-cur','n-fin','e-skip'],legendText:{'n-wait':'Active DFS call','e-skip':'Back edge: cycle'},result:{cycle},answer:`<p><b>No topological order exists.</b> Directed cycle: ${cycle.join(' → ')}.</p><p>The partial finish stack cannot be used as a topological order.</p>`};
+  const topo=[...finish].reverse(),pos={};topo.forEach((v,i)=>pos[v]=i+1);
+  const ns={},es={},badges={};V.forEach(v=>{ns[v]='n-fin';badges[v]='#'+pos[v]});g.edges.forEach(e=>es[ek(e[0],e[1])]='e-path');
+  const fwd=g.edges.every(e=>pos[e[0]]<pos[e[1]]);
+  const checks=g.edges.map(e=>`<span class="chip ok">${e[0]}→${e[1]} (${ord(pos[e[0]])}→${ord(pos[e[1]])}) ✓</span>`).join('');
+  steps.push({ns,es,badges,ds:`<div class="ds-row">${stackHtml([...finish],{name:'Finish stack',sub:'Pop from the top to read the order'})}<div class="ds-col"><div class="ds-name">Topological order</div><div class="big">${topo.join(' ')}</div><div class="ds-sub">Badge #k = position in the order</div></div></div>`,
+    seq:topo,seqTopo:true,note:`Pop the finish stack from top to bottom: topological order <b>${topo.join(', ')}</b>. Check: ${fwd?`all ${g.edges.length} edges point forward (each tail comes before its head).`:'some edge points backward!'}`,rows:rows.length});
+  return {columns:['#','Finish','Reason','Finish stack after (bottom → top)'],mono:[0,1,3],rows,steps,seqLabel:'Finish order so far',seqLabelEnd:'Topological order',
+    result:{order:topo,cycle:null},dsTitle:'DFS path and finish stack',legend:['n-idle','n-wait','n-cur','n-fin','e-tree','e-act','e-skip','e-path'],legendText:{'n-wait':'On the DFS path','n-fin':'Finished (badge fk = k-th to finish)','e-path':'Edge checked: points forward'},
+    answer:`<p><b>Topological order:</b> ${topo.join(', ')}</p><div class="chips">${checks}</div>${extra.answer||''}`};
+}
+
+/* ===================== Uniform Cost Search ===================== */
+function ucs(gid,s,t){
+  const g=GRAPHS[gid],adj=adjOf(g),V=verts(g);
+  const pq=[{v:s,c:0,p:null}],done=new Map(),rows=[],steps=[];
+  const fe=e=>`${e.v}(${e.c}, ${e.p||'—'})`;const sortPQ=()=>pq.sort((a,b)=>a.c-b.c||cmp(a.v,b.v));
+  const snap=o=>{
+    const ns={},es={},badges={};
+    V.forEach(v=>{ns[v]=done.has(v)?'n-vis':pq.some(e=>e.v===v)?'n-wait':'n-idle'});
+    if(o.cur)ns[o.cur]='n-cur';
+    done.forEach((e,v)=>{if(e.p)es[ek(e.p,v)]='e-tree';badges[v]=String(e.c)});
+    pq.forEach(e=>badges[e.v]=String(e.c));
+    (o.act||[]).forEach(k=>es[k]='e-act');(o.skip||[]).forEach(k=>es[k]='e-skip');(o.path||[]).forEach(k=>es[k]='e-path');
+    if(o.pathV)o.pathV.forEach(v=>ns[v]='n-fin');
+    const fl=o.flags||{};
+    const pqh=`<div class="ds-col"><div class="ds-name">Priority queue</div><div class="ds-sub">Lowest cost first · entry = node(cost, previous)</div><div class="pq">${pq.length?pq.map(e=>`<div class="cell ${fl[e.v]||''}"><span>${e.v}</span><em>cost ${e.c} · prev ${e.p||'—'}</em></div>`).join(''):'<div class="cell empty">empty</div>'}</div></div>`;
+    const deqh=o.deq?`<div class="popped"><span class="ds-sub">Dequeued</span>${cell(fe(o.deq),'cur')}</div>`:'';
+    const doneh=`<div class="ds-col"><div class="ds-sub">Dequeued so far (cost is final)</div><div class="chips">${[...done.values()].map(e=>`<span class="chip ok">${fe(e)}</span>`).join('')||'<span class="ds-sub">none</span>'}</div></div>`;
+    steps.push({ns,es,badges,ds:`<div class="ds">${deqh}${pqh}${doneh}</div>`,seq:o.seq||[...done.keys()],note:o.note,rows:rows.length});
+  };
+  rows.push([0,'—',s,fe(pq[0])]);
+  snap({flags:{[s]:'new'},note:`Put the start <b>${s}</b> into the priority queue with cost 0 and no previous vertex. The badge on each vertex is its current cost.`});
+  let step=0;
+  while(pq.length){
+    step++;sortPQ();const e=pq.shift();done.set(e.v,e);
+    if(e.v===t){rows.push([step,fe(e),'target dequeued: stop',pq.map(fe).join(', ')||'[ ]']);
+      snap({cur:t,deq:e,note:`Dequeue the lowest-cost entry <b>${fe(e)}</b>. It is the target, so UCS <b>stops</b>. Cost ${e.c} is final, because every entry left in the PQ costs at least ${e.c}.`});break}
+    const parts=[],long=[],flags={},act=[],skip=[];
+    for(const {to,w} of adj[e.v]){
+      if(done.has(to)){long.push(`${to} has already been dequeued, so it is not enqueued again.`);skip.push(ek(e.v,to));parts.push(`${to}: already dequeued`);continue}
+      const nc=e.c+w,ex=pq.find(x=>x.v===to);
+      if(!ex){pq.push({v:to,c:nc,p:e.v});flags[to]='new';act.push(ek(e.v,to));parts.push(`${to}: ${e.c}+${w} = ${nc}`);long.push(`Enqueue <b>${to}</b> with cost ${e.c} + ${w} = ${nc}, previous ${e.v}.`)}
+      else if(nc<ex.c){long.push(`${to} is in the PQ at cost ${ex.c}. ${e.c} + ${w} = ${nc} is lower, so update it to ${to}(${nc}, ${e.v}).`);ex.c=nc;ex.p=e.v;flags[to]='upd';act.push(ek(e.v,to));parts.push(`${to}: ${e.c}+${w} = ${nc}, lower: update`)}
+      else{long.push(`${to} is already in the PQ at cost ${ex.c}. ${e.c} + ${w} = ${nc} is <b>not lower</b>, so keep ${fe(ex)}.`);skip.push(ek(e.v,to));parts.push(`${to}: ${e.c}+${w} = ${nc}, not lower`)}
+    }
+    sortPQ();rows.push([step,fe(e),parts.join('; ')||'—',pq.map(fe).join(', ')||'[ ]']);
+    snap({cur:e.v,deq:e,flags,act,skip,note:`Dequeue the lowest-cost entry <b>${fe(e)}</b>. The cost of ${e.v} is now final. ${long.join(' ')||`${e.v} has no out-neighbours.`}`});
+  }
+  if(!done.has(t)){
+    snap({note:`The PQ is empty and ${t} was never dequeued. No directed path from ${s} to ${t} exists.`});
+    return {columns:['Step','deQ','enQ / updated','PQ after (lowest first)'],mono:[0,1,3],rows,steps,seqLabel:'Dequeued so far',dsTitle:'Priority queue',legend:['n-idle','n-vis','e-tree'],result:{found:false,path:[],cost:null},answer:`<p><b>No path</b> from ${s} to ${t}. The PQ emptied without removing the target.</p>`};
+  }
+  const path=[t];while(done.get(path[0]).p)path.unshift(done.get(path[0]).p);
+  const back=[...path].reverse().join(' ← ');const pe=[];for(let i=1;i<path.length;i++)pe.push(ek(path[i-1],path[i]));
+  const ws=[];for(let i=1;i<path.length;i++)ws.push(adj[path[i-1]].find(x=>x.to===path[i]).w);
+  snap({path:pe,pathV:path,seq:path,note:`Recover the path by following the previous-vertex links back from ${t}: ${back}. Lowest-cost path <b>${path.join(' → ')}</b>, cost ${(ws.length?ws.join(' + '):'0')} = <b>${done.get(t).c}</b>.`});
+  return {columns:['Step','deQ','enQ / updated','PQ after (lowest first)'],mono:[0,1,3],rows,steps,seqLabel:'Dequeued so far',seqLabelEnd:'Lowest-cost path',
+    result:{found:true,path,cost:done.get(t).c},dsTitle:'Priority queue',legend:['n-idle','n-wait','n-cur','n-vis','n-fin','e-tree','e-act','e-skip','e-path'],legendText:{'n-wait':'In the PQ (badge = cost)','n-vis':'Dequeued (cost final)','n-fin':'On the final path','e-tree':'Best link to previous vertex','e-act':'Relaxed: enqueued or updated','e-skip':'Not lower: no change'},
+    answer:`<p><b>Path:</b> ${path.join(' → ')} &nbsp; <b>Cost:</b> ${(ws.length?ws.join(' + '):'0')} = ${done.get(t).c}</p><p>UCS stops only when the target is <i>dequeued</i>. At that moment no cheaper entry remains in the PQ, so cost ${done.get(t).c} is guaranteed to be the minimum. A target can be discovered at a higher cost and improved before it is dequeued. Equal-cost alternatives retain the existing previous link. Cost ties are broken alphabetically.</p>`};
+}
+
+/* ===================== practice question catalogue (all new graphs) ===================== */
+const UNREACH='Dashed vertices cannot be reached from the start along the arrows.';
+const Q=[
+ {id:'q1',num:'Q1',short:'DFS',group:'Campus map',title:'Stack DFS on the campus map',team:'Warm-up',graph:'campus',rules:['stack','push alphabetical','visit on pop','start A'],
+  problem:'Find the DFS visit sequence from A, using a stack. Push out-neighbours in alphabetical order.',
+  build:()=>stackDFS('campus','A',false,{answer:'<p>When H is popped, its only out-neighbour C is already visited, so nothing is pushed. The loop C → F → H → C cannot trap DFS because a visited vertex is never expanded again.</p>'})},
+ {id:'q2',num:'Q2',short:'DFS',group:'Campus map',title:'Same map, reverse push order',team:'Core',graph:'campus',rules:['stack','push reverse alphabetical','visit on pop','start A'],
+  problem:'Find the DFS visit sequence from A, using a stack. Push out-neighbours in reverse alphabetical order. Compare with Q1.',
+  build:()=>stackDFS('campus','A',true,{answer:'<p>Only the push order changed from Q1, yet the visit sequence is completely different. Always check which neighbour ends up on top of the stack.</p>'})},
+ {id:'q3',num:'Q3',short:'BFS',group:'Campus map',title:'BFS on the campus map',team:'Warm-up',graph:'campus',rules:['queue','enqueue alphabetical','visit on enqueue','start A'],
+  problem:'Find the BFS visit sequence from A, using a queue. Enqueue out-neighbours in alphabetical order. Compare with Q1.',
+  build:()=>bfs('campus','A',false,{answer:'<p>BFS reaches vertices in order of the fewest edges from A: A · B, C · D, E, F · G, H. Compare with the DFS sequence in Q1 on the same graph.</p>'})},
+ {id:'q4',num:'Q4',short:'BFS',group:'Campus map',title:'BFS starting inside the loop',team:'Core',graph:'campus',rules:['queue','enqueue reverse alphabetical','visit on enqueue','start C'],
+  problem:'Find the BFS visit sequence from C, using a queue. Enqueue out-neighbours in reverse alphabetical order.',
+  build:()=>bfs('campus','C',true,{unreached:UNREACH,answer:'<p>C is visited when it is enqueued at the start, so the edge H → C never adds it again. A, B and D cannot be reached from C.</p>'})},
+
+ {id:'q5',num:'Q5',short:'DFS',group:'Server network',title:'Stack DFS on the server network',team:'Core',graph:'network',rules:['stack','push reverse alphabetical','visit on pop','start A'],
+  problem:'Find the DFS visit sequence from A, using a stack. Push out-neighbours in reverse alphabetical order. Mark the pops that are discarded.',
+  build:()=>stackDFS('network','A',true,{unreached:UNREACH,answer:'<p>H is never visited: it has only outgoing edges, so nothing leads to it from A.</p>'})},
+ {id:'q6',num:'Q6',short:'DFS',group:'Server network',title:'DFS starting in the middle',team:'Stretch',graph:'network',rules:['stack','push alphabetical','visit on pop','start D'],
+  problem:'Find the DFS visit sequence from D, using a stack. Push out-neighbours in alphabetical order.',
+  build:()=>stackDFS('network','D',false,{unreached:UNREACH,answer:'<p>A DFS from D only reaches what D can reach along the arrows. A, B, C and H stay unvisited; a single DFS does not restart elsewhere.</p>'})},
+ {id:'q7',num:'Q7',short:'BFS',group:'Server network',title:'BFS on the server network',team:'Core',graph:'network',rules:['queue','enqueue alphabetical','visit on enqueue','start A'],
+  problem:'Find the BFS visit sequence from A, using a queue. Enqueue out-neighbours in alphabetical order.',
+  build:()=>bfs('network','A',false,{unreached:UNREACH,answer:'<p>D is reached directly from A, so it is enqueued in the first layer even though B and C also point to it. H is unreachable.</p>'})},
+ {id:'q8',num:'Q8',short:'BFS',group:'Server network',title:'BFS from B, reverse order',team:'Stretch',graph:'network',rules:['queue','enqueue reverse alphabetical','visit on enqueue','start B'],
+  problem:'Find the BFS visit sequence from B, using a queue. Enqueue out-neighbours in reverse alphabetical order.',
+  build:()=>bfs('network','B',true,{unreached:UNREACH,answer:'<p>Reverse order changes the sequence inside each layer (E before D), but the layers themselves stay the same: B · D, E · F, G.</p>'})},
+
+ {id:'q9',num:'Q9',short:'Topo',group:'Topological sort',title:'Course prerequisites',team:'Warm-up',graph:'courses',rules:['DFS finish stack','push alphabetical','outer loop from A'],
+  problem:'An arrow X → Y means course X must be taken before course Y. Find a topological order with the DFS finish-stack method. Push out-neighbours in alphabetical order and run the outer loop from A.',
+  build:()=>topoDFS('courses',false,{answer:'<p>Many orders are valid here (42 in total). Any order in which every arrow points forward is correct.</p>'})},
+ {id:'q10',num:'Q10',short:'Topo',group:'Topological sort',title:'Build pipeline, labels out of order',team:'Core',graph:'pipeline',rules:['DFS finish stack','push alphabetical','outer loop from A'],
+  problem:'Build steps are labelled A to G, but the labels do not follow the dependencies. Find a topological order with the DFS finish-stack method (push alphabetical, outer loop from A).',
+  build:()=>topoDFS('pipeline',false,{answer:'<p>The outer loop starts from A, which depends on C and E. DFS still produces a valid order, because a vertex is only placed after everything it points to has finished.</p>'})},
+ {id:'q11',num:'Q11',short:'Topo',group:'Topological sort',title:'Is this schedule possible?',team:'Stretch',graph:'schedule',rules:['DFS finish stack','push alphabetical','outer loop from A','watch for cycles'],
+  problem:'Find a topological order with the DFS finish-stack method, or show that none exists.',
+  build:()=>topoDFS('schedule',false,{})},
+ {id:'q12',num:'Q12',short:'Topo',group:'Topological sort',title:'Two separate projects',team:'Core',graph:'twoparts',rules:['DFS finish stack','push reverse alphabetical','outer loop from A'],
+  problem:'Two unrelated projects share one schedule. Find a topological order of all seven tasks with the DFS finish-stack method. Push out-neighbours in reverse alphabetical order.',
+  build:()=>topoDFS('twoparts',true,{answer:'<p>The finish stack is kept across outer-loop restarts, so both projects end up in one order.</p>'})},
+
+ {id:'q13',num:'Q13',short:'UCS',group:'Uniform cost search',title:'Delivery routes',team:'Warm-up',graph:'delivery',rules:['priority queue','node(cost, previous)','update only if strictly lower','stop when target dequeued'],
+  problem:'Use UCS to find the cheapest route from depot S to customer T. Give every step.',
+  build:()=>withNote(ucs('delivery','S','T'),'A and D both get cheaper after they are first enqueued (A: 4 → 3, D: 9 → 5). That is why a cost is only final when the vertex is dequeued.')},
+ {id:'q14',num:'Q14',short:'UCS',group:'Uniform cost search',title:'Cheapest first step is a trap',team:'Core',graph:'trap',rules:['priority queue','node(cost, previous)','update only if strictly lower','stop when target dequeued'],
+  problem:'Always taking the cheapest next edge would go S → A → C → T. Use UCS to find the lowest-cost path from S to T.',
+  build:()=>withNote(ucs('trap','S','T'),'Greedy cheapest-edge gives S → A → C → T with cost 12. UCS compares total costs from S and finds a route costing 5.')},
+ {id:'q15',num:'Q15',short:'UCS',group:'Uniform cost search',title:'Flights with a tie',team:'Stretch',graph:'flights',rules:['priority queue','ties alphabetical','update only if strictly lower','stop when target dequeued'],
+  problem:'Use UCS to find the cheapest itinerary from A to G. Watch what happens when two routes give the same cost.',
+  build:()=>withNote(ucs('flights','A','G'),'Two routes to E cost 7 (A → C → E and A → C → B → E). The new cost is not strictly lower, so E keeps previous = C.')},
+ {id:'q16',num:'Q16',short:'UCS',group:'Uniform cost search',title:'Flights from a different start',team:'Core',graph:'flights',rules:['priority queue','ties alphabetical','update only if strictly lower','stop when target dequeued'],
+  problem:'Same flight map as Q15, but start at B. Use UCS to find the cheapest path from B to G.',
+  build:()=>withNote(ucs('flights','B','G'),'All costs are measured from the new start. Nothing carries over from Q15.')},
+ {id:'q17',num:'Q17',short:'UCS',group:'Uniform cost search',title:'Is there a route at all?',team:'Stretch',graph:'trap',rules:['priority queue','stop when PQ is empty'],
+  problem:'On the Q14 map, use UCS to find the cheapest path from C to D.',
+  build:()=>withNote(ucs('trap','C','D'),'From C the only arrow goes to T, and T has no outgoing edges. The priority queue empties without dequeuing D, so there is no path.')}
+];
+function withNote(b,t){b.answer+=`<p>${t}</p>`;return b}
+
+/* ===================== graph drawing ===================== */
+const NS='http://www.w3.org/2000/svg',SC=80,R=19,PAD=38;
+function el(t,a={},p){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e}
+function drawGraph(g){
+  const pts=Object.values(g.nodes).map(p=>[...p]);
+  g.edges.forEach(e=>{const o=e[3];if(o&&o.c){const a=g.nodes[e[0]],b=g.nodes[e[1]];pts.push([(a[0]+b[0])/4+o.c[0]/2,(a[1]+b[1])/4+o.c[1]/2])}});
+  const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]),minx=Math.min(...xs),maxx=Math.max(...xs),miny=Math.min(...ys),maxy=Math.max(...ys);
+  const X=x=>(x-minx)*SC+PAD,Y=y=>(maxy-y)*SC+PAD+6;
+  const W=(maxx-minx)*SC+2*PAD,H=(maxy-miny)*SC+2*PAD+12;
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':g.name});
+  const eg=el('g',{},svg),wg=el('g',{},svg),ng=el('g',{},svg),bg=el('g',{},svg);
+  const edges={},nodes={},badges={};
+  g.edges.forEach(e=>{
+    const [u,v,w,o={}]=e,a=g.nodes[u],b=g.nodes[v];
+    const P0=[X(a[0]),Y(a[1])],P2=[X(b[0]),Y(b[1])],C=o.c?[X(o.c[0]),Y(o.c[1])]:[(P0[0]+P2[0])/2,(P0[1]+P2[1])/2];
+    const un=(p,q)=>{const dx=q[0]-p[0],dy=q[1]-p[1],l=Math.hypot(dx,dy)||1;return [dx/l,dy/l]};
+    const d0=un(P0,C),d2=un(C,P2);
+    const S=[P0[0]+d0[0]*R,P0[1]+d0[1]*R],T=[P2[0]-d2[0]*(R+1),P2[1]-d2[1]*(R+1)],E=[T[0]-d2[0]*9,T[1]-d2[1]*9];
+    const grp=el('g',{class:'edge e-idle'},eg);
+    el('path',{d:o.c?`M${S} Q${C} ${E}`:`M${S} L${E}`},grp);
+    const pp=[-d2[1],d2[0]];
+    el('polygon',{points:`${T} ${T[0]-d2[0]*12+pp[0]*6},${T[1]-d2[1]*12+pp[1]*6} ${T[0]-d2[0]*12-pp[0]*6},${T[1]-d2[1]*12-pp[1]*6}`},grp);
+    edges[ek(u,v)]=grp;
+    if(w!=null){
+      const t=o.pos??.5;let px,py,off;
+      if(o.c){px=(1-t)*(1-t)*P0[0]+2*(1-t)*t*C[0]+t*t*P2[0];py=(1-t)*(1-t)*P0[1]+2*(1-t)*t*C[1]+t*t*P2[1]}
+      else{px=(1-t)*P0[0]+t*P2[0];py=(1-t)*P0[1]+t*P2[1]}
+      if(o.side)off={above:[0,-13],below:[0,14],left:[-13,0],right:[13,0],al:[-11,-11]}[o.side];
+      else if(o.c)off=[0,0];
+      else{const dx=P2[0]-P0[0],dy=P2[1]-P0[1],l=Math.hypot(dx,dy)||1;let nx=-dy/l,ny=dx/l;if(ny>1e-6||(Math.abs(ny)<1e-6&&nx>0)){nx=-nx;ny=-ny}off=[nx*13,ny*13]}
+      const tx=el('text',{x:px+off[0],y:py+off[1],class:'wlabel'},wg);tx.textContent=w;
+    }
+  });
+  for(const v of Object.keys(g.nodes).sort(cmp)){
+    const [x,y]=g.nodes[v],grp=el('g',{class:'node n-idle','data-v':v},ng);
+    el('circle',{cx:X(x),cy:Y(y),r:R},grp);const t=el('text',{x:X(x),y:Y(y)},grp);t.textContent=v;nodes[v]=grp;
+    const b=el('g',{class:'badge',visibility:'hidden'},bg);const rc=el('rect',{y:Y(y)-R-13,height:17,rx:8.5},b);const bt=el('text',{y:Y(y)-R-4.5},b);
+    badges[v]={g:b,rect:rc,text:bt,x:X(x)+R*.75};
+  }
+  return {g,svg,edges,nodes,badges};
+}
+function applyGraph(gx,st){
+  for(const v in gx.nodes)gx.nodes[v].setAttribute('class','node '+((st.ns&&st.ns[v])||'n-idle'));
+  for(const k in gx.edges)gx.edges[k].setAttribute('class','edge '+((st.es&&st.es[k])||'e-idle'));
+  for(const v in gx.badges){const b=gx.badges[v],t=st.badges&&st.badges[v];
+    if(t==null){b.g.setAttribute('visibility','hidden');continue}
+    const w=Math.max(20,t.length*7.4+10);b.g.setAttribute('visibility','visible');b.text.textContent=t;
+    b.rect.setAttribute('x',b.x-w/2);b.rect.setAttribute('width',w);b.text.setAttribute('x',b.x)}
+}
+
+
+/* ===================== UI ===================== */
+if(typeof document!=='undefined')(function(){
+  const $=id=>document.getElementById(id);
+  let cq=null,built=null,si=0,timer=null,gx=null;
+  const rail=$('rail');const groups=[...new Set(Q.map(q=>q.group))];
+  groups.forEach(gn=>{const d=document.createElement('div');d.className='rail-group';
+    d.innerHTML=`<div class="rail-label">${gn}</div><div class="rail-btns">${Q.filter(q=>q.group===gn).map(q=>`<button class="qbtn" data-q="${q.id}"><span>${q.num}</span><small>${q.short}</small></button>`).join('')}</div>`;rail.appendChild(d)});
+  rail.addEventListener('click',e=>{const b=e.target.closest('.qbtn');if(b)select(b.dataset.q,true)});
+
+  function paramUI(q){
+    const p=$('qparams');p.hidden=!q.paramUI;if(!q.paramUI){p.innerHTML='';return}
+    if(q.paramUI==='n'){p.innerHTML=`<label for="q11n">Number of vertices N</label><select id="q11n">${[3,4,5,6].map(n=>`<option ${n===q.params.N?'selected':''}>${n}</option>`).join('')}</select><span class="ds-sub">Each step is one value of k = 0 … N−1.</span>`;
+      $('q11n').onchange=e=>{q.params.N=+e.target.value;rebuild()}}
+  }
+  function rebuild(){stop();built=cq.build(cq.params);si=0;gx=null;renderHead();render()}
+  function select(id,push){
+    const q=Q.find(x=>x.id===id)||Q[0];cq=q;
+    rail.querySelectorAll('.qbtn').forEach(b=>b.setAttribute('aria-current',b.dataset.q===q.id));
+    if(push){try{history.replaceState(null,'','#'+q.id)}catch(e){}}
+    $('qtitle').innerHTML=`<span class="qn">${q.num}</span> ${esc(q.title)}`;$('qteam').textContent=q.team;
+    $('qproblem').textContent=q.problem;$('qrules').innerHTML=q.rules.map(r=>`<span class="rule">${esc(r)}</span>`).join('');
+    paramUI(q);rebuild();
+  }
+  function renderHead(){
+    $('tbl').querySelector('thead').innerHTML='<tr>'+built.columns.map(c=>`<th>${esc(c)}</th>`).join('')+'</tr>';
+    $('dsTitle').textContent=built.dsTitle||'State';
+    const leg=built.legend||[];
+    $('legend').innerHTML=leg.map(k=>{const t=(built.legendText&&built.legendText[k])||LEG[k];
+      const sw=k[0]==='n'?`<svg width="16" height="16" viewBox="0 0 16 16"><g class="node ${k}"><circle cx="8" cy="8" r="6"/></g></svg>`:`<svg width="22" height="10" viewBox="0 0 22 10"><g class="edge ${k}"><path d="M1 5 L21 5"/></g></svg>`;
+      return `<span>${sw}${esc(t)}</span>`}).join('');
+    $('legend').hidden=!leg.length;
+    $('scrub').max=built.steps.length-1;
+  }
+  function render(){
+    const st=built.steps[si],last=si===built.steps.length-1;
+    const g=st.graph||(cq.graph&&GRAPHS[cq.graph]);
+    if(g){if(!gx||gx.g!==g){gx=drawGraph(g);$('graphBox').replaceChildren(gx.svg)}applyGraph(gx,st);$('leftTitle').textContent=g.name.startsWith('N =')?'Construction':'Graph';$('leftSub').textContent=g.name}
+    else{gx=null;$('graphBox').innerHTML=st.visual||'';$('leftTitle').textContent=built.leftTitle||'Input';$('leftSub').textContent=''}
+    $('dsBox').innerHTML=st.ds||'';
+    const lbl=(last&&built.seqLabelEnd)||built.seqLabel||'';
+    $('seqLabel').textContent=lbl;$('seqBox').innerHTML=lbl?seqHtml(st.seq||[]):'';$('seqLabel').parentElement.hidden=!lbl;
+    $('note').innerHTML=st.note;
+    $('counter').textContent=`Step ${si} / ${built.steps.length-1}`;$('scrub').value=si;
+    $('bFirst').disabled=$('bPrev').disabled=si===0;$('bNext').disabled=$('bLast').disabled=last;
+    const all=$('revealAll').checked,prev=si>0?built.steps[si-1].rows:0,shown=all?built.rows.length:st.rows;
+    const hl=st.rows>prev?st.rows-1:-1,mono=new Set(built.mono||[]);
+    $('tbl').querySelector('tbody').innerHTML=built.rows.slice(0,shown).map((r,i)=>`<tr class="${i===hl?'now':''}">${r.map((c,j)=>`<td class="${mono.has(j)?'mono':''}">${esc(c)}</td>`).join('')}</tr>`).join('')
+      ||`<tr><td colspan="${built.columns.length}" class="ds-sub">The table fills in as you step through.</td></tr>`;
+    const rest=built.rows.length-shown;$('more').textContent=rest?`${rest} more row${rest>1?'s':''} to come.`:'';$('more').hidden=!rest;
+    const a=$('answer');
+    if(last){a.className='answer';a.innerHTML=`<h3>Answer</h3>${built.answer}`}else{a.className='answer locked';a.innerHTML=`<h3>Answer</h3><p>The answer appears at the last step.</p>`}
+  }
+  const go=i=>{si=Math.max(0,Math.min(built.steps.length-1,i));render();if(si===built.steps.length-1)stop()};
+  function stop(){if(timer){clearInterval(timer);timer=null}$('bPlay').textContent='Play'}
+  function play(){if(timer){stop();return}if(si===built.steps.length-1)si=-1,go(0);else go(si+1);timer=setInterval(()=>go(si+1),1500);$('bPlay').textContent='Pause'}
+  $('bFirst').onclick=()=>{stop();go(0)};$('bPrev').onclick=()=>{stop();go(si-1)};$('bNext').onclick=()=>{stop();go(si+1)};$('bLast').onclick=()=>{stop();go(1e9)};
+  $('bPlay').onclick=play;$('scrub').oninput=e=>{stop();go(+e.target.value)};$('revealAll').onchange=render;
+  document.addEventListener('keydown',e=>{
+    if(e.target.closest('input,select,textarea')||e.metaKey||e.ctrlKey||e.altKey)return;
+    if(e.key==='ArrowRight'){stop();go(si+1);e.preventDefault()}else if(e.key==='ArrowLeft'){stop();go(si-1);e.preventDefault()}
+    else if(e.key==='Home'){stop();go(0);e.preventDefault()}else if(e.key==='End'){stop();go(1e9);e.preventDefault()}
+    else if(e.key===' '&&!e.target.closest('button')){play();e.preventDefault()}
+  });
+  let start='q1';try{const h=location.hash.slice(1);if(Q.some(q=>q.id===h))start=h}catch(e){}
+  select(start,false);
+})();
+</script>
+
+</html>

@@ -1,0 +1,371 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>W11 In-class Exercises</title>
+<style>
+:root{--bg:#08162e;--panel:#102542;--ink:#e7f1ff;--muted:#adc3df;--line:#365477;--blue:#55c6ff;--gold:#ffc36a;--green:#57dfa8;--red:#ff8080;--orange:#ffa64d}
+*{box-sizing:border-box}body{margin:0;color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;background:radial-gradient(circle at 50% 0,#183f70,#08162e 65%) fixed;background-color:#08162e;min-height:100vh}
+main{max-width:1280px;margin:auto;padding:26px 16px 50px}h1{font-size:clamp(26px,4vw,40px);margin:0;color:#fff}h2{font-size:20px;margin:0 0 4px;color:#fff}
+.eyebrow{color:var(--gold);font-weight:700;letter-spacing:.14em;font-size:12px}.intro{color:var(--muted);margin:4px 0 16px}
+.tabs,.controls,.btns{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.tabs{margin-bottom:14px}
+button,input{font:inherit}button{cursor:pointer}.btn,.tab{border:1px solid var(--line);border-radius:10px;padding:8px 14px;color:var(--ink);background:#142d50}
+.tab[aria-selected=true],.btn.primary{border-color:var(--gold);background:#634726;color:#fff}.btn:disabled{opacity:.4;cursor:default}button:hover:not(:disabled){border-color:var(--gold)}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.panel{background:rgba(16,37,66,.93);border:1px solid var(--line);border-radius:15px;padding:16px 18px;margin-bottom:14px}
+.req{color:var(--muted);font-size:14px;margin:0}.req b{color:var(--ink)}
+.work{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:14px;margin-top:12px}
+.visual,.explain{background:#0a1e37;border:1px solid var(--line);border-radius:12px;padding:12px;min-width:0}.visual{overflow:auto}
+.tag{color:var(--blue);font-size:13px;font-weight:700}.stitle{font-size:19px;font-weight:800;color:#fff;margin:2px 0 6px}
+#say{margin:0 0 10px}#say p{margin:0 0 8px}code,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}code{color:var(--gold);font-size:13.5px}
+.good{color:var(--green)}.bad{color:var(--red)}.gold{color:var(--gold)}.org{color:var(--orange)}.blu{color:var(--blue)}.mut{color:var(--muted)}
+.controls{justify-content:space-between;margin-top:12px}.count{color:var(--muted);font-size:13px;min-width:92px;text-align:center}
+input[type=range]{accent-color:var(--gold);width:100%;margin-top:10px}
+.hint{color:var(--muted);font-size:12.5px;margin-top:6px}
+/* map */
+svg.map{width:100%;max-width:560px;display:block;margin:0 auto}svg.map.small{max-width:300px}
+.e{stroke-linecap:round;fill:none}.e.tour{stroke:var(--green);stroke-width:3.5}.e.cand{stroke:var(--blue);stroke-width:2.2;stroke-dasharray:6 6;opacity:.85}
+.e.pick{stroke:var(--gold);stroke-width:6}.e.rem{stroke:var(--red);stroke-width:3.5;stroke-dasharray:8 7}.e.add{stroke:var(--orange);stroke-width:6}
+.e.ghost{stroke:var(--red);stroke-width:3;opacity:.35}.e.rev{stroke:var(--blue);stroke-width:3.5}
+.el rect{fill:#0a1e37;stroke:#57739a}.el text{fill:#fff;font:700 13px ui-monospace,monospace;text-anchor:middle}
+.el.pick rect,.el.add rect{stroke:var(--gold);fill:#634726}.el.rem rect{stroke:var(--red)}.el.cand rect{stroke:var(--blue)}
+.nd circle{fill:#153456;stroke:var(--blue);stroke-width:2.5}.nd text{fill:#fff;font:800 16px system-ui;text-anchor:middle}.nd .nm{fill:var(--muted);font:500 11.5px system-ui;stroke:#0a1e37;stroke-width:4px;paint-order:stroke}svg.small .nd text{font-size:24px}svg.small .nd circle{r:22px}
+.nd.done circle{fill:#1d4a3b;stroke:var(--green)}.nd.cur circle{fill:#634726;stroke:var(--gold);stroke-width:4}.nd.cand circle{stroke:var(--blue);stroke-dasharray:4 3}.nd.hot circle{fill:#5a2f20;stroke:var(--orange);stroke-width:4}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:10px}.duo figure{margin:0;padding:8px;border:1px solid var(--line);border-radius:10px}.duo figure.win{border-color:var(--gold);background:#1b2c3f}
+figcaption{font-size:13px;text-align:center;color:var(--muted)}figcaption b{color:#fff}
+.legend{font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 14px;margin:8px 0 0;justify-content:center}.legend span{display:inline-flex;align-items:center;gap:5px}.sw{width:20px;height:0;border-top:4px solid;display:inline-block}
+/* tables */
+.tw{overflow:auto}table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:4px 7px;border-bottom:1px solid #28476d;text-align:center}th{color:var(--blue);font-weight:700}
+td{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}td.l{text-align:left}tr.on td{background:#634726;color:#fff}tr.best td{background:#1d4a3b;color:#fff;font-weight:700}tr.fade td{opacity:.55}
+table.mx{width:auto;margin:10px auto 0;font-size:13.5px}table.mx td,table.mx th{padding:3px 9px;border:1px solid #23405f}table.mx tr.row td{background:#16365a}
+table.mx td.cand{outline:2px dashed var(--blue);outline-offset:-3px;color:#fff}table.mx td.pick{background:#634726!important;color:#fff;font-weight:800;outline:2px solid var(--gold);outline-offset:-2px}table.mx .dim{opacity:.35}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin:8px 0}.tile{background:#153456;border-radius:10px;padding:7px 10px}.tile b{display:block;font-size:20px;color:#fff}.tile span{font-size:12px;color:var(--muted)}
+.insight{padding:9px 12px;border-radius:9px;background:#153456;border-left:3px solid var(--green);font-size:14px;margin-top:10px}.warn{border-left-color:var(--red)}
+.chain{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;margin:30px 0}.chain .box{background:#153456;border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-align:center}.chain .box b{display:block;font-size:30px;color:#fff}.chain .box span{font-size:12px;color:var(--muted)}.chain .box.fin{border-color:var(--green)}.chain .op{color:var(--gold);font-weight:800}
+.rot{font:14px/1.9 ui-monospace,monospace}.rot div{padding:0 8px;border-radius:6px}.rot div:first-child{background:#634726}
+.bars{display:grid;gap:12px;margin:14px 6px}.bar .lab{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);gap:10px}.bar .lab b{color:#fff}.bar .trk{height:16px;background:#1a3354;border-radius:8px;overflow:hidden;margin-top:3px}.bar .fill{height:100%;background:linear-gradient(90deg,var(--green),var(--gold),var(--red));border-radius:8px}
+.coins{display:flex;flex-wrap:wrap;gap:8px;align-items:center;min-height:70px;margin:8px 0}.coin{border-radius:50%;display:grid;place-items:center;font-weight:800;color:#2b1d05;background:radial-gradient(circle at 35% 30%,#ffe3a8,#e0a23c);border:2px solid #b07a20}
+.coin.opt{background:radial-gradient(circle at 35% 30%,#b8f5dc,#36b583);border-color:#1f7d58;color:#06301f}.coin.ghost{opacity:.25}
+.remain{font-size:14px;color:var(--muted)}.remain b{color:#fff;font-size:18px}
+details{margin-top:6px}summary{cursor:pointer;color:var(--blue);font-size:14px}
+.inputgrid{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center}.places{font-size:14px;line-height:1.8}.places b{color:var(--gold);display:inline-block;width:20px}
+@media (max-width:900px){.work,.inputgrid{grid-template-columns:1fr}}
+@media (max-width:520px){.duo{grid-template-columns:1fr}main{padding:18px 12px 40px}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<marker id="ar-tour" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#57dfa8"/></marker>
+<marker id="ar-rev" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#55c6ff"/></marker>
+<marker id="ar-pick" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="3.5" markerHeight="3.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#ffc36a"/></marker>
+</defs></svg>
+<main>
+<div class="eyebrow">IS115 · WEEK 11 · HEURISTICS</div>
+<h1>In-class Exercises</h1>
+<p class="intro">Five problems to explore. Each gives an example and the required output. Exercises 1–4 use the six places below. Explain your reasoning and state any assumptions.</p>
+
+<details class="panel"><summary>Show the input: six places and the distance matrix (km)</summary>
+<p class="req">Use these simplified, symmetric teaching distances for all calculations. Every pair is connected. Map positions are illustrative. A tour visits every place once before returning to its start; include that return edge in its total length.</p><div class="inputgrid" id="input"></div></details>
+
+<div class="tabs" role="tablist" id="tabs"></div>
+
+<section class="panel" role="tabpanel" id="exercise-panel" aria-labelledby="tab-0">
+<h2 id="extitle"></h2><p class="req" id="exreq"></p>
+<div class="insight"><b>Example:</b> <span id="exexample"></span></div>
+<div class="insight"><b>Required output:</b> <span id="exoutput"></span></div>
+<details id="worked-solution" style="margin-top:18px"><summary>Worked solution (open after attempting the exercise)</summary>
+<div class="work">
+<div class="visual" id="vis"></div>
+<div class="explain">
+<div class="tag" id="tag"></div><div class="stitle" id="stitle"></div>
+<div id="say"></div><div id="side"></div>
+</div>
+</div>
+<div class="controls">
+<div class="btns"><button class="btn" id="reset">⟲ Reset</button><button class="btn" id="play">▶ Play</button></div>
+<div class="btns"><button class="btn" id="prev">← Back</button><span class="count" id="count"></span><button class="btn primary" id="next">Next →</button></div>
+</div>
+<input type="range" id="scrub" min="0" value="0" aria-label="Jump to step">
+<div class="hint">Keyboard when the worked solution is open: ← → step · Home / End jump to first / last step</div>
+</details>
+</section>
+</main>
+
+<script>
+const P=['C','J','N','P','S','W'];
+const NAME={C:'Changi Airport',J:'Jurong East',N:'NUS',P:'Punggol',S:'SMU',W:'Woodlands'};
+const XY={C:[4.36,1.82],J:[1.58,1.47],N:[1.96,.6],P:[3.36,2.26],S:[2.78,.6],W:[2.08,2.62]};
+const RAW=[[0,28,25,13,17,24],[28,0,6,19,11,13],[25,6,0,17,10,16],[13,19,17,0,12,12],[17,11,10,12,0,17],[24,13,16,12,17,0]];
+const D={};P.forEach((a,i)=>{D[a]={};P.forEach((b,j)=>D[a][b]=RAW[i][j])});
+const d=(a,b)=>D[a][b];
+const pt=k=>[(XY[k][0]-1.58)*150+60,(2.62-XY[k][1])*150+40];
+const cyc=t=>t.length<2?[]:t.length===2?[[t[0],t[1]]]:t.map((a,i)=>[a,t[(i+1)%t.length]]);
+const tlen=t=>t.length<2?0:t.reduce((s,a,i)=>s+d(a,t[(i+1)%t.length]),0);
+const seq=t=>t.concat([t[0]]).join(' → ');
+const same=(e,a,b)=>(e[0]===a&&e[1]===b)||(e[0]===b&&e[1]===a);
+const sgn=v=>(v>0?'+':v<0?'−':'')+Math.abs(v);
+
+/* ---------- drawing helpers ---------- */
+function map(o={}){
+  const R=18;let s=`<svg class="map${o.small?' small':''}" viewBox="0 0 540 395" role="img" aria-label="Map of the six places">`,labs='';
+  for(const e of o.edges||[]){
+    const c=e.c||'tour',[x1,y1]=pt(e.a),[x2,y2]=pt(e.b),L=Math.hypot(x2-x1,y2-y1),ux=(x2-x1)/L,uy=(y2-y1)/L,g=e.dir?R+9:R+3;
+    s+=`<line class="e ${c}" x1="${x1+ux*(R+3)}" y1="${y1+uy*(R+3)}" x2="${x2-ux*g}" y2="${y2-uy*g}"${e.dir?` marker-end="url(#ar-${c})"`:''}/>`;
+    if(e.lab!==undefined){const t=e.lab===true?d(e.a,e.b):e.lab,f=e.at??.5,mx=x1+(x2-x1)*f,my=y1+(y2-y1)*f,z=o.small?1.7:1,w=(String(t).length*8+14)*z;
+      labs+=`<g class="el ${c}"><rect x="${mx-w/2}" y="${my-11*z}" width="${w}" height="${22*z}" rx="6"/><text x="${mx}" y="${my+5*z}" style="font-size:${13*z}px">${t}</text></g>`}
+  }
+  s+=labs;
+  for(const k of P){const [x,y]=pt(k);s+=`<g class="nd ${(o.nodes||{})[k]||''}"><circle cx="${x}" cy="${y}" r="${R}"/><text x="${x}" y="${y+6}">${k}</text>${o.small?'':`<text class="nm" x="${x}" y="${y+R+16}">${NAME[k]}</text>`}</g>`}
+  return s+'</svg>';
+}
+const tourEdges=(t,c='tour',dir=false)=>cyc(t).map(([a,b])=>({a,b,c,dir}));
+function matrix(o={}){
+  const cells=o.cells||{},dim=o.dim||[];
+  let h='<table class="mx"><tr><th></th>'+P.map(c=>`<th class="${dim.includes(c)?'dim':''}">${c}</th>`).join('')+'</tr>';
+  for(const r of P){h+=`<tr class="${o.row===r?'row':''}"><th>${r}</th>`;
+    for(const c of P)h+=`<td class="${cells[r+c]||''} ${o.row===r&&dim.includes(c)?'dim':''}">${r===c?'–':d(r,c)}</td>`;
+    h+='</tr>'}
+  return h+'</table>';
+}
+function table(head,rows){
+  return `<div class="tw"><table><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr>${rows.map(r=>`<tr class="${r.cls||''}">${r.c.map((v,i)=>`<td class="${r.l&&r.l.includes(i)?'l':''}">${v}</td>`).join('')}</tr>`).join('')}</table></div>`;
+}
+const tiles=a=>`<div class="tiles">${a.map(([v,l])=>`<div class="tile"><b>${v}</b><span>${l}</span></div>`).join('')}</div>`;
+const legend=a=>`<div class="legend">${a.map(([c,l])=>`<span><i class="sw" style="border-color:${c[0]==='-'?'var(--'+c.slice(1)+')':'var(--'+c+')'};${c[0]==='-'?'border-top-style:dashed':''}"></i>${l}</span>`).join('')}</div>`;
+
+/* ---------- Exercise 1: counting tours ---------- */
+function ex1(){
+  const S=[],t=['J','N','S','C','P','W'],rev=[t[0]].concat(t.slice(1).reverse());
+  const rots=t.map((_,i)=>t.slice(i).concat(t.slice(0,i)));
+  const big=[[10,'181,440','0.00018 s',Math.log10(181440)/Math.log10(3.102242e23)],[15,'43,589,145,600','43.6 s',Math.log10(43589145600)/Math.log10(3.102242e23)],[20,'60,822,550,204,416,000','6.1×10⁷ s ≈ <b class="bad">1.9 years</b>',Math.log10(6.082255e16)/Math.log10(3.102242e23)],[25,'≈ 3.1×10²³','≈ <b class="bad">10 million years</b>',1]];
+  const bars=k=>`<div class="bars">${big.slice(0,k).map(([n,c,tm,w])=>`<div class="bar"><div class="lab"><span><b>n = ${n}</b> · ${c} tours</span><span>${tm}</span></div><div class="trk"><div class="fill" style="width:${w*100}%"></div></div></div>`).join('')}</div><p class="hint" style="text-align:center">Bar length is proportional to log₁₀(tour count).</p>`;
+  const rowsN=k=>table(['n','Distinct tours (n−1)!/2','Time at 10⁹ tours/s'],big.slice(0,k).map(([n,c,tm],i)=>({c:[n,c,tm],cls:i===k-1?'on':''})));
+  S.push({tag:'Q1 · step 1',title:'Every ordering of 6 places',vis:map({edges:tourEdges(t,'tour',true),nodes:{J:'cur'}}),
+    say:`<p>Writing a tour as an ordering of the 6 places, there are</p><p><code>6! = 6 × 5 × 4 × 3 × 2 × 1 = 720</code> orderings.</p><p>But many orderings describe the <b>same</b> tour. We remove the duplicates in two steps.</p>`,
+    side:tiles([['720','orderings'],[seq(t).replace(/ → /g,''),'one example']])});
+  S.push({tag:'Q1 · step 2',title:'Divide by 6: the start does not matter',vis:map({edges:tourEdges(t,'tour',true),nodes:Object.fromEntries(P.map(k=>[k,'cur']))}),
+    say:`<p>A tour is a <b>cycle</b>. Starting it at a different place gives the same cycle with the same length. Each cycle appears <b>6 times</b>, once for each starting place:</p>`,
+    side:`<div class="rot">${rots.map(r=>`<div>${seq(r)}</div>`).join('')}</div><div class="insight"><code>720 ÷ 6 = 5! = 120</code></div>`});
+  S.push({tag:'Q1 · step 3',title:'Divide by 2: a tour and its mirror',vis:map({edges:tourEdges(rev,'rev',true),nodes:{J:'cur'}})+legend([['green','forward'],['blue','mirror (backwards)']]),
+    say:`<p>Reading the cycle backwards uses the <b>same edges</b>. With symmetric distances, d(x,y) = d(y,x), so both directions have the same length.</p>`,
+    side:`<div class="rot"><div>${seq(t)}  = ${tlen(t)} km</div><div style="background:#16365a">${seq(rev)}  = ${tlen(rev)} km</div></div><div class="insight"><code>120 ÷ 2 = 60</code></div>`});
+  S.push({tag:'Q1 · answer',title:'60 distinct tours',vis:`<div class="chain"><div class="box"><b>720</b><span>6! orderings</span></div><span class="op">÷ 6 starts</span><div class="box"><b>120</b><span>5! cycles</span></div><span class="op">÷ 2 mirrors</span><div class="box fin"><b>60</b><span>distinct tours</span></div></div>`,
+    say:`<p>For a complete symmetric input with n ≥ 3 places: <code>n! ÷ n ÷ 2 = (n−1)!/2</code>.</p><p>For n = 6: <code>5!/2 = 60</code>.</p>`,
+    side:`<div class="insight">Brute force must check all 60 of them. It finds the optimum, 71 km, achieved by J → N → S → C → P → W → J and its mirror.</div>`});
+  S.push({tag:'Q2',title:'Directed tours: do not halve',vis:map({edges:[...tourEdges(t,'tour',true)]})+map({edges:tourEdges(rev,'rev',true),small:true})+legend([['green','forward'],['blue','mirror']]),
+    say:`<p>Assume travel is possible between every ordered pair, but costs may depend on direction. We count a tour and its reverse as <b>distinct directed tours</b>, even if their costs happen to match. If some pairs are unreachable, the number of feasible tours can be smaller.</p><p>Still divide by n for rotations, but not by 2:</p><p><code>(n−1)! = 5! = 120</code></p>`,
+    side:tiles([['60','symmetric'],['120','asymmetric']])});
+  for(let k=1;k<=3;k++)S.push({tag:`Q3 · n = ${big[k-1][0]}`,title:`n = ${big[k-1][0]} places`,vis:bars(k),
+    say:k===1?`<p>Use <code>(n−1)!/2</code>, then divide by 10⁹ tours per second.</p><p><code>9!/2 = 362,880/2 = 181,440</code>, which takes about 0.00018 s.</p>`:k===2?`<p><code>14!/2 = 43,589,145,600</code>, about 43.6 seconds. Still OK.</p>`:`<p><code>19!/2 ≈ 6.08×10¹⁶</code> tours ÷ 10⁹ ≈ 6.1×10⁷ s ≈ <b>1.9 years</b>.</p><p>Only 5 more places than n = 15.</p>`,
+    side:rowsN(k)});
+  S.push({tag:'Q4',title:'Each new place multiplies the work by n',vis:bars(4),
+    say:`<p>Going from n to n+1 places:</p><p><code>(n!/2) ÷ ((n−1)!/2) = n</code></p><p>So the 21st place multiplies the work by 20, the 22nd by 21, and so on. At n = 25, brute force needs about <b>10 million years</b>.</p>`,
+    side:rowsN(4)+`<div class="insight warn">This factorial growth is why we need <b>heuristics</b>.</div>`});
+  return S;
+}
+
+/* ---------- Exercise 2: 1st greedy (nearest neighbour) ---------- */
+function ex2(){
+  const S=[],res={},head=['Last y','Candidates (km)','Chosen x','Path length (km)'];
+  for(const st of ['J','S']){
+    const t=[st],rows=[];let len=0,k=0;const tag=`From ${st} (${NAME[st]})`;
+    const nodes=(cur,extra={})=>Object.assign(Object.fromEntries(t.map(x=>[x,'done'])),{[cur]:'cur'},extra);
+    S.push({tag,title:`Start at ${st}`,vis:map({nodes:{[st]:'cur'}})+matrix({}),
+      say:`<p>The tour begins at <b>${st}</b> (${NAME[st]}). Path length = 0.</p><p>Rule: repeatedly add the unvisited place <b>nearest to the last place added</b>. Break minimum-distance ties alphabetically by label. Path length excludes the return edge until the final step.</p>`,side:table(head,[])});
+    while(t.length<6){
+      const y=t[t.length-1],un=P.filter(x=>!t.includes(x)).sort((a,b)=>d(y,a)-d(y,b)||a.localeCompare(b)),cs=un.map(x=>x+d(y,x)).join(', ');k++;rows.forEach(r=>r.cls='');
+      S.push({tag:`${tag} · step ${k}a`,title:`Look from ${y}`,
+        vis:map({edges:[...tourEdges(t,'tour',true).slice(0,t.length-1),...un.map(x=>({a:y,b:x,c:'cand',lab:true,at:.6}))],nodes:nodes(y,Object.fromEntries(un.map(x=>[x,'cand'])))})
+          +matrix({row:y,dim:t,cells:Object.fromEntries(un.map(x=>[y+x,'cand']))})+legend([['green','path so far'],['-blue','candidate']]),
+        say:`<p>Last place added: <b>${y}</b>. Read row ${y} of the matrix for the unvisited places:</p><p><code>${un.map(x=>`d(${y},${x}) = ${d(y,x)}`).join(' · ')}</code></p>`,
+        side:table(head,[...rows,{c:[y,cs,'?','…'],cls:'on',l:[1]}])});
+      const x=un[0];len+=d(y,x);t.push(x);rows.forEach(r=>r.cls='');rows.push({c:[y,cs,`<b>${x}</b>`,len],cls:'on',l:[1]});
+      S.push({tag:`${tag} · step ${k}b`,title:`Choose ${x} (${d(y,x)} km)`,
+        vis:map({edges:[...tourEdges(t,'tour',true).slice(0,t.length-2),{a:y,b:x,c:'pick',lab:true,dir:true}],nodes:nodes(x)})
+          +matrix({row:y,dim:t.slice(0,-1),cells:Object.fromEntries(un.map(z=>[y+z,z===x?'pick':'cand']))}),
+        say:`<p>The smallest distance from ${y} is to <b>${x}</b> (${NAME[x]}): ${d(y,x)} km.</p><p>Path so far: <code>${t.join(' → ')}</code> = <b>${len}</b> km.</p>`,
+        side:table(head,rows)});
+    }
+    const y=t[5];len+=d(y,st);rows.forEach(r=>r.cls='');rows.push({c:[y,`return to ${st}: ${d(y,st)}`,st,`<b>${len}</b>`],cls:'best',l:[1]});
+    res[st]={t:[...t],len};
+    S.push({tag:`${tag} · return`,title:`Close the tour: ${len} km`,
+      vis:map({edges:[...tourEdges(t,'tour',true).slice(0,5),{a:y,b:st,c:'pick',lab:true,dir:true}],nodes:{[st]:'cur'}})+matrix({row:y,cells:{[y+st]:'pick'}}),
+      say:`<p>No places left, so return from ${y} to ${st}: +${d(y,st)} km.</p><p>Tour: <code>${seq(t)}</code></p><p>Total: <b class="${len>71?'bad':'good'}">${len} km</b></p>`,
+      side:table(head,rows)});
+  }
+  const A=res.J,B=res.S;
+  S.push({tag:'Compare',title:'The starting place matters',
+    vis:map({edges:[...tourEdges(A.t,'ghost'),...tourEdges(B.t,'tour')]})+legend([['red',`from J: ${A.len} km`],['green',`from S: ${B.len} km`]]),
+    say:`<p>From J: <code>${seq(A.t)}</code> = <b class="bad">${A.len} km</b></p><p>From S: <code>${seq(B.t)}</code> = <b class="good">${B.len} km</b></p>`,
+    side:`<div class="insight">From J, greedy uses up the cheap places near J early. It then pays for the expensive edges <b>W–C (24)</b> and <b>C–J (28)</b> at the end. Every choice depends on where you are now, so the start matters.</div>`});
+  return S;
+}
+
+/* ---------- Exercise 3: 2nd greedy (cheapest-side insertion) ---------- */
+function ex3(){
+  const S=[],head=['x','Nearest y','d (km)','Next Δ (km)','Previous Δ (km)','Cyclic order','Length (km)'],rows=[];
+  let best=null;for(let i=0;i<6;i++)for(let j=i+1;j<6;j++)if(!best||d(P[i],P[j])<d(best[0],best[1]))best=[P[i],P[j]];
+  let t=best[0]==='J'||best[1]==='J'?['J',best[0]==='J'?best[1]:best[0]]:best;
+  S.push({tag:'Start · a',title:'Find the closest pair',vis:map({edges:[{a:t[0],b:t[1],c:'pick',lab:true}],nodes:{[t[0]]:'cur',[t[1]]:'cur'}})+matrix({cells:{[t[0]+t[1]]:'pick',[t[1]+t[0]]:'pick'}}),
+    say:`<p>Scan the off-diagonal entries for the smallest distance: <b>${t[0]}–${t[1]} = ${d(t[0],t[1])} km</b>.</p>`,side:table(head,[])});
+  rows.push({c:['—','—','—','start: closest pair','',t.join(' '),tlen(t)],l:[3]});
+  S.push({tag:'Start · b',title:`There-and-back tour: ${tlen(t)} km`,vis:map({edges:tourEdges(t),nodes:{[t[0]]:'done',[t[1]]:'done'}}),
+    say:`<p>The trace lists cyclic order; every tour length includes the return edge. Start with the closest pair in alphabetical order: <code>${seq(t)}</code>. It goes there and back (the map draws the shared connection once), so its length is ${d(t[0],t[1])} × 2 = <b>${tlen(t)}</b>.</p>`,side:table(head,rows)});
+  let k=0;
+  while(t.length<6){
+    k++;rows.forEach(r=>r.cls='');const un=P.filter(x=>!t.includes(x));
+    const near=un.map(x=>{const y=[...t].sort((a,b)=>d(x,a)-d(x,b)||a.localeCompare(b))[0];return{x,y,v:d(x,y)}}).sort((a,b)=>a.v-b.v||a.x.localeCompare(b.x)||a.y.localeCompare(b.y));
+    const {x,y}=near[0],m=t.length,i=t.indexOf(y),z=t[(i+1)%m],u=t[(i-1+m)%m];
+    const nx=d(y,x)+d(x,z)-d(y,z),pv=d(u,x)+d(x,y)-d(u,y),useNext=nx<=pv;
+    const done=Object.fromEntries(t.map(q=>[q,'done']));
+    S.push({tag:`Insertion ${k} · a`,title:`Which place joins next? ${x}`,
+      vis:map({edges:[...tourEdges(t),...near.map(n=>({a:n.x,b:n.y,c:n.x===x?'pick':'cand',lab:true}))],nodes:Object.assign({},done,Object.fromEntries(un.map(q=>[q,'cand'])),{[x]:'hot',[y]:'cur'})})
+        +matrix({cells:Object.fromEntries(near.map(n=>[n.x+n.y,n.x===x?'pick':'cand']))})+legend([['green','current tour'],['-blue','nearest tour place'],['gold','chosen']]),
+      say:`<p>For each unvisited place, find its nearest place <b>anywhere</b> in the tour:</p><p><code>${near.map(n=>`${n.x}→${n.y} ${n.v}`).join(' · ')}</code></p><p>Smallest: <b>${x}</b>, next to <b>${y}</b> (${d(x,y)} km).</p>`,
+      side:table(head,[...rows,{c:[x,y,d(x,y),'?','?','…','…'],cls:'on'}])});
+    const nStr=`${y}–${x}–${z}: ${d(y,x)}+${d(x,z)}−${d(y,z)} = +${nx}`,pStr=`${u}–${x}–${y}: ${d(u,x)}+${d(x,y)}−${d(u,y)} = +${pv}`;
+    const opt=(a,b,old)=>map({small:true,edges:[...(m===2?tourEdges(t):[...tourEdges(t).filter(e=>!same([e.a,e.b],old[0],old[1])),{a:old[0],b:old[1],c:'rem'}]),{a,b:x,c:'add',lab:true},{a:x,b,c:'add',lab:true}],nodes:Object.assign({},done,{[x]:'hot'})});
+    const tie=nx===pv;
+    S.push({tag:`Insertion ${k} · b`,title:`Insert ${x}: next side or previous side?`,
+      vis:`<div class="duo"><figure class="${useNext?'win':''}">${opt(y,z,[y,z])}<figcaption><b>Next side</b> (between ${y} and ${z})<br><code>+${nx}</code></figcaption></figure><figure class="${useNext?'':'win'}">${opt(u,y,[u,y])}<figcaption><b>Previous side</b> (between ${u} and ${y})<br><code>+${pv}</code></figcaption></figure></div>`+legend([['-red','edge removed'],['orange','edges added']]),
+      say:`<p>Tour order is <code>${seq(t)}</code>. Around <b>${y}</b>, the next place is <b>${z}</b> and the previous place is <b>${u}</b>.</p><p>Next side: <code>${nStr}</code><br>Previous side: <code>${pStr}</code></p><p>${tie?`<b>Tie</b>: with a 2-place tour both sides give the same cycle. Take the next side. Replace one traversal of the original connection; retain the other.`:`The <b>${useNext?'next':'previous'}</b> side adds less.`}</p>`,
+      side:table(head,[...rows,{c:[x,y,d(x,y),useNext?`<b>+${nx}</b>`:`+${nx}`,useNext?`+${pv}`:`<b>+${pv}</b>`,'…','…'],cls:'on'}])});
+    const old=t;t=[...t];t.splice(useNext?i+1:i,0,x);
+    rows.forEach(r=>r.cls='');rows.push({c:[x,y,d(x,y),useNext?`<b>${nStr}</b>`:nStr,useNext?pStr:`<b>${pStr}</b>`,t.join(' '),tlen(t)],cls:'on',l:[3,4]});
+    const nb=useNext?[y,z]:[u,y];
+    S.push({tag:`Insertion ${k} · c`,title:`Tour is now ${tlen(t)} km`,
+      vis:map({edges:[...tourEdges(t).filter(e=>!(same([e.a,e.b],nb[0],x)||same([e.a,e.b],x,nb[1]))),{a:nb[0],b:x,c:'pick',lab:true},{a:x,b:nb[1],c:'pick',lab:true}],nodes:Object.assign(Object.fromEntries(t.map(q=>[q,'done'])),{[x]:'hot'})}),
+      say:`<p>Insert ${x} between ${nb[0]} and ${nb[1]}: <code>${tlen(old)} + ${useNext?nx:pv} = ${tlen(t)}</code>.</p><p>Tour: <code>${seq(t)}</code></p>`,
+      side:table(head,rows)});
+  }
+  rows.forEach(r=>r.cls='');rows[rows.length-1].cls='best';
+  S.push({tag:'Result',title:`Final tour: ${tlen(t)} km`,vis:map({edges:tourEdges(t,'tour',true),nodes:Object.fromEntries(t.map(q=>[q,'done']))}),
+    say:`<p><code>${seq(t)}</code> = <b>${tlen(t)} km</b></p>`,
+    side:tiles([['92','1st greedy from J'],[tlen(t),'2nd greedy'],['71','1st greedy from S']])+`<div class="insight">2nd greedy beats the 1st greedy from J but loses to the 1st greedy from S. Neither greedy rule is always better: both are heuristics.</div>`+table(head,rows)});
+  return S;
+}
+
+/* ---------- Exercise 4: 2-opt best improvement ---------- */
+function ex4(){
+  const S=[],head=['Remove','Add','Δ'];let t=['J','N','S','P','W','C'],r=1;const hist=[tlen(t)];
+  const moves=t=>{const n=t.length,o=[];for(let i=0;i<n;i++)for(let j=i+2;j<n;j++){if(i===0&&j===n-1)continue;const a=t[i],b=t[i+1],c=t[j],e=t[(j+1)%n];o.push({i,j,a,b,c,e,v:d(a,c)+d(b,e)-d(a,b)-d(c,e)})}return o};
+  const mvMap=(t,m,c='add')=>map({edges:[...tourEdges(t).filter(e=>!same([e.a,e.b],m.a,m.b)&&!same([e.a,e.b],m.c,m.e)),{a:m.a,b:m.b,c:'rem',lab:true},{a:m.c,b:m.e,c:'rem',lab:true},{a:m.a,b:m.c,c,lab:true},{a:m.b,b:m.e,c,lab:true}],nodes:{[m.a]:'cur',[m.b]:'cur',[m.c]:'cur',[m.e]:'cur'}})+legend([['green','kept'],['-red','removed'],['orange','added']]);
+  const formula=m=>`d(${m.a},${m.c}) + d(${m.b},${m.e}) − d(${m.a},${m.b}) − d(${m.c},${m.e}) = ${d(m.a,m.c)}+${d(m.b,m.e)}−${d(m.a,m.b)}−${d(m.c,m.e)} = ${sgn(m.v)}`;
+  const histTiles=()=>tiles([[hist.join(' → '),'tour length per round']]);
+  S.push({tag:'Setup',title:`Start from the Exercise 2 tour: ${tlen(t)} km`,vis:map({edges:tourEdges(t,'tour',true)}),
+    say:`<p>Start: <code>${seq(t)}</code> = <b>${tlen(t)} km</b>.</p><p>Read (a,b) and (c,e) in cyclic tour order, with four distinct endpoints. Reconnect with (a,c) and (b,e), reversing the segment from b to c:</p><p><code>Δ = d(a,c) + d(b,e) − d(a,b) − d(c,e)</code></p><p>Neighbourhood size: <code>n(n−3)/2 = 6·3/2 = 9</code> moves per round.</p>`,
+    side:`<div class="insight">Best improvement: evaluate <b>all 9</b> moves, apply the most negative Δ, and repeat. Keep J first. Break equal-best ties by the first edge-index pair (i,j). Stop when every Δ ≥ 0.</div>`});
+  for(;;){
+    const ms=moves(t),rows=[];
+    ms.forEach((m,k)=>{
+      rows.forEach(x=>x.cls='');rows.push({c:[`${m.a}–${m.b}, ${m.c}–${m.e}`,`${m.a}–${m.c}, ${m.b}–${m.e}`,`<span class="${m.v<0?'good':'mut'}">${sgn(m.v)}</span>`],cls:'on'});
+      S.push({tag:`Round ${r} · move ${k+1} of ${ms.length}`,title:`Remove ${m.a}–${m.b} & ${m.c}–${m.e} → Δ = ${sgn(m.v)}`,vis:mvMap(t,m),
+        say:`<p>Current tour <code>${seq(t)}</code> (${tlen(t)} km).</p><p>Add ${m.a}–${m.c} and ${m.b}–${m.e}:</p><p><code>${formula(m)}</code></p><p>${m.v<0?`<b class="good">Improves</b> the tour by ${-m.v} km.`:`<span class="mut">Does not improve the tour.</span>`}</p>`,
+        side:table(head,rows.map(x=>({...x})))});
+    });
+    const b=ms.reduce((x,y)=>y.v<x.v?y:x);rows.forEach((x,k)=>x.cls=ms[k]===b&&b.v<0?'best':'');
+    if(b.v<0){
+      S.push({tag:`Round ${r} · decide`,title:`Best move: Δ = ${sgn(b.v)}`,vis:mvMap(t,b,'pick'),
+        say:`<p>All 9 moves are evaluated. The most negative Δ is <b class="good">${sgn(b.v)}</b>: remove <span class="bad">${b.a}–${b.b}, ${b.c}–${b.e}</span> and add <span class="org">${b.a}–${b.c}, ${b.b}–${b.e}</span>.</p><p><code>${formula(b)}</code></p>`,
+        side:table(head,rows)});
+      const seg=t.slice(b.i+1,b.j+1),old=tlen(t);t=t.slice(0,b.i+1).concat([...seg].reverse(),t.slice(b.j+1));hist.push(tlen(t));
+      S.push({tag:`Round ${r} · apply`,title:`New tour: ${old} ${sgn(b.v)} = ${tlen(t)} km`,
+        vis:map({edges:[...tourEdges(t,'tour',true).filter(e=>!same([e.a,e.b],b.a,b.c)&&!same([e.a,e.b],b.b,b.e)),{a:b.a,b:b.c,c:'pick',lab:true},{a:b.b,b:b.e,c:'pick',lab:true}]}),
+        say:`<p>Reverse the segment <code>${seg.join(' ')}</code> → <code>${[...seg].reverse().join(' ')}</code>.</p><p>New tour: <code>${seq(t)}</code> = <b>${tlen(t)} km</b>.</p>`,
+        side:histTiles()});
+      r++;
+    }else{
+      S.push({tag:`Round ${r} · decide`,title:'No improving move: stop',vis:map({edges:tourEdges(t,'tour',true),nodes:Object.fromEntries(P.map(q=>[q,'done']))}),
+        say:`<p>Every Δ ≥ 0, so no single 2-opt move improves <code>${seq(t)}</code>.</p><p>This is a <b class="good">2-opt local optimum: ${tlen(t)} km</b>.</p>`,
+        side:table(head,rows)+histTiles()});
+      S.push({tag:'Conclusion',title:'Is it guaranteed to be optimal?',vis:map({edges:tourEdges(t,'tour',true),nodes:Object.fromEntries(P.map(q=>[q,'done']))}),
+        say:`<p><b>No.</b> 2-opt only guarantees that no <i>single 2-opt move</i> improves the tour. That is a <b>local</b> optimum.</p><p>Here, brute force over all 60 tours shows that ${tlen(t)} km is also the global optimum. That is lucky: in general, a local optimum can be worse.</p>`,
+        side:histTiles()+`<div class="insight">Rounds used: ${r-1} improving + 1 check round = ${r} rounds × 9 moves.</div>`});
+      break;
+    }
+  }
+  return S;
+}
+
+/* ---------- Exercise 5: coin change and trade-offs ---------- */
+function ex5(){
+  const S=[],C=[9,6,5,1],sz=v=>34+v*3.2;
+  const coin=(v,cls='')=>`<div class="coin ${cls}" style="width:${sz(v)}px;height:${sz(v)}px;font-size:${12+v}px">${v}</div>`;
+  const opt=a=>{const b=[[]];for(let x=1;x<=a;x++){let m=null;for(const c of C)if(c<=x&&b[x-c]&&(!m||b[x-c].length+1<m.length))m=[...b[x-c],c];b[x]=m}return b[a].sort((p,q)=>p-q)};
+  const head=['Amount','Greedy','Optimal','Optimal?'],rowsA=[];
+  const palette=`<div class="mut" style="font-size:13px">Coins available:</div><div class="coins">${C.map(v=>coin(v)).join('')}</div>`;
+  S.push({tag:'Part A',title:'Coins 1, 5, 6, 9: largest coin first',vis:palette,
+    say:`<p>Goal: pay an amount with the <b>fewest coins</b>. Unlimited supply of each coin.</p><p>Greedy rule: repeatedly take the <b>largest coin that still fits</b>.</p>`,side:table(head,[])});
+  for(const a of [11,12,15]){
+    let rem=a;const g=[];
+    while(rem>0){const c=C.find(v=>v<=rem);g.push(c);const before=rem;rem-=c;
+      S.push({tag:`Amount ${a} · greedy`,title:`Remaining ${before}: take ${c}`,
+        vis:palette+`<div class="mut" style="font-size:13px">Greedy so far:</div><div class="coins">${g.map(v=>coin(v)).join('')}</div><div class="remain">Remaining: <b>${rem}</b></div>`,
+        say:`<p>Remaining ${before}. Largest coin ≤ ${before} is <b>${c}</b>${C.filter(v=>v>before).length?` (${C.filter(v=>v>before).join(', ')} too big)`:''}.</p><p>Remaining: ${before} − ${c} = <b>${rem}</b>.</p>${rem===0?`<p>Greedy uses <b>${g.length} coins</b>: <code>${g.join(' + ')}</code>.</p>`:''}`,
+        side:table(head,[...rowsA,{c:[a,g.join('+')+(rem?' + …':''),'?','?'],cls:'on'}])});
+    }
+    const o=opt(a),ok=o.length===g.length;rowsA.forEach(r=>r.cls='');
+    rowsA.push({c:[a,`${g.join('+')} (${g.length})`,`${o.join('+')} (${o.length})`,ok?'<span class="good">yes</span>':'<span class="bad">no</span>'],cls:'on'});
+    S.push({tag:`Amount ${a} · optimal`,title:ok?`Greedy is optimal for ${a}`:`Greedy fails for ${a}`,
+      vis:`<div class="mut" style="font-size:13px">Greedy (${g.length} coins):</div><div class="coins">${g.map(v=>coin(v)).join('')}</div><div class="mut" style="font-size:13px">Optimal (${o.length} coins):</div><div class="coins">${o.map(v=>coin(v,'opt')).join('')}</div>`,
+      say:ok?`<p>${a} is not a single coin, so at least 2 coins are needed. Greedy found <code>${g.join(' + ')}</code>, which is optimal.</p>`
+        :`<p>${a} is not a single coin, but <code>${o.join(' + ')} = ${a}</code> uses only <b>${o.length}</b> coins.</p><p>The mistake is the <b>first choice, the 9 coin</b>. It leaves a remainder of ${a-9} that only 1-coins can pay.</p>`,
+      side:table(head,rowsA)});
+  }
+  const B=[
+    ['Exhaustive TSP search','O(n!) with full tour scoring','All complete symmetric TSP inputs','Yes','Checks every distinct tour.'],
+    ['Random TSP search (k tours)','O(kn)','All complete symmetric TSP inputs','No','Return the best of k ≥ 1 complete sampled tours. An optimum may never be sampled. Polynomial in n when k is fixed or polynomially bounded.'],
+    ['1st greedy','O(n²)','All complete symmetric TSP inputs','No','Nearest choices can give a longer tour, as the run from J shows.'],
+    ['2-opt local search','O(n²) per scan; O(rn²) for r scans','All complete symmetric TSP inputs','No','With constant-time four-edge delta evaluation, one scan is cheap. The number of scans r still matters. Stopping proves local optimality.'],
+    ['Greedy coins 1, 5, 10, 50','One pass over four denominations, returning counts','All nonnegative integer amounts for this coin system','Yes, for this system','Use division and remainder to obtain coin counts. Any minimum solution has fewer than five 1s, two 5s and five 10s, otherwise exchange them for a larger coin. These bounds force greedy counts. Arbitrary denominations need not work.']
+  ];
+  const headB=['Strategy','Work','Scope','Global optimum?'];
+  B.forEach((row,k)=>{
+    S.push({tag:`Part B · ${k+1} of 5`,title:row[0],
+      vis:table(headB,B.slice(0,k+1).map((r,i)=>({c:r.slice(0,4),cls:i===k?'on':'',l:[0,1,2,3]}))),
+      say:`<p><b>Work:</b> ${row[1]}.</p><p><b>Scope:</b> ${row[2]}.</p><p><b>Global optimum guaranteed?</b> ${row[3]}.</p><div class="insight">${row[4]}</div>`,
+      side:'<p class="hint">For TSP: n places, k sampled tours, r complete neighbourhood scans. Assume constant-time matrix lookups. Compare cost, applicability and exactness separately.</p>'});
+  });
+  return S;
+}
+
+/* ---------- app ---------- */
+const EX=[
+  {k:'Ex 1',t:'Exercise 1: How big is brute force?',r:'<b>Requirement:</b> count distinct tours for 6 places (complete symmetric and complete directed inputs), fill in the table for n = 10, 15, 20, and find the growth factor.',s:ex1()},
+  {k:'Ex 2',t:'Exercise 2: 1st greedy (nearest neighbour)',r:'<b>Rule:</b> from the start, repeatedly add the unvisited place nearest to the <b>last place added</b>, then return. Break minimum-distance ties alphabetically by label. Run from J and from S.',s:ex2()},
+  {k:'Ex 3',t:'Exercise 3: 2nd greedy (cheapest-side insertion)',r:'<b>Rule:</b> start with the closest pair. Repeatedly pick the unvisited x nearest to <b>any</b> tour place y, and compare only the two sides of y: Δnext = d(y,x)+d(x,z)−d(y,z); Δprev = d(u,x)+d(x,y)−d(u,y). Break pair ties alphabetically by x then y, and side ties toward next. Record every unvisited place’s nearest tour place.',s:ex3()},
+  {k:'Ex 4',t:'Exercise 4: Improve a tour with 2-opt',r:'<b>Rule (best improvement):</b> evaluate every 2-opt move, apply the most negative Δ, and stop when every Δ ≥ 0. Start from the Exercise 2 tour from J. Read edges in tour order, reverse the inner segment, keep J first, and break equal-best ties by edge-index order. Record all moves with full calculations in round 1 and the final check, plus each selected improving move.',s:ex4()},
+  {k:'Ex 5',t:'Exercise 5: When greedy fails, and the trade-offs',r:'<b>Part A:</b> greedy coin change with coins 1, 5, 6, 9 for amounts 11, 12, 15. <b>Part B:</b> compare each strategy’s work, scope and global-optimum guarantee. Use n places, k sampled tours and r 2-opt scans.',s:ex5()},
+];
+const PROMPTS=[
+ {problem:'How many different tours could exhaustive TSP search need to consider? Explore how the search grows as places are added. Assume 10⁹ tours can be checked per second.',example:'A → B → C → A and B → C → A → B describe the same cycle. With symmetric distances, its reverse also represents the same tour.',output:'Give the distinct-tour count for six places with reasoning, and the directed count when all ordered pairs are reachable and reversals count separately. For symmetric inputs with n = 10, 15, 20, give tour counts and search times. Explain the growth factor from n to n+1.'},
+ {problem:'Use the W11 1st greedy algorithm (nearest neighbour) to plan a tour of the six places. Explore whether starting at Jurong East (J) or SMU (S) affects the result.',example:'In a separate example, if B and C are unvisited, d(A,B) = 4 and d(A,C) = 7, nearest neighbour chooses B from A.',output:'Give a tour and total distance for each start, including the return journey. Show enough working to explain your choices, compare the results and explain any difference.'},
+ {problem:'Use the W11 2nd greedy algorithm (cheapest-side insertion) to construct a tour of the same six places. How does it compare with nearest neighbour?',example:'A tour A → B → C → A could become A → X → B → C → A when X is inserted. One connection is replaced by two, changing the total distance.',output:'Give the final tour and total distance, with working that explains your insertion choices. Compare its length with both Exercise 2 tours.'},
+ {problem:'Can local search improve your Exercise 2 tour from J? Use 2-opt with best improvement to explore neighbouring tours and find a tour with no improving 2-opt move.',example:'A → B → C → D → A and A → C → B → D → A are 2-opt neighbours. Whether the change helps depends on the distances.',output:'Give the number of 2-opt neighbours of a six-place tour, with reasoning. Show your sequence of improved tours and lengths, and explain why you stopped. Must the final result be a global optimum? Justify your answer.'},
+ {problem:'Part A: with unlimited coins 1, 5, 6, 9, investigate whether largest-coin-first greedy always pays an amount with the fewest coins. Part B: compare exhaustive TSP search, random TSP search (k tours), 1st greedy, 2-opt, and greedy coins 1, 5, 10, 50.',example:'With coins 1, 3, 4, amount 6 can be paid as 4+1+1 or 3+3, using different coin counts. When comparing search strategies, consider how the input size and search effort affect the work.',output:'Part A: for 11, 12, 15, give greedy and optimal combinations and counts, with explanations. Part B: make a table comparing work, range of inputs and global-optimum guarantees. Explain your answers and state assumptions.'}
+];
+const $=s=>document.querySelector(s);let cur=0,idx=0,timer=null;
+$('#input').innerHTML=`<div>${map({})}</div><div><div class="places">${P.map(k=>`<div><b>${k}</b>${NAME[k]}</div>`).join('')}</div>${matrix({})}</div>`;
+$('#tabs').innerHTML=EX.map((e,i)=>`<button class="tab" role="tab" id="tab-${i}" aria-controls="exercise-panel" data-i="${i}">${e.k}</button>`).join('');
+$('#tabs').addEventListener('click',e=>{const b=e.target.closest('.tab');if(b){cur=+b.dataset.i;idx=0;stop();$('#worked-solution').open=false;render()}});
+function render(){
+  const ex=EX[cur],st=ex.s[idx];
+  document.querySelectorAll('.tab').forEach((b,i)=>b.setAttribute('aria-selected',i===cur));
+  $('#exercise-panel').setAttribute('aria-labelledby',`tab-${cur}`);
+  $('#extitle').textContent=ex.t;$('#exreq').textContent='Problem: '+PROMPTS[cur].problem;
+  $('#exexample').textContent=PROMPTS[cur].example;$('#exoutput').textContent=PROMPTS[cur].output;
+  $('#tag').textContent=st.tag;$('#stitle').innerHTML=st.title;$('#say').innerHTML=st.say;$('#vis').innerHTML=st.vis;$('#side').innerHTML=st.side||'';
+  $('#count').textContent=`Step ${idx+1} / ${ex.s.length}`;$('#prev').disabled=idx===0;$('#next').disabled=idx===ex.s.length-1;
+  $('#scrub').max=ex.s.length-1;$('#scrub').value=idx;
+}
+const go=i=>{idx=Math.max(0,Math.min(EX[cur].s.length-1,i));render()};
+function stop(){clearInterval(timer);timer=null;$('#play').textContent='▶ Play'}
+$('#worked-solution').addEventListener('toggle',()=>{if(!$('#worked-solution').open)stop()});
+$('#next').onclick=()=>{stop();go(idx+1)};$('#prev').onclick=()=>{stop();go(idx-1)};$('#reset').onclick=()=>{stop();go(0)};
+$('#scrub').oninput=e=>{stop();go(+e.target.value)};
+$('#play').onclick=()=>{if(timer)return stop();if(idx===EX[cur].s.length-1)go(0);$('#play').textContent='❚❚ Pause';timer=setInterval(()=>{if(idx>=EX[cur].s.length-1)return stop();go(idx+1)},2200)};
+document.addEventListener('keydown',e=>{if(!$('#worked-solution').open||e.target.matches('input')||!['ArrowRight','ArrowLeft','Home','End'].includes(e.key))return;e.preventDefault();stop();if(e.key==='ArrowRight')go(idx+1);else if(e.key==='ArrowLeft')go(idx-1);else if(e.key==='Home')go(0);else go(EX[cur].s.length-1)});
+render();
+</script>
+</body>
+</html>

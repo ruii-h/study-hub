@@ -1,0 +1,356 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TSP Heuristics Visualizer</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+<style>
+:root{--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--card:#fff;--bg:#f1f5f9;--accent:#4f46e5;--green:#059669;--blue:#2563eb;--amber:#d97706;--red:#ef4444;--purple:#a855f7}
+*{box-sizing:border-box}html,body{margin:0}body{font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;color:var(--ink);background:var(--bg)}
+header{background:#fff;border-bottom:1px solid var(--line);padding:12px 18px;display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
+h1{font-size:19px;margin:0}header p{margin:0;color:var(--muted);font-size:12.5px}
+.tabs{display:flex;gap:4px;background:#e2e8f0;padding:4px;border-radius:10px;flex-wrap:wrap}
+.tab{border:0;background:transparent;padding:7px 13px;border-radius:7px;font:600 13px system-ui;color:#475569;cursor:pointer}.tab[aria-selected=true]{background:#fff;color:var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.bar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;padding:10px 18px;background:#fff;border-bottom:1px solid var(--line);font-size:13px}
+.bar label{display:flex;align-items:center;gap:7px;color:#334155;font-weight:600}.bar .hint{color:var(--muted);font-size:12px;margin-left:auto}
+select,button,input{font:inherit}select{padding:5px 8px;border:1px solid #cbd5e1;border-radius:7px;background:#fff;font-size:13px}input[type=range]{accent-color:var(--accent);width:110px}
+.btn{border:1px solid #cbd5e1;background:#fff;color:#334155;border-radius:8px;padding:7px 12px;font-weight:600;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+.btn:hover:not(:disabled){background:#f8fafc;border-color:#94a3b8}.btn:disabled{opacity:.4;cursor:default}
+.btn.go{background:#10b981;border-color:#059669;color:#fff}.btn.go:hover:not(:disabled){background:#059669}.btn.play{background:var(--accent);border-color:#4338ca;color:#fff}.btn.play.on{background:#e11d48;border-color:#be123c}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #a5b4fc;outline-offset:2px}
+main{padding:16px 18px 40px;max-width:1500px;margin:auto}.pane[hidden]{display:none}
+.single{display:grid;grid-template-columns:340px minmax(0,1fr);gap:16px;align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 14px;margin-bottom:12px}
+.card h3{margin:0 0 8px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#94a3b8}
+.ctrls{display:flex;flex-wrap:wrap;gap:6px}.opts{display:grid;gap:8px;margin-top:11px;font-size:13px}.opts label{display:flex;justify-content:space-between;align-items:center;gap:8px;color:#334155;font-weight:600}
+ol.code{list-style:none;margin:0;padding:0;font:12.5px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;counter-reset:ln}
+ol.code li{counter-increment:ln;padding:3px 6px 3px 0;border-left:4px solid transparent;border-radius:0 5px 5px 0;transition:background .15s}
+ol.code li::before{content:counter(ln);display:inline-block;width:22px;text-align:right;margin-right:8px;color:#cbd5e1}
+ol.code li.on{background:#fef08a;border-left-color:#eab308}ol.code b{color:var(--accent)}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.tile{background:#f8fafc;border:1px solid var(--line);border-radius:9px;padding:6px 9px}.tile b{display:block;font:700 16px ui-monospace,monospace}.tile span{font-size:11px;color:var(--muted)}
+.list{margin-top:9px;font:12px/1.5 ui-monospace,monospace;background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:6px 8px;max-height:90px;overflow:auto;word-break:break-word}.list span{color:var(--muted);font-family:system-ui;font-weight:600;display:block;font-size:11px}
+.stage{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;min-width:0}
+.msgbar{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;margin-bottom:9px;min-height:44px}
+.msg{font-size:14.5px}.msg code{font:13px ui-monospace,monospace;background:#f1f5f9;padding:1px 4px;border-radius:4px}.stepno{font:700 11px system-ui;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;display:block}
+.len{text-align:right;white-space:nowrap}.len span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:block}.len b{font:800 22px ui-monospace,monospace}
+canvas{width:100%;height:auto;aspect-ratio:1000/640;display:block;border-radius:9px;border:1px solid var(--line);touch-action:none;cursor:grab}
+.legend{display:flex;flex-wrap:wrap;gap:5px 16px;font-size:12px;color:#475569;margin-top:9px}.legend span{display:inline-flex;align-items:center;gap:6px}
+.ln{width:22px;height:0;border-top:3px solid}.dot{width:12px;height:12px;border-radius:50%;border:2px solid}
+.grid4{display:grid;grid-template-columns:1fr 1fr;gap:14px}.panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;position:relative}
+.panel .hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;gap:8px}.panel h2{font-size:14px;margin:0}.panel .hd b{font:800 18px ui-monospace,monospace}.panel .sub{font-size:12px;color:var(--muted);min-height:18px;margin-bottom:6px}
+.badge{position:absolute;top:56px;left:22px;background:#0f172a;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;opacity:0;transition:opacity .2s}.badge.show{opacity:1}
+table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:6px 9px;border-bottom:1px solid var(--line);text-align:left}th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#94a3b8}td.num{font-family:ui-monospace,monospace;text-align:right}tr.win td{background:#ecfdf5;font-weight:700}
+.note{font-size:12.5px;color:var(--muted);margin-top:8px}
+@media (max-width:980px){.single{grid-template-columns:1fr}.grid4{grid-template-columns:1fr}.bar .hint{margin-left:0}}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>TSP Heuristics Visualizer</h1><p>IS115 · Week 11 · 1st greedy, 2nd greedy and 2-opt local search, step by step</p></div>
+  <nav class="tabs" role="tablist" id="tabs">
+    <button class="tab" role="tab" data-tab="nn">1st Greedy</button>
+    <button class="tab" role="tab" data-tab="ins">2nd Greedy</button>
+    <button class="tab" role="tab" data-tab="opt">2-Opt</button>
+    <button class="tab" role="tab" data-tab="cmp">Compare all</button>
+  </nav>
+</header>
+<div class="bar">
+  <label>Cities <select id="region">
+    <option value="RAND">Random points</option><option value="SEA">Southeast Asia (25)</option><option value="US">US state capitals (50)</option><option value="EU">Europe (24)</option>
+  </select></label>
+  <label id="nwrap">Number <input type="range" id="ncities" min="5" max="50" value="12"><span id="nval">12</span></label>
+  <button class="btn" id="regen">⟳ New cities</button>
+  <label>Speed <input type="range" id="speed" min="1" max="10" value="5"></label>
+  <span class="hint" id="hint">Drag any city to move it · → step · ← back · Space play</span>
+</div>
+<main>
+  <section class="pane" id="pane-nn"></section>
+  <section class="pane" id="pane-ins"></section>
+  <section class="pane" id="pane-opt"></section>
+  <section class="pane" id="pane-cmp">
+    <div class="card" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between">
+      <div class="ctrls"><button class="btn" data-act="reset">⟲ Reset</button><button class="btn go" data-act="step">Step all ›</button><button class="btn play" data-act="play">▶ Play</button><button class="btn" data-act="finish">⏭ Finish all</button></div>
+      <span class="note" style="margin:0">All four start on the same cities. 2-opt panels show only the moves that improve the tour.</span>
+    </div>
+    <div class="grid4" id="cmpgrid"></div>
+    <div class="card" style="margin-top:14px"><h3>Results</h3><div id="cmpres"></div>
+      <p class="note">Both 2-opt runs stop at a <b>local</b> optimum, and which one ends shorter depends on the cities. Starting from the greedy tour needs far fewer moves. Press Reset or choose new cities to see the ranking change.</p></div>
+  </section>
+</main>
+
+<script>
+/* ================= data ================= */
+const W=1000,H=640,PAD=48;
+const DATA={
+SEA:[{id:"BKK",lat:13.7563,lon:100.5018},{id:"HAN",lat:21.0285,lon:105.8542},{id:"SGN",lat:10.8231,lon:106.6297},{id:"JKT",lat:-6.2088,lon:106.8456},{id:"KUL",lat:3.139,lon:101.6869},{id:"MNL",lat:14.5995,lon:120.9842},{id:"PNH",lat:11.5564,lon:104.9282},{id:"SIN",lat:1.3521,lon:103.8198},{id:"VTE",lat:17.9757,lon:102.6331},{id:"RGN",lat:16.8409,lon:96.1903},{id:"BWN",lat:4.9031,lon:114.9398},{id:"DIL",lat:-8.5586,lon:125.5736},{id:"CEB",lat:10.3157,lon:123.8854},{id:"DVO",lat:7.0702,lon:125.6172},{id:"SUB",lat:-7.2504,lon:112.7688},{id:"MES",lat:3.5952,lon:98.6722},{id:"BDO",lat:-6.9175,lon:107.6191},{id:"UPG",lat:-5.1477,lon:119.4327},{id:"CNX",lat:18.7883,lon:98.9853},{id:"HKT",lat:7.8804,lon:98.3923},{id:"DAD",lat:16.0544,lon:108.2022},{id:"MDL",lat:21.9588,lon:96.0891},{id:"BKI",lat:5.9804,lon:116.0735},{id:"KCH",lat:1.5533,lon:110.344},{id:"REP",lat:13.3611,lon:103.8606}],
+US:[{id:"AL",lat:32.36,lon:-86.27},{id:"AK",lat:58.3,lon:-134.41},{id:"AZ",lat:33.44,lon:-112.07},{id:"AR",lat:34.74,lon:-92.28},{id:"CA",lat:38.58,lon:-121.49},{id:"CO",lat:39.73,lon:-104.99},{id:"CT",lat:41.76,lon:-72.67},{id:"DE",lat:39.15,lon:-75.52},{id:"FL",lat:30.43,lon:-84.28},{id:"GA",lat:33.74,lon:-84.38},{id:"HI",lat:21.3,lon:-157.85},{id:"ID",lat:43.61,lon:-116.2},{id:"IL",lat:39.78,lon:-89.65},{id:"IN",lat:39.76,lon:-86.15},{id:"IA",lat:41.6,lon:-93.6},{id:"KS",lat:39.05,lon:-95.68},{id:"KY",lat:38.2,lon:-84.87},{id:"LA",lat:30.45,lon:-91.14},{id:"ME",lat:44.31,lon:-69.77},{id:"MD",lat:38.97,lon:-76.49},{id:"MA",lat:42.36,lon:-71.05},{id:"MI",lat:42.73,lon:-84.55},{id:"MN",lat:44.95,lon:-93.08},{id:"MS",lat:32.29,lon:-90.18},{id:"MO",lat:38.57,lon:-92.17},{id:"MT",lat:46.58,lon:-112.01},{id:"NE",lat:40.81,lon:-96.68},{id:"NV",lat:39.16,lon:-119.76},{id:"NH",lat:43.2,lon:-71.53},{id:"NJ",lat:40.21,lon:-74.76},{id:"NM",lat:35.68,lon:-105.93},{id:"NY",lat:42.65,lon:-73.75},{id:"NC",lat:35.77,lon:-78.63},{id:"ND",lat:46.8,lon:-100.78},{id:"OH",lat:39.96,lon:-82.99},{id:"OK",lat:35.46,lon:-97.51},{id:"OR",lat:44.94,lon:-123.03},{id:"PA",lat:40.27,lon:-76.88},{id:"RI",lat:41.82,lon:-71.41},{id:"SC",lat:34,lon:-81.03},{id:"SD",lat:44.36,lon:-100.35},{id:"TN",lat:36.16,lon:-86.78},{id:"TX",lat:30.26,lon:-97.74},{id:"UT",lat:40.76,lon:-111.89},{id:"VT",lat:44.26,lon:-72.57},{id:"VA",lat:37.54,lon:-77.46},{id:"WA",lat:47.03,lon:-122.9},{id:"WV",lat:38.34,lon:-81.63},{id:"WI",lat:43.07,lon:-89.38},{id:"WY",lat:41.13,lon:-104.82}],
+EU:[{id:"LON",lat:51.5074,lon:-.1278},{id:"PAR",lat:48.8566,lon:2.3522},{id:"BER",lat:52.52,lon:13.405},{id:"MAD",lat:40.4168,lon:-3.7038},{id:"ROM",lat:41.9028,lon:12.4964},{id:"VIE",lat:48.2082,lon:16.3738},{id:"PRG",lat:50.0755,lon:14.4378},{id:"BUD",lat:47.4979,lon:19.0402},{id:"WAR",lat:52.2297,lon:21.0122},{id:"AMS",lat:52.3676,lon:4.9041},{id:"BRU",lat:50.8503,lon:4.3517},{id:"COP",lat:55.6761,lon:12.5683},{id:"STO",lat:59.3293,lon:18.0686},{id:"OSL",lat:59.9139,lon:10.7522},{id:"HEL",lat:60.1695,lon:24.9354},{id:"ATH",lat:37.9838,lon:23.7275},{id:"LIS",lat:38.7223,lon:-9.1393},{id:"DUB",lat:53.3498,lon:-6.2603},{id:"ZUR",lat:47.3769,lon:8.5417},{id:"MIL",lat:45.4642,lon:9.19},{id:"MUC",lat:48.1351,lon:11.582},{id:"HAM",lat:53.5511,lon:9.9937},{id:"LYO",lat:45.764,lon:4.8357},{id:"BAR",lat:41.3851,lon:2.1734}]
+};
+
+/* ================= cities, distances, map ================= */
+let cities=[],D=[],unit='',proj=null,bg=null,region='RAND',buildToken=0;
+const atlas={};
+const libsOK=()=>typeof d3!=='undefined'&&typeof topojson!=='undefined';
+const hav=(a,b)=>{const r=Math.PI/180,dl=(b.lat-a.lat)*r,dn=(b.lon-a.lon)*r,s=Math.sin(dl/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dn/2)**2;return 12742*Math.asin(Math.sqrt(s))};
+function computeD(){D=cities.map(a=>cities.map(b=>a.lat!=null?hav(a,b):Math.hypot(a.x-b.x,a.y-b.y)))}
+const lab=i=>cities[i].id;
+const fmt=v=>unit?Math.round(v).toLocaleString()+' km':Math.round(v).toLocaleString();
+const sgn=v=>(v<0?'−':'+')+fmt(Math.abs(v));
+const tourLen=t=>t.length<2?0:t.reduce((s,a,i)=>s+D[a][t[(i+1)%t.length]],0);
+function linearProj(data){ // offline fallback when d3 is unavailable
+  const lons=data.map(c=>c.lon),lats=data.map(c=>c.lat),k=Math.cos((Math.min(...lats)+Math.max(...lats))/2*Math.PI/180);
+  const x0=Math.min(...lons),y1=Math.max(...lats),sx=(Math.max(...lons)-x0)*k,sy=y1-Math.min(...lats),s=Math.min((W-2*PAD)/sx,(H-2*PAD)/sy);
+  const f=([lon,lat])=>[PAD+(lon-x0)*k*s,PAD+(y1-lat)*s];f.invert=([x,y])=>[(x-PAD)/(k*s)+x0,y1-(y-PAD)/s];return f;
+}
+async function loadAtlas(kind){
+  if(kind in atlas)return atlas[kind];
+  try{const url=kind==='us'?'https://cdn.jsdelivr.net/npm/us-atlas@3.0.1/states-10m.json':'https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-50m.json';atlas[kind]=await (await fetch(url)).json()}catch(e){atlas[kind]=null}
+  return atlas[kind];
+}
+function renderBg(topo){
+  const dpr=window.devicePixelRatio||1,c=document.createElement('canvas');c.width=W*dpr;c.height=H*dpr;const x=c.getContext('2d');x.scale(dpr,dpr);
+  x.fillStyle=region==='US'?'#f8fafc':'#eef6fb';x.fillRect(0,0,W,H);
+  if(topo){const path=d3.geoPath(proj,x);x.beginPath();path(topojson.feature(topo,region==='US'?topo.objects.states:topo.objects.countries));
+    x.fillStyle=region==='US'?'#eef2f7':'#e2e8f0';x.fill();x.strokeStyle='#cbd5e1';x.lineWidth=1;x.stroke()}
+  return c;
+}
+async function buildCities(){
+  const tok=++buildToken;stopPlay();
+  if(region==='RAND'){
+    proj=null;bg=null;unit='';cities=[];const n=+$('#ncities').value;let tries=0;
+    while(cities.length<n&&tries++<20000){const c={x:PAD+Math.random()*(W-2*PAD),y:PAD+Math.random()*(H-2*PAD)};if(cities.every(o=>Math.hypot(o.x-c.x,o.y-c.y)>(n>30?40:56)))cities.push({...c,id:String(cities.length)})}
+  }else{
+    const data=DATA[region];unit='km';
+    if(libsOK()){const pts={type:'MultiPoint',coordinates:data.map(c=>[c.lon,c.lat])};proj=(region==='US'?d3.geoAlbersUsa():d3.geoMercator()).fitExtent([[PAD,PAD],[W-PAD,H-PAD]],pts)}
+    else proj=linearProj(data);
+    cities=data.map(c=>{const p=proj([c.lon,c.lat]);return{x:p[0],y:p[1],id:c.id,lat:c.lat,lon:c.lon}});
+    bg=renderBg(null);
+  }
+  computeD();fillStartSelect();resetAll();
+  if(region!=='RAND'&&libsOK()){const topo=await loadAtlas(region==='US'?'us':'world');if(tok!==buildToken)return;bg=renderBg(topo);renderActive()}
+}
+
+/* ================= drawing ================= */
+const SEG={scan:{c:'rgba(148,163,184,.55)',w:1.2},pick:{c:'#ef4444',w:3},new:{c:'#10b981',w:5},rem:{c:'#ef4444',w:6,dash:[12,8]},add:{c:'#10b981',w:4,dash:[10,7]},optA:{c:'#2563eb',w:3.5,dash:[9,6]},optB:{c:'#a855f7',w:3.5,dash:[9,6]}};
+const NODE={s:['#e2e8f0','#94a3b8','#334155'],tour:['#334155','#0f172a','#fff'],start:['#10b981','#047857','#fff'],cur:['#f59e0b','#b45309','#fff'],cand:['#ef4444','#b91c1c','#fff'],active:['#f59e0b','#b45309','#fff'],drag:['#8b5cf6','#5b21b6','#fff']};
+let dragIdx=null;
+const nodeR=()=>cities.length<=15?17:cities.length<=30?14:11;
+function prep(cv){const dpr=window.devicePixelRatio||1;if(cv.width!==W*dpr){cv.width=W*dpr;cv.height=H*dpr}const x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);return x}
+function drawFrame(cv,f,tourColor='#334155'){
+  const x=prep(cv),C=cities;
+  if(bg)x.drawImage(bg,0,0,W,H);else{x.fillStyle='#fff';x.fillRect(0,0,W,H);x.fillStyle='#e2e8f0';for(let i=20;i<W;i+=24)for(let j=20;j<H;j+=24)x.fillRect(i,j,1.6,1.6)}
+  x.lineCap='round';x.lineJoin='round';
+  const t=f?.tour||[];
+  if(t.length>1){x.beginPath();x.moveTo(C[t[0]].x,C[t[0]].y);for(let i=1;i<t.length;i++)x.lineTo(C[t[i]].x,C[t[i]].y);if(f.closed)x.lineTo(C[t[0]].x,C[t[0]].y);
+    x.strokeStyle=f.faded?'#cbd5e1':tourColor;x.lineWidth=f.faded?2.5:3.5;x.setLineDash([]);x.stroke()}
+  const labs=[];
+  for(const s of f?.segs||[]){const st=SEG[s.s],a=C[s.a],b=C[s.b];x.beginPath();x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);x.strokeStyle=st.c;x.lineWidth=st.w;x.setLineDash(st.dash||[]);x.stroke();if(s.lab)labs.push([(a.x+b.x)/2,(a.y+b.y)/2,fmt(D[s.a][s.b]).replace(' km',''),st.c])}
+  x.setLineDash([]);
+  const R=nodeR(),S=new Set(f?.S||C.map((_,i)=>i)),inT=new Set(t);
+  C.forEach((c,i)=>{
+    let k=(f?.nodes||{})[i]||(inT.has(i)?'tour':S.has(i)?'s':'tour');if(dragIdx===i)k='drag';const [fill,stroke,tc]=NODE[k];
+    if(k==='cur'||k==='cand'||k==='active'){x.beginPath();x.arc(c.x,c.y,R+6,0,7);x.strokeStyle=fill+'66';x.lineWidth=5;x.stroke()}
+    x.beginPath();x.arc(c.x,c.y,R,0,7);x.fillStyle=fill;x.fill();x.strokeStyle=stroke;x.lineWidth=2;x.stroke();
+    x.fillStyle=tc;x.font=`700 ${Math.round(R*(c.id.length>2?.7:.85))}px ui-monospace,monospace`;x.textAlign='center';x.textBaseline='middle';x.fillText(c.id,c.x,c.y+1);
+  });
+  x.font='700 13px ui-monospace,monospace';
+  for(const [mx,my,s,col] of labs){const w=x.measureText(s).width+12;x.fillStyle='#fff';x.strokeStyle=col;x.lineWidth=1.5;x.beginPath();x.roundRect(mx-w/2,my-11,w,22,6);x.fill();x.stroke();x.fillStyle='#0f172a';x.fillText(s,mx,my+1)}
+}
+
+/* ================= algorithms (generators yield one frame per visible step) ================= */
+function* genNN(start){
+  const S=new Set(cities.map((_,i)=>i));
+  yield {line:0,tour:[],S:[...S],len:0,msg:`S = all ${cities.length} cities (grey). The tour T is empty.`};
+  const T=[start];S.delete(start);let len=0;
+  yield {line:1,tour:[...T],S:[...S],len,nodes:{[start]:'start'},msg:`Start at city <b>${lab(start)}</b>: add it to T and remove it from S.`};
+  while(S.size){
+    const y=T[T.length-1];let x=-1;for(const k of S)if(x<0||D[y][k]<D[y][x])x=k;
+    yield {line:3,tour:[...T],S:[...S],len,segs:[...[...S].map(k=>({a:y,b:k,s:'scan'})),{a:y,b:x,s:'pick',lab:true}],nodes:{[T[0]]:'start',[y]:'cur',[x]:'cand'},
+      msg:`Last city <b>y = ${lab(y)}</b>. Check all ${S.size} cities still in S: the nearest is <b>x = ${lab(x)}</b> (${fmt(D[y][x])}).`};
+    S.delete(x);T.push(x);len+=D[y][x];
+    yield {line:4,tour:[...T],S:[...S],len,segs:[{a:y,b:x,s:'new'}],nodes:{[T[0]]:'start',[x]:'cur'},msg:`Remove ${lab(x)} from S and append it to T. Path so far: ${fmt(len)}.`};
+  }
+  const l=T[T.length-1];len+=D[l][T[0]];
+  yield {line:5,tour:[...T],closed:true,S:[],len,done:true,segs:[{a:l,b:T[0],s:'new',lab:true}],nodes:{[T[0]]:'start'},
+    msg:`S is empty. Return from ${lab(l)} to the start ${lab(T[0])} (+${fmt(D[l][T[0]])}). <b>Tour length = ${fmt(len)}</b>.`};
+}
+function* genIns(){
+  const n=cities.length,S=new Set(cities.map((_,i)=>i));
+  yield {line:0,tour:[],S:[...S],len:0,msg:`S = all ${n} cities (grey). The tour T is empty.`};
+  let a=0,b=1;for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)if(D[i][j]<D[a][b]){a=i;b=j}
+  const T=[a,b];S.delete(a);S.delete(b);
+  yield {line:1,tour:[...T],closed:true,S:[...S],len:tourLen(T),segs:[{a,b,s:'pick',lab:true}],nodes:{[a]:'cand',[b]:'cand'},
+    msg:`Closest pair of cities: <b>${lab(a)}–${lab(b)}</b> (${fmt(D[a][b])}). T = ${lab(a)} → ${lab(b)} → ${lab(a)}, length ${fmt(tourLen(T))}.`};
+  while(S.size){
+    let bx=-1,by=-1;const scans=[];
+    for(const x of S){let ny=T[0];for(const y of T)if(D[x][y]<D[x][ny])ny=y;scans.push({a:x,b:ny,s:'scan'});if(bx<0||D[x][ny]<D[bx][by]){bx=x;by=ny}}
+    const x=bx,y=by;
+    yield {line:3,tour:[...T],closed:true,S:[...S],len:tourLen(T),segs:[...scans,{a:x,b:y,s:'pick',lab:true}],nodes:{[x]:'cand',[y]:'cur'},
+      msg:`For each city in S, find its nearest city in T (grey lines). The overall closest is <b>x = ${lab(x)}</b>, next to <b>y = ${lab(y)}</b> (${fmt(D[x][y])}).`};
+    const m=T.length,i=T.indexOf(y),z=T[(i+1)%m],u=T[(i-1+m)%m];
+    const cn=D[y][x]+D[x][z]-D[y][z],cp=D[u][x]+D[x][y]-D[u][y],next=cn<=cp;
+    yield {line:5,tour:[...T],closed:true,S:[...S],len:tourLen(T),segs:[{a:y,b:x,s:'optA'},{a:x,b:z,s:'optA'},{a:u,b:x,s:'optB'},{a:x,b:y,s:'optB'}],nodes:{[x]:'cand',[y]:'cur',[z]:'active',[u]:'active'},
+      msg:`<span style="color:#2563eb">Next side</span> (between ${lab(y)} and ${lab(z)}): <code>d(y,x)+d(x,z)−d(y,z) = +${fmt(cn)}</code><br><span style="color:#a855f7">Previous side</span> (between ${lab(u)} and ${lab(y)}): <code>d(u,x)+d(x,y)−d(u,y) = +${fmt(cp)}</code><br>${m===2?'With a 2-city tour, both sides give the same cycle. Take the next side.':`<b>${next?'Next':'Previous'} side</b> adds less.`}`};
+    T.splice(next?i+1:i,0,x);S.delete(x);const p=next?[y,z]:[u,y];
+    yield {line:6,tour:[...T],closed:true,S:[...S],len:tourLen(T),segs:[{a:p[0],b:x,s:'new'},{a:x,b:p[1],s:'new'}],nodes:{[x]:'cur'},
+      msg:`Insert ${lab(x)} between ${lab(p[0])} and ${lab(p[1])} (+${fmt(next?cn:cp)}), then remove it from S. Tour length = ${fmt(tourLen(T))}.`};
+  }
+  yield {line:7,tour:[...T],closed:true,S:[],len:tourLen(T),done:true,msg:`S is empty. <b>Final tour length = ${fmt(tourLen(T))}</b>.`};
+}
+function nnTour(start){const S=new Set(cities.map((_,i)=>i)),T=[start];S.delete(start);while(S.size){const y=T[T.length-1];let x=-1;for(const k of S)if(x<0||D[y][k]<D[y][x])x=k;S.delete(x);T.push(x)}return T}
+function shuffled(n){const t=[...Array(n).keys()];for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[t[i],t[j]]=[t[j],t[i]]}return t}
+const orient=(p,q,r)=>Math.sign((q.y-p.y)*(r.x-q.x)-(q.x-p.x)*(r.y-q.y));
+const crosses=(a,b,c,e)=>{const [A,B,Cc,E]=[a,b,c,e].map(i=>cities[i]);return orient(A,B,Cc)!==orient(A,B,E)&&orient(Cc,E,A)!==orient(Cc,E,B)};
+function* gen2opt({init,strategy,show,start}){
+  const n=cities.length,EPS=1e-9;let T=init==='nn'?nnTour(start):shuffled(n),L=tourLen(T);const L0=L,N=n*(n-3)/2;let pass=0,evals=0,moves=0;
+  const st=()=>({pass,evals,moves,L0,L,N});
+  const mv=(i,j)=>{const a=T[i],b=T[i+1],c=T[j],e=T[(j+1)%n];return{i,j,a,b,c,e,dl:D[a][c]+D[b][e]-D[a][b]-D[c][e]}};
+  const segsOf=m=>[{a:m.a,b:m.b,s:'rem',lab:true},{a:m.c,b:m.e,s:'rem',lab:true},{a:m.a,b:m.c,s:'add',lab:true},{a:m.b,b:m.e,s:'add',lab:true}];
+  const act=m=>({[m.a]:'active',[m.b]:'active',[m.c]:'active',[m.e]:'active'});
+  const deltaTxt=m=>`<code>Δ = d(${lab(m.a)},${lab(m.c)}) + d(${lab(m.b)},${lab(m.e)}) − d(${lab(m.a)},${lab(m.b)}) − d(${lab(m.c)},${lab(m.e)}) = ${sgn(m.dl)}</code>${crosses(m.a,m.b,m.c,m.e)?' <i>(these two edges cross)</i>':''}`;
+  const apply=m=>{T=T.slice(0,m.i+1).concat(T.slice(m.i+1,m.j+1).reverse(),T.slice(m.j+1));L+=m.dl;moves++};
+  yield {line:0,tour:[...T],closed:true,len:L,stats:st(),msg:`Initial tour (${init==='nn'?'from the 1st greedy':'a random order'}): length <b>${fmt(L)}</b>. Each pass checks all n(n−3)/2 = ${N} pairs of non-adjacent edges.`};
+  for(;;){
+    pass++;let imp=0,best=null;
+    for(let i=0;i<n-2;i++)for(let j=i+2;j<n;j++){
+      if(i===0&&j===n-1)continue;
+      const m=mv(i,j);evals++;
+      if(strategy==='first'){
+        if(show==='all'||m.dl<-EPS)yield {line:3,tour:[...T],closed:true,faded:true,len:L,stats:st(),segs:segsOf(m),nodes:act(m),msg:`Pass ${pass}: remove ${lab(m.a)}–${lab(m.b)} and ${lab(m.c)}–${lab(m.e)}, add ${lab(m.a)}–${lab(m.c)} and ${lab(m.b)}–${lab(m.e)}.<br>${deltaTxt(m)} ${m.dl<-EPS?'→ <b style="color:#059669">improves</b>':'→ no gain'}`};
+        if(m.dl<-EPS){const seg=T.slice(i+1,j+1).map(lab);apply(m);imp++;
+          yield {line:4,tour:[...T],closed:true,len:L,stats:st(),segs:[{a:m.a,b:m.c,s:'new'},{a:m.b,b:m.e,s:'new'}],nodes:act(m),msg:`Δ < 0, so apply the move: reverse <code>${seg.length>8?seg.slice(0,4).join(' ')+' … '+seg.slice(-3).join(' '):seg.join(' ')}</code>. Length now <b>${fmt(L)}</b> (${sgn(m.dl)}).`}}
+      }else{
+        if(!best||m.dl<best.dl)best=m;
+        if(show==='all')yield {line:3,tour:[...T],closed:true,faded:true,len:L,stats:st(),segs:segsOf(m),nodes:act(m),msg:`Pass ${pass}: ${deltaTxt(m)}<br>Best so far this pass: Δ = ${sgn(best.dl)}`};
+      }
+    }
+    if(strategy==='best'&&best&&best.dl<-EPS){
+      yield {line:4,tour:[...T],closed:true,faded:true,len:L,stats:st(),segs:segsOf(best),nodes:act(best),msg:`All ${N} moves checked. Most negative: ${deltaTxt(best)}`};
+      apply(best);imp++;
+      yield {line:4,tour:[...T],closed:true,len:L,stats:st(),segs:[{a:best.a,b:best.c,s:'new'},{a:best.b,b:best.e,s:'new'}],nodes:act(best),msg:`Apply it. Length now <b>${fmt(L)}</b>.`};
+    }
+    if(!imp){yield {line:6,tour:[...T],closed:true,len:L,stats:st(),done:true,msg:`Pass ${pass}: none of the ${N} moves has Δ < 0, so this is a <b>2-opt local optimum</b>: ${fmt(L)} (started at ${fmt(L0)}, ${((1-L/L0)*100).toFixed(1)}% shorter). A local optimum is not guaranteed to be the global optimum.`};return}
+    yield {line:5,tour:[...T],closed:true,len:L,stats:st(),msg:`End of pass ${pass}: ${imp} improving move${imp>1?'s':''} applied. Length ${fmt(L)}. The tour changed, so run another pass.`};
+  }
+}
+
+/* ================= step runner with history (supports Back) ================= */
+class Runner{
+  constructor(make){this.make=make;this.reset()}
+  reset(){this.gen=this.make();this.hist=[];this.pos=-1;this.done=false;this.advance()}
+  advance(){if(this.pos<this.hist.length-1){this.pos++;return true}if(this.done)return false;const r=this.gen.next();if(r.done){this.done=true;return false}this.hist.push(r.value);this.pos++;if(r.value.done)this.done=true;return true}
+  back(){if(this.pos>0){this.pos--;return true}return false}
+  finish(){let k=0;while(this.advance()&&k++<500000);}
+  get frame(){return this.hist[this.pos]}
+  get atEnd(){return this.done&&this.pos===this.hist.length-1}
+}
+
+/* ================= single-algorithm panes ================= */
+const CODE={
+  nn:[[0,'S ← all cities; T ← empty tour'],[0,'pick a start city: add it to T, remove it from S'],[0,'<b>while</b> S is not empty:'],[1,'y ← last city in T; find x ∈ S with the smallest d(y, x)'],[1,'remove x from S; append x to the end of T'],[0,'connect the last city back to the start']],
+  ins:[[0,'S ← all cities; T ← empty tour'],[0,'T ← the 2 closest cities (there and back); remove them from S'],[0,'<b>while</b> S is not empty:'],[1,'find x ∈ S and y ∈ T with the smallest d(x, y)'],[1,'z ← city after y, u ← city before y'],[1,'cost next = d(y,x)+d(x,z)−d(y,z); cost prev = d(u,x)+d(x,y)−d(u,y)'],[1,'insert x on the cheaper side; remove x from S'],[0,'<b>return</b> T']],
+  optfirst:[[0,'T ← initial tour'],[0,'<b>repeat</b>'],[1,'<b>for each</b> pair of non-adjacent edges (a,b), (c,e) in T:'],[2,'Δ ← d(a,c) + d(b,e) − d(a,b) − d(c,e)'],[2,'<b>if</b> Δ < 0: replace them with (a,c), (b,e) by reversing b … c'],[0,'<b>until</b> a whole pass makes no improvement'],[0,'T is a 2-opt local optimum']],
+  optbest:[[0,'T ← initial tour'],[0,'<b>repeat</b>'],[1,'<b>for each</b> pair of non-adjacent edges (a,b), (c,e) in T:'],[2,'Δ ← d(a,c) + d(b,e) − d(a,b) − d(c,e)'],[1,'<b>if</b> the most negative Δ < 0: apply that move'],[0,'<b>until</b> no move has Δ < 0'],[0,'T is a 2-opt local optimum']],
+};
+const LEG={
+  nn:[['dot','#10b981','start city'],['dot','#f59e0b','current city y'],['dot','#ef4444','nearest x'],['dot','#94a3b8','unvisited (in S)'],['ln','#cbd5e1','distances checked'],['ln','#10b981','edge just added']],
+  ins:[['dot','#ef4444','city x to insert'],['dot','#f59e0b','nearest tour city y'],['ln','#2563eb','next-side option'],['ln','#a855f7','previous-side option'],['ln','#10b981','edges just added']],
+  opt:[['ln','#ef4444','edges removed'],['ln','#10b981','edges added'],['dot','#f59e0b','the 4 cities in the move']],
+};
+const TITLE={nn:'1st Greedy: Nearest Neighbour',ins:'2nd Greedy: Closest Insertion',opt:'Local Search: 2-Opt'};
+const $=s=>document.querySelector(s);
+const panes={};let active='nn';
+function startOf(v){return v==='-1'?Math.floor(Math.random()*cities.length):Math.min(+v,cities.length-1)}
+function makePane(key){
+  const el=$('#pane-'+key);
+  const opts=key==='nn'?`<label>Start city <select data-opt="start"></select></label>`
+    :key==='opt'?`<label>Initial tour <select data-opt="init"><option value="random">Random order</option><option value="nn">1st greedy tour</option></select></label>
+      <label>Strategy <select data-opt="strategy"><option value="first">First improvement</option><option value="best">Best improvement</option></select></label>
+      <label>Show <select data-opt="show"><option value="all">Every pair checked</option><option value="improving">Only improving moves</option></select></label>`:'';
+  el.innerHTML=`<div class="single"><aside>
+    <div class="card"><h3>${TITLE[key]}</h3><div class="ctrls"><button class="btn" data-act="reset">⟲ Reset</button><button class="btn" data-act="back">‹ Back</button><button class="btn go" data-act="step">Step ›</button><button class="btn play" data-act="play">▶ Play</button><button class="btn" data-act="finish">⏭ Finish</button></div>${opts?`<div class="opts">${opts}</div>`:''}</div>
+    <div class="card"><h3>Pseudocode</h3><ol class="code"></ol></div>
+    <div class="card"><h3>State</h3><div class="state"></div></div>
+  </aside><div class="stage"><div class="msgbar"><div><span class="stepno"></span><div class="msg"></div></div><div class="len"><span>Length</span><b>0</b></div></div>
+    <canvas></canvas><div class="legend">${LEG[key].map(([k,c,t])=>`<span><i class="${k}" style="${k==='dot'?`background:${c};border-color:${c}`:`border-color:${c}`}"></i>${t}</span>`).join('')}</div></div></div>`;
+  const p={key,el,cv:el.querySelector('canvas'),opts:{start:'0',init:'random',strategy:'first',show:'all'}};
+  p.make=()=>key==='nn'?genNN(startOf(p.opts.start)):key==='ins'?genIns():gen2opt({...p.opts,start:startOf($('#pane-nn select[data-opt=start]').value)});
+  el.querySelectorAll('[data-opt]').forEach(s=>s.addEventListener('change',()=>{p.opts[s.dataset.opt]=s.value;stopPlay();p.runner.reset();renderPane(p)}));
+  bindCtrls(el,{reset:()=>{stopPlay();p.runner.reset()},back:()=>{stopPlay();p.runner.back()},step:()=>p.runner.advance(),finish:()=>{stopPlay();p.runner.finish()}});
+  attachDrag(p.cv);
+  panes[key]=p;
+}
+function renderPane(p){
+  const f=p.runner.frame,el=p.el,code=p.key==='opt'?CODE['opt'+p.opts.strategy]:CODE[p.key];
+  drawFrame(p.cv,f);
+  el.querySelector('.stepno').textContent=`Step ${p.runner.pos+1}${p.runner.done?' of '+p.runner.hist.length:''}${f.done?' · done':''}`;
+  el.querySelector('.msg').innerHTML=f.msg;el.querySelector('.len b').textContent=fmt(f.len||0);
+  el.querySelector('ol.code').innerHTML=code.map(([ind,t],i)=>`<li class="${i===f.line?'on':''}" style="padding-left:${ind*1.3}em">${t}</li>`).join('');
+  let st;
+  if(p.key==='opt'){const s=f.stats;st=`<div class="tiles"><div class="tile"><b>${s.pass}</b><span>pass</span></div><div class="tile"><b>${s.evals}</b><span>pairs checked</span></div><div class="tile"><b>${s.moves}</b><span>moves applied</span></div><div class="tile"><b>${fmt(s.L0)}</b><span>start length</span></div><div class="tile"><b>${fmt(s.L)}</b><span>current</span></div><div class="tile"><b>${((1-s.L/s.L0)*100).toFixed(1)}%</b><span>shorter</span></div></div>`}
+  else{const S=f.S||[],T=f.tour;st=`<div class="tiles"><div class="tile"><b>${S.length}</b><span>|S| unvisited</span></div><div class="tile"><b>${T.length}</b><span>|T| in tour</span></div><div class="tile"><b>${cities.length}</b><span>n cities</span></div></div>
+    <div class="list"><span>S (unvisited)</span>{ ${S.map(lab).join(', ')} }</div><div class="list"><span>T (tour order)</span>[ ${T.map(lab).join(' → ')}${f.closed&&T.length>1?' → '+lab(T[0]):''} ]</div>`}
+  el.querySelector('.state').innerHTML=st;
+  setBtns(el,p.runner.pos===0,p.runner.atEnd);
+}
+function fillStartSelect(){const s=$('#pane-nn select[data-opt=start]');const v=panes.nn.opts.start;s.innerHTML=`<option value="-1">Random</option>`+cities.map((c,i)=>`<option value="${i}">${c.id}</option>`).join('');s.value=(v==='-1'||+v<cities.length)?v:'0';panes.nn.opts.start=s.value}
+
+/* ================= compare pane ================= */
+const CMP=[
+  {name:'1st greedy (nearest neighbour)',color:'#059669',make:()=>genNN(startOf(panes.nn.opts.start))},
+  {name:'2nd greedy (closest insertion)',color:'#2563eb',make:()=>genIns()},
+  {name:'2-opt from a random tour',color:'#d97706',make:()=>gen2opt({init:'random',strategy:'first',show:'improving'})},
+  {name:'2-opt from the 1st greedy tour',color:'#7c3aed',make:()=>gen2opt({init:'nn',strategy:'first',show:'improving',start:startOf(panes.nn.opts.start)})},
+];
+function makeCmp(){
+  $('#cmpgrid').innerHTML=CMP.map((c,i)=>`<div class="panel"><div class="hd"><h2 style="color:${c.color}">${c.name}</h2><b data-len="${i}">0</b></div><div class="sub" data-sub="${i}"></div><canvas data-cv="${i}"></canvas><span class="badge" data-badge="${i}">Done</span></div>`).join('');
+  CMP.forEach((c,i)=>{c.cv=$(`[data-cv="${i}"]`);attachDrag(c.cv)});
+  bindCtrls($('#pane-cmp'),{reset:()=>{stopPlay();CMP.forEach(c=>c.runner.reset())},step:()=>CMP.map(c=>c.runner.advance()).some(Boolean),finish:()=>{stopPlay();CMP.forEach(c=>c.runner.finish())}});
+}
+function renderCmp(){
+  CMP.forEach((c,i)=>{const f=c.runner.frame;drawFrame(c.cv,f,c.color);$(`[data-len="${i}"]`).textContent=fmt(f.len||0);
+    $(`[data-sub="${i}"]`).textContent=f.stats?`pass ${f.stats.pass} · ${f.stats.moves} moves · from ${fmt(f.stats.L0)}`:`${f.tour.length} of ${cities.length} cities in the tour`;
+    $(`[data-badge="${i}"]`).classList.toggle('show',!!f.done)});
+  const rows=CMP.map(c=>({c,f:c.runner.frame})),fin=rows.filter(r=>r.f.done),best=fin.length?Math.min(...fin.map(r=>r.f.len)):null;
+  $('#cmpres').innerHTML=`<table><tr><th>Algorithm</th><th>Status</th><th style="text-align:right">Steps</th><th style="text-align:right">Length</th><th style="text-align:right">vs best</th></tr>${rows.map(({c,f})=>`<tr class="${f.done&&f.len===best?'win':''}"><td style="color:${c.color}">${c.name}</td><td>${f.done?'done':'running…'}</td><td class="num">${c.runner.pos+1}</td><td class="num">${fmt(f.len||0)}</td><td class="num">${f.done&&best?(f.len===best?'best':'+'+((f.len/best-1)*100).toFixed(1)+'%'):'–'}</td></tr>`).join('')}</table>`;
+  setBtns($('#pane-cmp'),false,CMP.every(c=>c.runner.atEnd));
+}
+
+/* ================= shared controls ================= */
+function bindCtrls(el,h){el.querySelectorAll('[data-act]').forEach(b=>b.addEventListener('click',()=>{const a=b.dataset.act;if(a==='play')togglePlay();else{h[a]();renderActive()}}))}
+function setBtns(el,atStart,atEnd){const q=a=>el.querySelector(`[data-act="${a}"]`);if(q('back'))q('back').disabled=atStart;q('step').disabled=atEnd;q('finish').disabled=atEnd}
+function resetAll(){['nn','ins','opt'].forEach(k=>{panes[k].runner?panes[k].runner.reset():panes[k].runner=new Runner(panes[k].make)});CMP.forEach(c=>c.runner?c.runner.reset():c.runner=new Runner(c.make));renderActive()}
+function renderActive(){if(active==='cmp')renderCmp();else renderPane(panes[active])}
+function stepActive(){return active==='cmp'?CMP.map(c=>c.runner.advance()).some(Boolean):panes[active].runner.advance()}
+let timer=null;
+const delay=()=>[1500,1100,800,550,380,250,150,80,35,5][$('#speed').value-1];
+function togglePlay(){if(timer)return stopPlay();const atEnd=active==='cmp'?CMP.every(c=>c.runner.atEnd):panes[active].runner.atEnd;if(atEnd){if(active==='cmp')CMP.forEach(c=>c.runner.reset());else panes[active].runner.reset()}
+  document.querySelectorAll('[data-act=play]').forEach(b=>{b.textContent='❚❚ Pause';b.classList.add('on')});const tick=()=>{const moved=stepActive();renderActive();if(!moved||(active!=='cmp'&&panes[active].runner.atEnd)||(active==='cmp'&&CMP.every(c=>c.runner.atEnd)))return stopPlay();timer=setTimeout(tick,delay())};timer=setTimeout(tick,0)}
+function stopPlay(){clearTimeout(timer);timer=null;document.querySelectorAll('[data-act=play]').forEach(b=>{b.textContent='▶ Play';b.classList.remove('on')})}
+
+/* ================= drag cities ================= */
+function attachDrag(cv){
+  const pos=e=>{const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}};
+  cv.addEventListener('pointerdown',e=>{const p=pos(e),R=nodeR()+8;let best=-1,bd=R;cities.forEach((c,i)=>{const d=Math.hypot(c.x-p.x,c.y-p.y);if(d<bd){bd=d;best=i}});if(best<0)return;dragIdx=best;stopPlay();cv.setPointerCapture(e.pointerId);cv.style.cursor='grabbing'});
+  cv.addEventListener('pointermove',e=>{if(dragIdx===null)return;const p=pos(e),c=cities[dragIdx];const x=Math.max(10,Math.min(W-10,p.x)),y=Math.max(10,Math.min(H-10,p.y));
+    if(c.lat!=null){const ll=proj.invert([x,y]);if(!ll)return;c.lon=ll[0];c.lat=ll[1]}c.x=x;c.y=y;computeD();resetAll()});
+  const end=()=>{if(dragIdx===null)return;dragIdx=null;cv.style.cursor='';renderActive()};cv.addEventListener('pointerup',end);cv.addEventListener('pointercancel',end);
+}
+
+/* ================= init ================= */
+['nn','ins','opt'].forEach(makePane);makeCmp();
+function showTab(k){stopPlay();active=k;document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===k));document.querySelectorAll('.pane').forEach(p=>p.hidden=p.id!=='pane-'+k);renderActive()}
+$('#tabs').addEventListener('click',e=>{const b=e.target.closest('.tab');if(b)showTab(b.dataset.tab)});
+$('#region').addEventListener('change',e=>{region=e.target.value;$('#nwrap').style.display=region==='RAND'?'':'none';$('#regen').textContent=region==='RAND'?'⟳ New cities':'⟲ Reset positions';buildCities()});
+$('#ncities').addEventListener('input',e=>$('#nval').textContent=e.target.value);
+$('#ncities').addEventListener('change',buildCities);$('#regen').addEventListener('click',buildCities);
+document.addEventListener('keydown',e=>{if(e.target.closest('input,select,textarea'))return;
+  if(e.key==='ArrowRight'){stopPlay();stepActive();renderActive()}
+  else if(e.key==='ArrowLeft'&&active!=='cmp'){stopPlay();panes[active].runner.back();renderActive()}
+  else if(e.key===' '&&!e.target.closest('button')){e.preventDefault();togglePlay()}});
+window.addEventListener('resize',()=>{if(dragIdx===null)renderActive()});
+buildCities();showTab('nn');
+</script>
+</body>
+</html>

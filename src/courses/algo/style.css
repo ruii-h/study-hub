@@ -1696,3 +1696,12 @@ html[data-theme=light] .nb>b:first-child{color:#1a7f37}
   figure.diagram{padding:8px}
   .dg-t{font-size:15px}.dg-s{font-size:13.5px}.dg-hd{font-size:14.5px}.dg-lt{font-size:13.5px}.dg-sn{font-size:11px}
 }
+
+/* Embedded interactive labs (public/labs/algo/*.html) */
+.lab-embed{grid-column:1/-1;margin:14px 0 18px;border:1px solid var(--line,rgba(120,150,200,.3));border-radius:14px;background:rgba(10,24,54,.35);overflow:hidden}
+.lab-embed .lab-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--line,rgba(120,150,200,.3))}
+.lab-embed .lab-bar a{font-size:13px;font-weight:700;white-space:nowrap}
+.lab-embed .lab-blurb{margin:0;padding:10px 14px 0;font-size:14px;line-height:1.55;opacity:.9}
+.lab-embed iframe{display:block;width:100%;border:0;margin-top:10px;background:#0a1e3d;max-height:86vh;min-height:520px}
+.t-section>.lab-embed{grid-column:1/-1}
+@media(max-width:640px){.lab-embed{margin-left:-4px;margin-right:-4px}.lab-embed iframe{min-height:560px;max-height:82vh}}

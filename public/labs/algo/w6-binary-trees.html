@@ -1,0 +1,244 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IS115 W6 — Binary Trees Visual Lab</title>
+<style>
+  :root{
+    --bg:#0a1e3d; --bg2:#071630; --grid:rgba(120,180,255,.10);
+    --ink:#dce9ff; --dim:#91a9cc; --panel:#0d1930; --panel2:#101f3a;
+    --green:#2ee6a0; --cyan:#3fd0ff; --violet:#c07bff; --gold:#ffb340; --red:#ff6b6b;
+  }
+  *{box-sizing:border-box}
+  html,body{min-height:100%}
+  body{margin:0; color:var(--ink); font-family:"SF Mono",ui-monospace,Menlo,Consolas,"Courier New",monospace;
+    background:linear-gradient(0deg,var(--grid) 1px,transparent 1px) 0 0/38px 38px,
+      linear-gradient(90deg,var(--grid) 1px,transparent 1px) 0 0/38px 38px,
+      radial-gradient(120% 90% at 50% 0%,#123b74 0%,var(--bg) 45%,var(--bg2) 100%);
+    background-attachment:fixed}
+  button,input,select{font:inherit}
+  button{cursor:pointer}
+  button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid rgba(63,208,255,.6);outline-offset:2px}
+  .bar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;padding:11px 18px;
+    background:rgba(6,16,36,.94);backdrop-filter:blur(8px);border-bottom:1px solid rgba(120,180,255,.22)}
+  .brand{font-size:14px;font-weight:800;letter-spacing:.13em;white-space:nowrap}.brand span{color:var(--gold)}
+  .spacer{flex:1}.crumb{font-size:12px;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.crumb b{color:var(--ink)}
+  .btn,.chip{color:var(--ink);background:rgba(10,30,62,.9);border:1px solid rgba(120,180,255,.34);border-radius:9px;padding:8px 13px;transition:.18s}
+  .btn:hover,.chip:hover{border-color:var(--gold);box-shadow:0 0 14px rgba(255,179,64,.24)}
+  .btn.primary{background:linear-gradient(180deg,#ffd88a,#e59a24);border-color:#e59a24;color:#2a1a05;font-weight:800}
+  .btn:disabled{opacity:.38;cursor:default;box-shadow:none}
+  .page{max-width:1220px;margin:0 auto;padding:20px 18px 50px}
+  h1{margin:9px 0 4px;text-align:center;font-size:29px;letter-spacing:.13em;text-shadow:0 0 18px rgba(120,190,255,.55)}
+  .sub{text-align:center;color:var(--dim);font-size:12px;letter-spacing:.11em;margin-bottom:22px}
+  .sect{margin:0 0 27px}.secthead{display:flex;align-items:baseline;gap:10px;margin:0 2px 12px;padding-bottom:7px;border-bottom:1px solid rgba(120,180,255,.16)}
+  .secthead .n{font-size:12px;letter-spacing:.16em;color:var(--gold)}.secthead .d{font-size:11.5px;color:var(--dim)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:13px}
+  .card{position:relative;text-align:left;padding:15px 16px 14px;border-radius:14px;color:var(--ink);
+    background:rgba(8,26,54,.76);border:1px solid rgba(120,180,255,.22);transition:.18s;overflow:hidden;min-height:160px}
+  .card:hover{transform:translateY(-3px);border-color:var(--gold);box-shadow:0 14px 34px rgba(0,0,0,.42),0 0 22px rgba(255,179,64,.16)}
+  .card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
+  .card .row{display:flex;align-items:center;gap:9px;margin-bottom:7px}.card .ico{font-size:22px}.card .ttl{font-weight:800;font-size:14px}.card .no{position:absolute;right:12px;top:12px;font-size:10px;color:rgba(143,168,204,.55)}
+  .tag{display:inline-block;font-size:9px;letter-spacing:.12em;padding:2px 7px;border-radius:6px;margin-bottom:8px;border:1px solid var(--accent);color:var(--accent)}
+  .desc{font-size:12px;line-height:1.55;color:#bed1ee}.use{margin-top:8px;font-size:11px;line-height:1.45;color:var(--dim)}.use b{color:var(--gold);font-weight:400}
+  .foot{text-align:center;color:rgba(143,168,204,.72);font-size:11px;line-height:1.7;margin-top:28px}
+
+  #viewer{display:none}.viewer-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px}.viewer-head .titles{flex:1}.viewer-head h2{margin:0 0 5px;font-size:21px;letter-spacing:.06em}.viewer-head p{margin:0;color:var(--dim);font-size:12px;line-height:1.55}
+  .workbench{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(300px,.9fr);gap:14px;align-items:start}
+  .stagebox,.sidebox{background:rgba(8,24,50,.78);border:1px solid rgba(120,180,255,.23);border-radius:14px;overflow:hidden}
+  .stagebar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;padding:10px 12px;background:rgba(15,38,72,.82);border-bottom:1px solid rgba(120,180,255,.18)}
+  .stagebar label{font-size:11px;color:var(--dim);display:flex;align-items:center;gap:7px}.stagebar select,.stagebar input{color:var(--ink);background:#0a1e3d;border:1px solid rgba(120,180,255,.34);border-radius:7px;padding:7px 9px}
+  .stagebar input[type=number]{width:76px}.stagebar input[type=range]{padding:0;width:105px;accent-color:var(--gold)}
+  .stage{position:relative;min-height:430px;padding:8px}.stage svg{display:block;width:100%;height:auto;max-height:470px}
+  .status{min-height:58px;padding:10px 14px;border-top:1px solid rgba(120,180,255,.18);font-size:12.5px;line-height:1.55;color:#cfe0ff}.status b{color:var(--gold)}
+  .sidebox{display:flex;flex-direction:column}.panel-title{padding:10px 13px;color:var(--gold);font-size:11px;letter-spacing:.12em;border-bottom:1px solid rgba(120,180,255,.16)}
+  .explain{padding:12px 14px;font-size:12px;line-height:1.6;color:#cfe0ff;min-height:120px}.explain ul{margin:5px 0 0;padding-left:19px}.explain li{margin:4px 0}.explain .good{color:var(--green)}.explain .bad{color:#ffb3b3}.explain .key{color:var(--cyan)}
+  .code{margin:0;padding:10px 0 12px;background:#0b1425;overflow:auto;font-size:12px;line-height:1.55;min-height:170px}
+  .line{display:flex;padding:1px 12px;white-space:pre}.line .ln{width:24px;text-align:right;margin-right:11px;color:#596f90;flex:none}.line.on{background:rgba(255,179,64,.14);box-shadow:inset 3px 0 0 var(--gold)}.line.on .ln{color:var(--gold)}
+  .kw{color:#c792ea}.fn{color:var(--gold)}.cm{color:#6882a7}.num{color:#ff8d7b}
+  .tracebox{padding:11px 13px;border-top:1px solid rgba(120,180,255,.16);font-size:11.5px;line-height:1.55;color:var(--dim);min-height:88px}.tracebox b{color:var(--cyan)}
+  .controls{display:flex;justify-content:center;align-items:center;gap:9px;flex-wrap:wrap;margin:14px 0 5px}.progress{width:min(820px,100%);height:4px;margin:10px auto 0;background:rgba(120,180,255,.15);border-radius:2px;overflow:hidden}.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--green));transition:width .2s}
+  .legend{display:flex;justify-content:center;gap:17px;flex-wrap:wrap;margin-top:10px;font-size:10.5px;color:var(--dim)}.legend span{display:flex;align-items:center;gap:6px}.sw{width:12px;height:12px;border-radius:4px;border:2px solid currentColor}
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:8px}.compare>div{min-width:0}.compare h3{text-align:center;margin:6px 0 0;font-size:12px;color:var(--cyan)}
+  .checks{display:grid;gap:7px;margin-top:5px}.check{display:flex;gap:8px;align-items:flex-start}.check strong{width:20px}.yes{color:var(--green)}.no{color:var(--red)}
+  .sequence{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px}.token{min-width:28px;text-align:center;padding:4px 7px;border-radius:7px;border:1px solid rgba(120,180,255,.3);color:#cfe0ff}.token.done{border-color:var(--green);color:#c9ffe9;background:rgba(46,230,160,.10)}.token.current{border-color:var(--gold);color:#ffe2b0;background:rgba(255,179,64,.13)}
+  .node{transition:all .28s}.node circle{fill:#102744;stroke:#6c8fba;stroke-width:2}.node text{fill:var(--ink);font-size:15px;font-weight:700;text-anchor:middle;dominant-baseline:middle;pointer-events:none}.node.subtle{opacity:.18}.node.active circle{fill:#51371a;stroke:var(--gold);stroke-width:4;filter:drop-shadow(0 0 8px rgba(255,179,64,.8))}.node.visited circle{fill:#123d36;stroke:var(--green);stroke-width:3}.node.bad circle{fill:#4a202b;stroke:var(--red);stroke-width:4}.node.selected circle{fill:#153f50;stroke:var(--cyan);stroke-width:4}.edge{stroke:#7393bc;stroke-width:2;transition:.25s}.edge.subtle{opacity:.16}.edge.active{stroke:var(--gold);stroke-width:4}.edge.good{stroke:var(--green);stroke-width:3}.level-line{stroke:rgba(120,180,255,.16);stroke-dasharray:5 6}.svg-label{fill:var(--dim);font-size:11px}.arrow-label{fill:var(--gold);font-size:12px;font-weight:700}.range-label{fill:var(--cyan);font-size:10px}
+  .emptytree{display:grid;place-items:center;min-height:400px;color:var(--dim)}
+  @media(max-width:850px){.workbench{grid-template-columns:1fr}.stage{min-height:380px}.sidebox{display:grid;grid-template-columns:1fr 1fr}.sidebox .panel-title{grid-column:1/-1}.tracebox{border-top:0;border-left:1px solid rgba(120,180,255,.16)}}
+  @media(max-width:600px){.bar{padding:9px}.brand{font-size:12px}.crumb{display:none}.page{padding:15px 10px 35px}h1{font-size:23px}.viewer-head{display:block}.viewer-head .btn{margin-bottom:10px}.sidebox{display:flex}.stage{min-height:310px;padding:2px}.stagebar{align-items:stretch}.stagebar label{width:100%;justify-content:space-between}.compare{grid-template-columns:1fr}.btn{padding:9px 11px}.secthead{display:block}.secthead .d{display:block;margin-top:5px}}
+  @media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header class="bar">
+  <span class="brand">IS115 · W6 <span>BINARY TREES</span></span>
+  <button class="btn" id="home" style="display:none">◀ All visualizers</button>
+  <span class="crumb" id="crumb"></span><span class="spacer"></span>
+  <button class="btn" id="prev" style="display:none" aria-label="Previous visualizer">◀</button>
+  <button class="btn" id="next" style="display:none" aria-label="Next visualizer">▶</button>
+</header>
+
+<main class="page">
+  <section id="gallery">
+    <h1>BINARY TREES VISUAL LAB</h1>
+    <div class="sub">NINE STEP-BY-STEP VISUALIZERS · BASED ON THE WEEK 6 LECTURE SLIDES</div>
+    <div id="sections"></div>
+    <div class="foot">Start with Tree Anatomy, then move from traversal to BST operations.<br>Keyboard: <b>←</b> and <b>→</b> step through an open visualizer · <b>Esc</b> returns here.</div>
+  </section>
+
+  <section id="viewer" aria-live="polite">
+    <div class="viewer-head">
+      <div class="titles"><h2 id="viewTitle"></h2><p id="viewDesc"></p></div>
+    </div>
+    <div class="workbench">
+      <div class="stagebox">
+        <div class="stagebar" id="stagebar"></div>
+        <div class="stage" id="stage"></div>
+        <div class="status" id="status"></div>
+      </div>
+      <aside class="sidebox">
+        <div class="panel-title">HOW TO THINK</div>
+        <div class="explain" id="explain"></div>
+        <div class="panel-title">PSEUDOCODE / RULE</div>
+        <pre class="code" id="code"></pre>
+        <div class="tracebox" id="trace"></div>
+      </aside>
+    </div>
+    <div class="progress"><i id="bar"></i></div>
+    <div class="controls" id="controls"></div>
+    <div class="legend"><span style="color:var(--gold)"><i class="sw"></i>current</span><span style="color:var(--green)"><i class="sw"></i>completed / valid</span><span style="color:var(--red)"><i class="sw"></i>problem</span><span style="color:var(--cyan)"><i class="sw"></i>selected</span></div>
+  </section>
+</main>
+
+<script>
+const SECTIONS=[
+ {name:'1 · TREE FOUNDATIONS',hint:'read a tree correctly before running any algorithm',accent:'#2ee6a0',items:[
+  {id:'anatomy',ico:'🌳',t:'Tree Anatomy',tag:'PART 1 · SLIDES 12–16',d:'Root, leaf, parent, child, sibling, ancestor, descendant, subtree, level and height.',u:'Learning the vocabulary and reading a diagram.'},
+  {id:'types',ico:'🔷',t:'Types of Binary Tree',tag:'PART 1 · SLIDES 17–18',d:'Compare full, complete and perfect binary trees using the exact lecture definitions.',u:'Avoiding confusion between the three shapes.'},
+  {id:'links',ico:'🔗',t:'Nodes and Links',tag:'PART 1 · SLIDES 20–22',d:'Watch setRoot, setLeft, setRight and delRight change references in a tree.',u:'Connecting object operations to the diagram.'}
+ ]},
+ {name:'2 · WALK THROUGH A TREE',hint:'the same tree produces three different visit orders',accent:'#3fd0ff',items:[
+  {id:'traversal',ico:'🚶',t:'Tree Traversal',tag:'PART 1 · SLIDES 23–29',d:'Run preorder, inorder and postorder with the active recursive call and visit sequence visible.',u:'Knowing exactly when a node is visited.'}
+ ]},
+ {name:'3 · BINARY SEARCH TREES',hint:'ordering lets every comparison discard an entire subtree',accent:'#ffb340',items:[
+  {id:'bst-rule',ico:'⚖️',t:'The BST Rule',tag:'PART 2 · SLIDES 3–5',d:'Check the recursive ordering rule at every node, not only at the root.',u:'Deciding whether a binary tree is a BST.'},
+  {id:'search',ico:'🔍',t:'Search a BST',tag:'PART 2 · SLIDES 7–8',d:'Compare the key, choose one subtree, and stop when the key is found or the path ends.',u:'Tracing searchbst one comparison at a time.'},
+  {id:'insert',ico:'➕',t:'Insert into a BST',tag:'PART 2 · SLIDES 9–10',d:'Follow the search path; the first missing link is the insertion position.',u:'Preserving BST order during insertion.'},
+  {id:'remove',ico:'✂️',t:'Remove from a BST',tag:'PART 2 · SLIDES 11–15',d:'See the three cases: leaf, one child, and two children.',u:'Rewiring links without breaking BST order.'},
+  {id:'efficiency',ico:'📈',t:'Shape and Efficiency',tag:'PART 2 · SLIDE 16',d:'Compare balanced and skewed BSTs using height and number of comparisons.',u:'Explaining why BST operations are O(h).'}
+ ]}
+];
+const ITEMS=SECTIONS.flatMap(s=>s.items.map(x=>({...x,section:s.name,accent:s.accent})));
+const $=id=>document.getElementById(id);
+let current=-1,step=0,steps=[],timer=null,activeModule='';
+
+function drawGallery(){
+ $('sections').innerHTML=SECTIONS.map(s=>`<section class="sect"><div class="secthead"><span class="n">${s.name}</span><span class="d">${s.hint}</span></div><div class="grid">${s.items.map(it=>{const n=ITEMS.findIndex(x=>x.id===it.id)+1;return `<button class="card" data-id="${it.id}" style="--accent:${s.accent}"><span class="no">${String(n).padStart(2,'0')}</span><div class="row"><span class="ico">${it.ico}</span><span class="ttl">${it.t}</span></div><span class="tag">${it.tag}</span><div class="desc">${it.d}</div><div class="use"><b>Use it for:</b> ${it.u}</div></button>`}).join('')}</div></section>`).join('');
+ document.querySelectorAll('.card').forEach(c=>c.onclick=()=>openModule(c.dataset.id));
+}
+function openModule(id){
+ stop();activeModule=id;current=ITEMS.findIndex(x=>x.id===id);step=0;
+ const it=ITEMS[current];$('gallery').style.display='none';$('viewer').style.display='block';$('home').style.display='';$('prev').style.display='';$('next').style.display='';
+ $('crumb').innerHTML=`<b>${it.ico} ${it.t}</b> &nbsp;·&nbsp; ${it.tag}`;$('viewTitle').textContent=`${it.ico} ${it.t}`;$('viewDesc').textContent=it.d;
+ MODULES[id].init();render();window.scrollTo({top:0,behavior:'smooth'});
+}
+function goHome(){stop();$('viewer').style.display='none';$('gallery').style.display='';$('home').style.display='none';$('prev').style.display='none';$('next').style.display='none';$('crumb').textContent='';window.scrollTo({top:0,behavior:'smooth'})}
+function stop(){if(timer)clearInterval(timer);timer=null;const p=$('play');if(p)p.textContent='▶ Play'}
+function move(d){stop();step=Math.max(0,Math.min(steps.length-1,step+d));render()}
+function play(){if(timer){stop();return}if(step>=steps.length-1)step=0;const p=$('play');if(p)p.textContent='❚❚ Pause';timer=setInterval(()=>{if(step>=steps.length-1){stop();return}step++;render()},850)}
+function baseControls(extra=''){return `<button class="btn" id="back">◀ Step</button><button class="btn primary" id="play">▶ Play</button><button class="btn" id="forward">Step ▶</button><button class="btn" id="reset">↻ Reset</button>${extra}`}
+function wireControls(){const b=$('back'),f=$('forward'),p=$('play'),r=$('reset');if(b)b.onclick=()=>move(-1);if(f)f.onclick=()=>move(1);if(p)p.onclick=play;if(r)r.onclick=()=>{stop();step=0;render()};if(b)b.disabled=step===0;if(f)f.disabled=step===steps.length-1}
+function setProgress(){ $('bar').style.width=steps.length>1?(100*step/(steps.length-1))+'%':'0%' }
+function codeLines(lines,on=[]){return lines.map((x,i)=>`<span class="line${on.includes(i+1)?' on':''}"><span class="ln">${i+1}</span><span>${x}</span></span>`).join('')}
+function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+
+function layout(root){
+ const nodes=[],edges=[];let ix=0,maxDepth=0;
+ function walk(n,d,parent){if(!n)return;walk(n.left,d+1,n);n._ix=ix++;n._d=d;nodes.push(n);maxDepth=Math.max(maxDepth,d);if(parent)edges.push([parent,n]);walk(n.right,d+1,n)}walk(root,0,null);
+ const span=Math.max(1,ix-1);nodes.forEach(n=>{n._x=span?70+n._ix*(620/span):380;n._y=65+n._d*105});return{nodes,edges,maxDepth};
+}
+function treeSVG(root,opt={}){
+ if(!root)return '<div class="emptytree">The tree is empty.</div>';
+ const {nodes,edges,maxDepth}=layout(root),active=new Set(opt.active||[]),visited=new Set(opt.visited||[]),subtle=new Set(opt.subtle||[]),bad=new Set(opt.bad||[]),selected=new Set(opt.selected||[]),activeEdges=new Set(opt.activeEdges||[]);
+ let s=`<svg viewBox="0 0 760 ${Math.max(330,115+maxDepth*105)}" role="img" aria-label="${esc(opt.label||'Binary tree diagram')}">`;
+ if(opt.levels){for(let d=0;d<=maxDepth;d++)s+=`<line class="level-line" x1="45" y1="${65+d*105}" x2="720" y2="${65+d*105}"/><text class="svg-label" x="7" y="${69+d*105}">level ${d+1}</text>`}
+ edges.forEach(([a,b])=>{const k=a.v+'-'+b.v,cl=['edge'];if(subtle.has(a.v)||subtle.has(b.v))cl.push('subtle');if(activeEdges.has(k))cl.push('active');if(visited.has(a.v)&&visited.has(b.v))cl.push('good');s+=`<line class="${cl.join(' ')}" x1="${a._x}" y1="${a._y+24}" x2="${b._x}" y2="${b._y-24}"/>`});
+ nodes.forEach(n=>{const cl=['node'];if(subtle.has(n.v))cl.push('subtle');if(visited.has(n.v))cl.push('visited');if(active.has(n.v))cl.push('active');if(bad.has(n.v))cl.push('bad');if(selected.has(n.v))cl.push('selected');s+=`<g class="${cl.join(' ')}" data-v="${esc(n.v)}"><circle cx="${n._x}" cy="${n._y}" r="25"/><text x="${n._x}" y="${n._y+1}">${esc(n.v)}</text>${opt.ranges&&opt.ranges[n.v]?`<text class="range-label" x="${n._x}" y="${n._y+40}" text-anchor="middle">${esc(opt.ranges[n.v])}</text>`:''}</g>`});
+ if(opt.annotations)(opt.annotations||[]).forEach(a=>s+=`<text class="arrow-label" x="${a.x}" y="${a.y}" text-anchor="${a.anchor||'middle'}">${esc(a.text)}</text>`);
+ return s+'</svg>';
+}
+function n(v,left=null,right=null){return{v:String(v),left,right}}
+function clone(t){return t?{v:t.v,left:clone(t.left),right:clone(t.right)}:null}
+function findNode(t,v){if(!t)return null;if(String(t.v)===String(v))return t;return findNode(t.left,v)||findNode(t.right,v)}
+function insertNode(t,val){if(!t)return n(val);if(+val<+t.v)t.left=insertNode(t.left,val);else if(+val>+t.v)t.right=insertNode(t.right,val);return t}
+function fromSeq(a){let t=null;a.forEach(v=>t=insertNode(t,v));return t}
+function height(t){return t?1+Math.max(height(t.left),height(t.right)):0}
+
+const sample=n('A',n('B',n('D'),n('E')),n('C',n('F'),n('G')));
+const bstBase=fromSeq([40,20,60,10,30,50,70,25,35,55]);
+
+const MODULES={
+ anatomy:{init(){
+   steps=['A','B','E','C'];$('stagebar').innerHTML=`<label>SELECT NODE <select id="nodePick"><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option></select></label>`;
+   $('controls').innerHTML=baseControls();$('nodePick').onchange=e=>{step=steps.indexOf(e.target.value);if(step<0)step=0;render()};
+ },render(){const v=steps[step],info={A:['root','no parent','children B and C','ancestor of every other node','subtree = entire tree'],B:['internal node','parent A','children D and E','sibling C','descendant of A'],E:['leaf node','parent B','no children','sibling D','ancestors B and A'],C:['internal node','parent A','children F and G','sibling B','subtree C–F–G']}[v];$('nodePick').value=v;
+   $('stage').innerHTML=treeSVG(clone(sample),{selected:[v],levels:true,label:'Binary tree with levels and selected node '+v});
+   $('status').innerHTML=`Selected <b>${v}</b>. Follow the links upward for ancestors and downward for descendants.`;
+   $('explain').innerHTML=`<ul>${info.map(x=>`<li>${x}</li>`).join('')}</ul><p><span class="key">Height = 3</span> because the deepest nodes are at level 3. The root is at level 1; an empty tree has height 0.</p>`;
+   $('code').innerHTML=codeLines(['tree = root + zero or more subtrees','binary tree: each node has at most 2 children','height = maximum level of any node'],[step===0?1:3]);
+   $('trace').innerHTML='<b>Recursive idea:</b> each child is the root of a smaller subtree.';setProgress();wireControls();
+ }},
+ types:{init(){steps=['full','complete','perfect','neither'];$('stagebar').innerHTML=`<label>EXAMPLE <select id="typePick"><option value="full">Full, not complete</option><option value="complete">Complete, not full</option><option value="perfect">Perfect</option><option value="neither">Neither</option></select></label>`;$('controls').innerHTML=baseControls();$('typePick').onchange=e=>{step=steps.indexOf(e.target.value);render()};},
+ render(){const kind=steps[step];$('typePick').value=kind;const trees={
+  full:n('A',n('B'),n('C',n('F'),n('G'))),
+  complete:n('A',n('B',n('D'),n('E')),n('C',n('F'),null)),
+  perfect:n('A',n('B',n('D'),n('E')),n('C',n('F'),n('G'))),
+  neither:n('A',n('B',null,n('D')),n('C',n('E'),null))};
+ const truth={full:[true,false,false],complete:[false,true,false],perfect:[true,true,true],neither:[false,false,false]}[kind];
+ $('stage').innerHTML=treeSVG(trees[kind],{levels:true,label:kind+' binary tree example'});
+ const rows=[['FULL','Every node has exactly 0 or 2 children.'],['COMPLETE','All earlier levels are full; deepest-level nodes are as far left as possible.'],['PERFECT','Every internal node has 2 children and every leaf is at the same depth.']];
+ $('status').innerHTML=`This tree is <b>${rows.filter((_,i)=>truth[i]).map(x=>x[0]).join(', ')||'none of the three types'}</b>.`;
+ $('explain').innerHTML=`<div class="checks">${rows.map((x,i)=>`<div class="check"><strong class="${truth[i]?'yes':'no'}">${truth[i]?'✓':'✗'}</strong><span><b>${x[0]}</b><br>${x[1]}</span></div>`).join('')}</div>`;
+ $('code').innerHTML=codeLines(['FULL: each node has 0 or 2 children','COMPLETE: last level fills from left to right','PERFECT: all leaves have the same depth','         and every internal node has 2 children'],[step+1>3?0:step+1]);
+ $('trace').innerHTML='<b>Important:</b> a perfect tree is both full and complete, but a full tree is not necessarily perfect.';setProgress();wireControls();
+ }},
+ links:{init(){steps=[0,1,2,3,4,5,6];$('stagebar').innerHTML='<span style="font-size:11px;color:var(--dim)">BUILD THE TREE ONE REFERENCE AT A TIME</span>';$('controls').innerHTML=baseControls();},
+ render(){const actions=[['Create nodes only',null],['t.setRoot(A)','A'],['A.setLeft(B)','B'],['A.setRight(C)','C'],['B.setLeft(D)','D'],['C.setRight(E)','E'],['C.delRight()','C']];let root=null;if(step>=1)root=n('A');if(step>=2)root.left=n('B');if(step>=3)root.right=n('C');if(step>=4)root.left.left=n('D');if(step>=5)root.right.right=n('E');
+ if(step>=6)root.right.right=null;$('stage').innerHTML=root?treeSVG(root,{active:[actions[step][1]],label:'Tree being built with node references'}):'<div class="emptytree">Nodes A, B, C, D and E exist, but no root has been set.</div>';
+ const code=['A = Node("A")','B = Node("B")','C = Node("C")','D = Node("D")','E = Node("E")','t = BinaryTree()','t.setRoot(A)','A.setLeft(B)','A.setRight(C)','B.setLeft(D)','C.setRight(E)','C.delRight()'];const hi=[step===0?1:step+6];
+ $('status').innerHTML=`Step ${step+1}: <b>${actions[step][0]}</b>`;$('explain').innerHTML='<ul><li>A node stores a value and two references: <b>left</b> and <b>right</b>.</li><li>A missing child reference is <b>None</b>.</li><li><code>setLeft</code> and <code>setRight</code> change the parent’s reference.</li><li><code>delRight()</code> removes the link from the parent.</li></ul>';$('code').innerHTML=codeLines(code,hi);$('trace').innerHTML=step===6?'<b>Result:</b> E still existed as an object, but it is no longer linked into tree t.':'The diagram changes only when a root or child reference is set.';setProgress();wireControls();
+ }},
+ traversal:{mode:'pre',init(){this.rebuild('pre');$('stagebar').innerHTML=`<label>ORDER <select id="travMode"><option value="pre">Preorder</option><option value="in">Inorder</option><option value="post">Postorder</option></select></label>`;$('controls').innerHTML=baseControls();$('travMode').onchange=e=>{stop();this.rebuild(e.target.value);step=0;render()};},
+ rebuild(mode){this.mode=mode;steps=[];const out=[],stack=[];const visitLine={pre:3,in:4,post:5}[mode];function walk(x){if(!x)return;stack.push(x.v);steps.push({at:x.v,line:2,out:[...out],stack:[...stack],msg:`Call ${mode}(${x.v})`});if(mode==='pre'){out.push(x.v);steps.push({at:x.v,line:3,out:[...out],stack:[...stack],msg:`Visit ${x.v} before its children`})}if(x.left){steps.push({at:x.v,line:mode==='pre'?4:3,out:[...out],stack:[...stack],edge:x.v+'-'+x.left.v,msg:`Go to the left subtree of ${x.v}`});walk(x.left)}if(mode==='in'){out.push(x.v);steps.push({at:x.v,line:4,out:[...out],stack:[...stack],msg:`Visit ${x.v} between left and right`})}if(x.right){steps.push({at:x.v,line:mode==='post'?4:5,out:[...out],stack:[...stack],edge:x.v+'-'+x.right.v,msg:`Go to the right subtree of ${x.v}`});walk(x.right)}if(mode==='post'){out.push(x.v);steps.push({at:x.v,line:5,out:[...out],stack:[...stack],msg:`Visit ${x.v} after both children`})}stack.pop();steps.push({at:x.v,line:6,out:[...out],stack:[...stack],msg:`Return from ${x.v}`})}walk(clone(sample));this.final=out;},
+ render(){const st=steps[step],visited=st.out;$('stage').innerHTML=treeSVG(clone(sample),{active:[st.at],visited,activeEdges:st.edge?[st.edge]:[],label:this.mode+' traversal animation'});$('status').innerHTML=`<b>${st.msg}</b><div class="sequence">${this.final.map(v=>`<span class="token ${visited.includes(v)?'done':''} ${v===st.at&&visited[visited.length-1]===v?'current':''}">${v}</span>`).join('')}</div>`;
+ const names={pre:'Parent → Left → Right',in:'Left → Parent → Right',post:'Left → Right → Parent'};$('explain').innerHTML=`<p><b>${this.mode.toUpperCase()}:</b> ${names[this.mode]}</p><ul><li>The recursive calls determine where we travel.</li><li>The position of <code>visit(node)</code> determines the output order.</li><li>Each node is visited exactly once.</li></ul>`;
+ const lines=['def traverse(node):','  if node != None:',this.mode==='pre'?'    visit(node)':'    traverse(node.left)',this.mode==='in'?'    visit(node)':(this.mode==='pre'?'    traverse(node.left)':'    traverse(node.right)'),this.mode==='post'?'    visit(node)':'    traverse(node.right)','  return'];$('code').innerHTML=codeLines(lines,[st.line]);$('trace').innerHTML=`<b>Call stack:</b> ${st.stack.length?st.stack.join(' → '):'empty'}<br><b>Visited:</b> ${visited.join(' → ')||'none yet'}`;setProgress();wireControls();
+ }},
+ 'bst-rule':{caseId:'valid',init(){steps=['valid','root-only','deep'];$('stagebar').innerHTML=`<label>EXAMPLE <select id="bstCase"><option value="valid">Valid BST</option><option value="root-only">Fails at the root</option><option value="deep">Deep violation</option></select></label>`;$('controls').innerHTML=baseControls();$('bstCase').onchange=e=>{step=steps.indexOf(e.target.value);render()};},
+ render(){const k=steps[step];$('bstCase').value=k;const trees={valid:fromSeq([40,20,60,10,30,50,70]),'root-only':n(40,n(55),n(60)),'deep':n(40,n(20,n(10),n(45)),n(60,n(50),n(70)))};const ranges={40:'(-∞, +∞)',20:'(-∞, 40)',60:'(40, +∞)',10:'(-∞, 20)',30:'(20, 40)',50:'(40, 60)',70:'(60, +∞)',55:'(-∞, 40)',45:'(20, 40)'};const bad=k==='root-only'?['55']:k==='deep'?['45']:[];$('stage').innerHTML=treeSVG(trees[k],{bad,ranges,label:'BST rule example with allowed ranges'});const ok=!bad.length;$('status').innerHTML=ok?'<b>Valid BST.</b> Every node obeys the ordering rule recursively.':`<b>Not a BST.</b> Node ${bad[0]} is outside its allowed range.`;$('explain').innerHTML='<ul><li>Every value in a node’s <b>left subtree</b> must be smaller.</li><li>Every value in its <b>right subtree</b> must be larger.</li><li>The left and right subtrees must themselves be BSTs.</li></ul>';$('code').innerHTML=codeLines(['for every node r:','  every key in r.left  < r.key','  every key in r.right > r.key','  apply the same rule to both subtrees'],ok?[1,2,3,4]:[2,3]);$('trace').innerHTML=k==='deep'?'<b>Why 45 fails:</b> 45 is greater than its parent 20, so a parent-only check would accept it. However, 45 is inside the left subtree of 40, so it must be less than 40.':'Ranges under nodes show all limits inherited from ancestors.';setProgress();wireControls();
+ }},
+ search:{target:55,init(){this.rebuild(55);$('stagebar').innerHTML=`<label>TARGET <select id="searchTarget"><option>55</option><option>25</option><option>65</option><option>90</option></select></label>`;$('controls').innerHTML=baseControls();$('searchTarget').onchange=e=>{stop();this.rebuild(+e.target.value);step=0;render()};},
+ rebuild(target){this.target=target;steps=[];let cur=clone(bstBase),visited=[],discarded=[];const values=t=>t?[t.v,...values(t.left),...values(t.right)]:[];while(cur){visited.push(cur.v);const cmp=target===+cur.v?'equal':target<+cur.v?'smaller':'larger';if(cmp==='smaller')discarded.push(...values(cur.right));if(cmp==='larger')discarded.push(...values(cur.left));steps.push({at:cur.v,visited:[...visited],discarded:[...new Set(discarded)],cmp,line:cmp==='equal'?2:cmp==='smaller'?4:6,msg:cmp==='equal'?`${target} equals ${cur.v}: found!`:`${target} is ${cmp} than ${cur.v}: go ${cmp==='smaller'?'left':'right'}`});if(cmp==='equal')break;cur=cmp==='smaller'?cur.left:cur.right}if(!cur)steps.push({at:null,visited:[...visited],discarded:[...new Set(discarded)],cmp:'missing',line:8,msg:'The required child is None: the key is not in the tree.'});},
+ render(){const st=steps[step];$('stage').innerHTML=treeSVG(clone(bstBase),{active:st.at?[st.at]:[],visited:st.visited.slice(0,-1),subtle:st.discarded,label:'Binary search tree search path'});$('status').innerHTML=`Comparison ${Math.min(step+1,st.visited.length)}: <b>${st.msg}</b>`;$('explain').innerHTML='<ul><li>Start at the root.</li><li>If the target is smaller, only search the left subtree.</li><li>If larger, only search the right subtree.</li><li>Stop when found or when the required child is <code>None</code>.</li></ul>';$('code').innerHTML=codeLines(['def searchbst(root, key):','  if root.value == key: return root','  elif root.left != None and key < root.value:','    return searchbst(root.left, key)','  elif root.right != None and key > root.value:','    return searchbst(root.right, key)','  else:','    return None'],[st.line]);$('trace').innerHTML=`<b>Path:</b> ${st.visited.join(' → ')}<br><b>Comparisons so far:</b> ${st.visited.length}<br>Faded nodes belong to discarded subtrees.`;setProgress();wireControls();
+ }},
+ insert:{key:34,init(){this.rebuild(34);$('stagebar').innerHTML=`<label>INSERT <select id="insertKey"><option>34</option><option>5</option><option>65</option><option>80</option></select></label>`;$('controls').innerHTML=baseControls();$('insertKey').onchange=e=>{stop();this.rebuild(+e.target.value);step=0;render()};},
+ rebuild(key){this.key=key;const base=fromSeq([40,20,60,10,30,50,70,25,35]);steps=[];let cur=base,path=[];while(cur){path.push(cur.v);if(key===+cur.v){steps.push({tree:clone(base),at:cur.v,path:[...path],line:2,msg:`${key} already exists; do not insert a duplicate.`});this.final=base;return}const dir=key<+cur.v?'left':'right';steps.push({tree:clone(base),at:cur.v,path:[...path],line:dir==='left'?3:7,msg:`${key} ${dir==='left'?'<':'>'} ${cur.v}: follow the ${dir} link.`});if(!cur[dir]){const before=clone(base);cur[dir]=n(key);steps.push({tree:before,at:cur.v,path:[...path],line:dir==='left'?6:10,msg:`The ${dir} link is None. This is the insertion position.`});steps.push({tree:clone(base),at:String(key),path:[...path,String(key)],line:dir==='left'?6:10,msg:`Create node ${key} as the ${dir} child of ${cur.v}.`,inserted:true});this.final=base;return}cur=cur[dir]}},
+ render(){const st=steps[step];$('stage').innerHTML=treeSVG(st.tree,{active:[st.at],visited:st.path.slice(0,-1),label:'BST insertion path'});$('status').innerHTML=`<b>${st.msg}</b>`;$('explain').innerHTML='<ul><li>Insertion begins exactly like search.</li><li>At each node, choose only left or right.</li><li>When the required child is <code>None</code>, searching has failed.</li><li>Insert the new node at that missing link.</li></ul>';$('code').innerHTML=codeLines(['def insertbst(root, key):','  if root.value == key: return root','  elif key < root.value:','    if root.left != None:','      return insertbst(root.left, key)','    root.setLeft(Node(key))','  else:','    if root.right != None:','      return insertbst(root.right, key)','    root.setRight(Node(key))'],[st.line]);$('trace').innerHTML=`<b>Search path:</b> ${st.path.join(' → ')}${st.inserted?'<br><b>BST order is preserved.</b>':''}`;setProgress();wireControls();
+ }},
+ remove:{kind:'leaf',init(){this.rebuild('leaf');$('stagebar').innerHTML=`<label>CASE <select id="removeCase"><option value="leaf">Leaf node: remove 25</option><option value="one">One child: remove 50</option><option value="two">Two children: remove 20</option></select></label>`;$('controls').innerHTML=baseControls();$('removeCase').onchange=e=>{stop();this.rebuild(e.target.value);step=0;render()};},
+ rebuild(kind){this.kind=kind;const base=clone(bstBase);const cfg={leaf:{target:'25',replacement:null},one:{target:'50',replacement:'55'},two:{target:'20',replacement:'25'}}[kind];steps=[{tree:clone(base),at:cfg.target,msg:`Find node ${cfg.target}.`,line:1}];if(kind==='leaf'){steps.push({tree:clone(base),at:'25',msg:'25 is a leaf: it has no children.',line:2});findNode(base,'30').left=null;steps.push({tree:clone(base),at:'30',msg:'Set the parent’s link to None.',line:3})}else if(kind==='one'){steps.push({tree:clone(base),at:'50',msg:'50 has one child, 55.',line:4});findNode(base,'60').left=findNode(base,'50').right;steps.push({tree:clone(base),at:'55',msg:'Let the parent 60 adopt child 55.',line:5})}else{steps.push({tree:clone(base),at:'20',msg:'20 has two children. Choose the left-most node of its right subtree.',line:6});steps.push({tree:clone(base),at:'25',msg:'25 is the inorder successor: the smallest value greater than 20.',line:7});findNode(base,'20').v='25';findNode(base,'30').left=null;steps.push({tree:clone(base),at:'25',msg:'Copy 25 into the target position, then remove the old 25 node.',line:8})}},
+ render(){const st=steps[step];$('removeCase').value=this.kind;$('stage').innerHTML=treeSVG(st.tree,{active:[st.at],label:'BST deletion '+this.kind+' case'});$('status').innerHTML=`<b>${st.msg}</b>`;$('explain').innerHTML='<ol><li><b>Leaf:</b> set the parent’s pointer to <code>None</code>.</li><li><b>One child:</b> let the parent adopt that child.</li><li><b>Two children:</b> replace using either the left-most node of the right subtree or the right-most node of the left subtree.</li></ol>';$('code').innerHTML=codeLines(['find the node n','if n is a leaf:','  parent link = None','else if n has one child:','  parent link = n.child','else:  # two children','  successor = left-most(n.right)','  replace n with successor'],[st.line]);$('trace').innerHTML='<b>Final check:</b> an inorder traversal of the resulting tree must still be sorted.';setProgress();wireControls();
+ }},
+ efficiency:{init(){steps=[0,1,2,3,4,5,6];$('stagebar').innerHTML='<span style="font-size:11px;color:var(--dim)">SEARCH FOR 7 IN TWO BSTs CONTAINING THE SAME VALUES</span>';$('controls').innerHTML=baseControls();},
+ render(){const balanced=fromSeq([4,2,6,1,3,5,7]),skewed=fromSeq([1,2,3,4,5,6,7]);const bp=['4','6','7'],sp=['1','2','3','4','5','6','7'];const bSeen=bp.slice(0,Math.min(bp.length,step+1)),sSeen=sp.slice(0,Math.min(sp.length,step+1));$('stage').innerHTML=`<div class="compare"><div><h3>BALANCED SHAPE · HEIGHT ${height(balanced)}</h3>${treeSVG(balanced,{active:[bSeen.at(-1)],visited:bSeen.slice(0,-1),label:'Balanced BST'})}</div><div><h3>SKEWED SHAPE · HEIGHT ${height(skewed)}</h3>${treeSVG(skewed,{active:[sSeen.at(-1)],visited:sSeen.slice(0,-1),label:'Skewed BST'})}</div></div>`;
+ const bd=Math.min(step+1,bp.length),sd=Math.min(step+1,sp.length);$('status').innerHTML=`Search for 7: balanced tree uses <b>${bd} comparison${bd===1?'':'s'}</b>; skewed tree uses <b>${sd} comparison${sd===1?'':'s'}</b>${step===6?' — both searches are complete.':''}`;$('explain').innerHTML='<ul><li>Search, insertion and deletion follow one root-to-node path.</li><li>Maximum comparisons are proportional to tree height <b>h</b>.</li><li>A shorter tree means fewer comparisons.</li><li>The insertion order determines the shape.</li></ul>';$('code').innerHTML=codeLines(['cost of BST operation = O(h)','balanced shape: h ≈ log₂(n)','  therefore cost ≈ O(log n)','linear / skewed shape: h = n','  therefore cost = O(n)'],step<3?[1,2,3]:[1,4,5]);$('trace').innerHTML='<b>Same values, different shape:</b><br>Balanced insertion: 4, 2, 6, 1, 3, 5, 7<br>Skewed insertion: 1, 2, 3, 4, 5, 6, 7';setProgress();wireControls();
+ }}
+};
+
+function render(){MODULES[activeModule].render()}
+$('home').onclick=goHome;$('prev').onclick=()=>openModule(ITEMS[(current-1+ITEMS.length)%ITEMS.length].id);$('next').onclick=()=>openModule(ITEMS[(current+1)%ITEMS.length].id);
+document.addEventListener('keydown',e=>{if(e.target.matches('input,select'))return;if(e.key==='Escape'&&current>=0)goHome();else if(e.key==='ArrowRight'&&current>=0)move(1);else if(e.key==='ArrowLeft'&&current>=0)move(-1);else if(e.key===' '&&current>=0){e.preventDefault();play()}});
+drawGallery();
+</script>
+</body>
+</html>
