@@ -14,7 +14,7 @@ import { watchHighlight } from '../course/highlight';
 
 const TAB_DEF: Record<string, [string, string, string]> = {
   theory: ['📖', 'Theory', ''], practice: ['🧠', 'Practice', ' Questions'], cards: ['🃏', 'Flashcards', ''],
-  cheat: ['📌', 'Cheat', '-sheet'], tut: ['✏️', 'Tutorials', ' & Exercises'], mock: ['🎯', 'Mock', ' Exams'], ice: ['✏️', 'ICE', ' Exercises'], past: ['📝', 'Past', ' Exam'],
+  cheat: ['📌', 'Cheat', '-sheet'], tut: ['✏️', 'Tutorials', ' & Exercises'], mock: ['🎯', 'Exam', ' Practice'], ice: ['✏️', 'ICE', ' Exercises'], past: ['📝', 'Past', ' Exam'],
 };
 
 const tabDef = (D: Data, t: string): [string, string, string] => { const x = D.tabs?.find((y) => y.key === t); return x ? [x.ico, x.label, x.x] : TAB_DEF[t]; };

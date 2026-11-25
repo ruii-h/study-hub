@@ -21,9 +21,13 @@ const FIX = [
 ];
 for (const [a, b] of FIX) { const n = md.split(a).length - 1; if (n !== 1) throw new Error('FIX matched ' + n + ' times: ' + a.slice(0, 50)); md = md.replace(a, () => b); }
 
+// second source: the three mock midterms and the actual midterm (items 4 to 7)
+let md2 = fs.readFileSync(path.join(here, 'midterms-src.md'), 'utf8').replace(/\r\n/g, '\n').replace(/\s*\(Your pick[^)]*\)/g, '');
+
 // ---- fenced blocks -> placeholders (so "# comment" lines inside code are not read as headings) ----
 const fences = [];
-md = md.replace(/```(\w*)\n([\s\S]*?)```/g, (m, lang, body) => { fences.push({ lang, body: body.replace(/\n$/, '') }); return `\n@@FENCE${fences.length - 1}@@\n`; });
+const fence = (t) => t.replace(/```(\w*)\n([\s\S]*?)```/g, (m, lang, body) => { fences.push({ lang, body: body.replace(/\n$/, '') }); return `\n@@FENCE${fences.length - 1}@@\n`; });
+md = fence(md); md2 = fence(md2);
 
 // ---- inline markdown ----
 const inline = (s) => {
@@ -57,6 +61,7 @@ function blocks(lines) {
       }
       out.push({ t: 'list', ord, items }); continue;
     }
+    if (/^\(Q\d+[^)]*(screenshot|written-response)/.test(l.trim())) { i++; continue; }
     const p = [l.trim()]; i++;
     while (i < lines.length && lines[i].trim() && !/^(\||>|#{3,4}\s|\s*([-*]|\d+\.)\s|@@FENCE|---+$)/.test(lines[i])) p.push(lines[i++].trim());
     out.push({ t: 'p', text: p.join(' ') });
@@ -88,7 +93,12 @@ function render(b, hideMarks) {
 
 // ---- where the question ends and the answer begins ----
 const ANS = /^(\*\*(Answer|Why|Working|Check|Approach|Idea|Best|One valid|How each|Trace|Tour|Step|The project|Number|Option [1-3] –|Counter|Each|Fix|Path)|Working:|Check:|Rule:|Why|Greedy criterion|Iteration|\(Iteration|Distances? |Input:|Step )/;
+const hasMark = (b) => b.t === 'list' && b.items.some((x) => MARK.test(x.text));
 const firstAnswer = (bl) => {
+  const b0 = bl[0];
+  if (!b0) return 0;
+  if (b0.t === 'p' && ANS.test(b0.text)) return 0;                        // the body starts with the answer
+  if (b0.t === 'list' && (b0.items.length === 1 || !b0.items.some((x) => MARK.test(x.text)))) return 0; // a bare list is the typed answer
   for (let k = 1; k < bl.length; k++) {
     const b = bl[k];
     if (b.t === 'p' && ANS.test(b.text)) return k;
@@ -100,12 +110,24 @@ const firstAnswer = (bl) => {
 const SPLIT = {
   '1.9': 2, '1.10': 1, '1.11': 1, '1.12': 2, '1.13': 0, '1.14': 0, '1.15': 0, '1.16': 0, '1.17': 0, '1.18': 0, '1.19': 2, '1.21': 0, '1.22': 0,
   '2.4': 1, '2.5': 0, '2.6': 0, '2.7': 0, '2.11': 2, '2.12': 0, '2.13': 0, '2.14': 0, '2.18': 5, '2.19': 6, '2.20': 0, '2.21': 0,
+  '4.6': 0, '5.10': 1, '5.16': 0, '6.6': 3, '6.14': 3, '6.15': 0, '5.1': 11, '7.1': 3, '7.2': 2, '7.3': 2, '7.4': 2, '7.6': 1, '7.9': 1, '7.11': 1, '7.14': 1, '7.22': 1, '7.23': 2, '7.24': 1, '7.25': 1, '7.27': 3, '7.28': 2, '7.29': 2, '7.33': 2, '7.34': 2, '7.37': 1,
   '3.1': 1, '3.3': 2, '3.4': 8, '3.5': 0, '3.8': 2, '3.10': 1, '3.11': 0, '3.14': 0, '3.15': 2, '3.17': 1, '3.18': 5, '3.19': 2, '3.22': 1, '3.23': 5, '3.24': 0,
 };
 // blocks removed (key -> indexes into the block list): the old mermaid / text description of a picture that is now drawn
-const DROP = { '1.5': [1], '1.16': [1], '3.8': [2, 3] };
+const DROP = { '7.13': [3, 4], '1.5': [1], '1.16': [1], '3.8': [2, 3] };
 // reorder blocks (key -> new order of the original indexes, applied after DROP)
-const ORDER = { '3.19': [0, 2, 1] };
+const ORDER = {
+  '3.19': [0, 2, 1],
+  // the four rotated seatings and the options first, the working after
+  '5.1': (bl) => [...bl.slice(0, 10), bl[13], ...bl.slice(10, 13), ...bl.slice(14)],
+  '7.33': [0, 2, 1, 3],
+  '7.37': [2, 0, 1],
+  // question tree without the shading / the new node; the shaded one moves into the answer
+  '7.34': (bl) => { const f = bl[0]; const clean = { ...f, body: f.body.split('\n').filter((l) => !/^\s*style |n60 -\.->/.test(l)).join('\n') }; return [clean, bl[2], f, bl[1], bl[3]]; },
+};
+const RAW = {};
+const QXPRE = { '7.14': () => BSEARCH(), '7.15': () => BSEARCH() }; // shown before the options
+const BSEARCH = (key) => { const r = RAW['7.13']; return r ? render(r[3]) + render(r[4]) : ''; };
 // figures injected at the end of the question part
 const FIG = { '1.5': curveFig(), '1.16': topoFig(), '3.8': ringsFig(), '3.22': vennFig() };
 // short subheaders for the questions that have no title in the source
@@ -148,28 +170,34 @@ const QX = {
   '3.15': P('Fill in the blanks (a) to (d) of this level-by-level (breadth-first) traversal.')
     + blank('def level_by_level_traverse(root):\n    q = Queue()\n    visit(root)\n    q.enqueue(root)\n\n    while q.count() > 0:\n        node = q.dequeue()\n        if node.left != None:\n            ______    # (a)\n            ______    # (b)\n        if node.right != None:\n            ______    # (c)\n            ______    # (d)'),
   '3.17': P('(a) How many comparisons are needed to find 32? (b) How many to search for 78? (c) Which two nodes could replace the root 43 if it were deleted?'),
+  '7.37': () => P('Use the tree of Q36 and delete 50 with its inorder successor.') + (RAW['7.36'] ? render(RAW['7.36'][2]) : ''),
   '3.22': P('Assuming P ≠ NP, which Venn diagram shows the correct positions of X and Y?'),
   '3.24': P('Assign T tasks to D developers. Developer d needs time[d][t] hours for task t and has a fixed number of working hours. (a) How many assignments does brute force have to examine? (b) Give a heuristic (greedy) algorithm and its worst-case time complexity.'),
 };
 
 // ---- parse the markdown into mocks -> sections -> questions ----
-const parts = md.split(/^# (?=Mock 2|Mock 3)/m);
-const mocks = [];
-parts.forEach((txt, mi) => {
-  const lines = txt.split('\n'); const mock = { n: mi + 1, secs: [] }; let sec = null, q = null;
-  const open = (title) => { sec = { title, qs: [] }; mock.secs.push(sec); };
-  for (const l of lines) {
-    let m;
-    if (/^# /.test(l)) continue;
-    if ((m = /^#{2,3} Q(\d+)(?: \((\d+) pts?\))?(?: [–-] (.*))?$/.exec(l))) {
-      if (!sec) open('Questions');
-      q = { n: +m[1], pts: m[2] ? +m[2] : null, title: (m[3] || '').trim(), lines: [] }; sec.qs.push(q); continue;
+function parseMocks(text, splitRe, first, skipFirst) {
+  const parts = text.split(splitRe); if (skipFirst) parts.shift();
+  const out = [];
+  parts.forEach((txt, mi) => {
+    const lines = txt.split('\n'); const mock = { n: first + mi, secs: [] }; let sec = null, q = null;
+    const open = (title) => { sec = { title, qs: [] }; mock.secs.push(sec); };
+    for (const l of lines) {
+      let m;
+      if (/^# /.test(l)) continue;
+      if ((m = /^#{2,3} Q(\d+)(?:[–-]Q\d+)?(?: \(([\d.]+(?: \+ [\d.]+)*) pts?\))?(?: [–-] (.*))?$/.exec(l))) {
+        if (!sec) open('Questions');
+        q = { n: +m[1], pts: m[2] ? m[2].replace(/ \+ /g, '+') : null, title: (m[3] || '').trim(), sec: sec.title, lines: [] }; sec.qs.push(q); continue;
+      }
+      if ((m = /^## (.*)$/.exec(l))) { open(m[1].trim()); q = null; continue; }
+      if (q) q.lines.push(l);
     }
-    if ((m = /^## (.*)$/.exec(l))) { open(m[1].trim()); q = null; continue; }
-    if (q) q.lines.push(l);
-  }
-  mocks.push(mock);
-});
+    out.push(mock);
+  });
+  return out;
+}
+const NAMES = { 1: 'Mock Final 1', 2: 'Mock Final 2', 3: 'Mock Final 3', 4: 'Mock Midterm 1', 5: 'Mock Midterm 2', 6: 'Mock Midterm 3', 7: 'Actual Midterm' };
+const mocks = [...parseMocks(md, /^# (?=Mock 2|Mock 3)/m, 1, false), ...parseMocks(md2, /^# (?=Mock Midterm|Actual Midterm)/m, 4, true)];
 
 const strip = (s) => s.replace(/[*`✅]/g, '').replace(/\s+/g, ' ').trim();
 const outMocks = [];
@@ -179,8 +207,9 @@ for (const mock of mocks) {
   mock.secs.forEach((sec, si) => {
     const cards = sec.qs.map((q) => {
       const key = `${mock.n}.${q.n}`;
-      let bl = blocks(q.lines).filter((b, k) => !(DROP[key] || []).includes(k));
-      if (ORDER[key]) bl = ORDER[key].map((k) => bl[k]);
+      const raw = blocks(q.lines); RAW[key] = raw;
+      let bl = raw.filter((b, k) => !(DROP[key] || []).includes(k));
+      if (typeof ORDER[key] === 'function') bl = ORDER[key](bl); else if (ORDER[key]) bl = ORDER[key].map((k) => bl[k]);
       if (process.argv.includes('--blocks')) console.log(key, bl.map((b, k) => `${k}:${b.t}:${(b.text || (b.items && b.items[0].text) || (b.rows && b.rows[0].join('/')) || b.body || '').toString().slice(0, 28).replace(/\s+/g, ' ')}`).join(' | '));
       let cut = SPLIT[key] ?? firstAnswer(bl);
       let Q = bl.slice(0, cut), A = bl.slice(cut);
@@ -188,11 +217,12 @@ for (const mock of mocks) {
       const right = [];
       let hinted = null;
       Q.forEach((b) => { if (b.t === 'list') { b.items.forEach((x) => { if (MARK.test(x.text)) right.push(x.text.replace(/\s*✅/g, '')); }); if (b.items.some((x) => /\*\([^)]*\)\*/.test(x.text))) hinted = b; } });
-      let title = q.title.replace(/`/g, '') || TITLES[key] || 'Question ' + q.n;
-      const chip = `MOCK ${mock.n} · Q${q.n}${q.pts ? ` · ${q.pts} PT${q.pts > 1 ? 'S' : ''}` : ''}`;
+      let title = q.title.replace(/`/g, '') || TITLES[key] || q.sec || 'Question ' + q.n;
+      const chip = `${NAMES[mock.n].toUpperCase()} · Q${q.n}${q.pts ? ` · ${q.pts} PT${q.pts === '1' ? '' : 'S'}` : ''}`;
       let qh = Q.map((b) => render(b, true)).join('');
       const xq = typeof QX[key] === 'function' ? QX[key](bl) : QX[key];
       if (xq) qh += xq;
+      if (QXPRE[key]) qh = QXPRE[key]() + qh;
       if (FIG[key]) qh += FIG[key];
       let ah = '';
       if (right.length && !(A[0] && A[0].t === 'p' && /^\*\*Answer/.test(A[0].text))) ah += `<p><b>Correct option${right.length > 1 ? 's' : ''}.</b></p><ul>${right.map((x) => `<li>${inline(x)}</li>`).join('')}</ul>`;
@@ -205,10 +235,11 @@ for (const mock of mocks) {
     });
     secHtml.push(`<div class="t-section" id="msec${mock.n}-${si}" data-gen="1"><div role="heading" aria-level="2" class="t-h2">${inline(sec.title)}</div>${cards.join('')}</div>`);
   });
-  outMocks.push({ n: mock.n, count, html: secHtml.join('') });
+  outMocks.push({ n: mock.n, title: NAMES[mock.n], count, html: secHtml.join('') });
 }
 if (dump) process.exit(0);
 const D = JSON.parse(fs.readFileSync(F, 'utf8'));
 D.mocks = outMocks;
+D.exam = { mcq: [], wr: [] }; // the old Past Exam tab is scrapped (replaced by Exam Practice)
 fs.writeFileSync(F, JSON.stringify(D));
-console.log('mocks:', outMocks.map((m) => `Mock ${m.n}: ${m.count} questions`).join(', '));
+console.log('mocks:', outMocks.map((m) => `${m.title}: ${m.count}`).join(', '));

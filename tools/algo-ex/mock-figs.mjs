@@ -69,29 +69,18 @@ export function vennFig() {
 /** Mock 1 Q16: the 14-vertex DAG, laid out left to right in layers (an edge always points to the right). */
 export function topoFig() {
   const pos = {
-    m: [0, 0], n: [0, 1], p: [0, 3],
-    q: [1, 0], o: [1, 2],
-    s: [2, 3],
-    r: [3, 2],
-    u: [4, 1], y: [4, 3],
-    t: [5, 0], v: [5, 3],
-    x: [6, 2], w: [6, 3.9],
-    z: [7, 3],
+    m: [45, 45], n: [190, 45], o: [342, 45], p: [492, 45],
+    q: [118, 120], r: [265, 120], s: [418, 120],
+    t: [45, 195], u: [190, 195], v: [342, 195], w: [492, 195],
+    x: [118, 268], y: [265, 268], z: [418, 268],
   };
-  const E = [['m', 'q'], ['m', 'r', -0.18], ['m', 'x', -0.3], ['n', 'o'], ['n', 'q'], ['n', 'u', -0.12], ['o', 'r'], ['o', 's'], ['o', 'v', 0.22], ['p', 'o'], ['p', 's'], ['p', 'z', 0.3],
-    ['q', 't', -0.2], ['r', 'u'], ['r', 'y'], ['s', 'r'], ['u', 't'], ['v', 'w'], ['v', 'x'], ['w', 'z'], ['y', 'v']];
-  const DX = 58, DY = 44, PAD = 26, R = 13;
-  const P = (k) => [PAD + pos[k][0] * DX, PAD + pos[k][1] * DY];
-  const W = PAD * 2 + 7 * DX, H = PAD * 2 + 3.9 * DY;
+  const E = ['mq', 'mr', 'mx', 'no', 'nq', 'nu', 'or', 'os', 'ov', 'po', 'ps', 'pz', 'qt', 'ru', 'ry', 'sr', 'ut', 'vw', 'vx', 'wz', 'yv'];
+  const R = 17, W = 540, H = 300;
   let e = '', n = '';
-  for (const [a, b, bend = 0] of E) {
-    const [x1, y1] = P(a), [x2, y2] = P(b), mx = (x1 + x2) / 2, my = (y1 + y2) / 2, dx = x2 - x1, dy = y2 - y1, L = Math.hypot(dx, dy);
-    const cx = mx - (dy / L) * bend * L, cy = my + (dx / L) * bend * L;
-    const sx = cx - x1, sy = cy - y1, ex = x2 - cx, ey = y2 - cy, ls = Math.hypot(sx, sy), le = Math.hypot(ex, ey);
-    const ax = x1 + (sx / ls) * R, ay = y1 + (sy / ls) * R, bx = x2 - (ex / le) * (R + 3), by = y2 - (ey / le) * (R + 3);
-    e += bend ? `<path class="dg-ar" d="M${f1(ax)} ${f1(ay)} Q${f1(cx)} ${f1(cy)} ${f1(bx)} ${f1(by)}" marker-end="url(#A)"/>`
-      : `<line class="dg-ar" x1="${f1(ax)}" y1="${f1(ay)}" x2="${f1(bx)}" y2="${f1(by)}" marker-end="url(#A)"/>`;
+  for (const [a, b] of E) {
+    const [x1, y1] = pos[a], [x2, y2] = pos[b], L = Math.hypot(x2 - x1, y2 - y1), ux = (x2 - x1) / L, uy = (y2 - y1) / L;
+    e += `<line class="dg-ar" x1="${f1(x1 + ux * R)}" y1="${f1(y1 + uy * R)}" x2="${f1(x2 - ux * (R + 3))}" y2="${f1(y2 - uy * (R + 3))}" marker-end="url(#A)"/>`;
   }
-  Object.keys(pos).forEach((k) => { const [x, y] = P(k); n += node(x, y, k, 'dg-n', R); });
-  return fig(W, H, e + n, 'Figure 3, drawn left to right.', 'Directed acyclic graph on vertices m to z drawn left to right');
+  Object.keys(pos).forEach((k) => { n += node(pos[k][0], pos[k][1], k, 'dg-n', R); });
+  return fig(W, H, e + n, 'Figure 3.', 'Directed acyclic graph on vertices m to z');
 }

@@ -8,9 +8,5 @@ export const EXTRA: Record<string, Extra> = {
     pastNote: 'these are the questions you transcribed (73 in total). Your file has <b>no answer key</b>, so the answers and model answers below are <b>my own, worked out from the course notes</b>. Use them as a study aid; if your lecturer or a marked paper disagrees, trust that. Where I am less sure, the explanation says so. Multiple-select questions need <b>all</b> the right options and none of the wrong ones.',
     pqg: [['Section A · Introduction to prototypes', [1, 2, 3, 4, 5]], ['Section B · Models, cognition, input and interface design', [6, 7, 8, 9, 10, 11, 16]], ['Section C · Evaluation methods, experiments and analysis', [12, 13, 14, 15, 17, 18, 19]], ['Presenting, review and AI', [20, 21, 22, 23]]],
   },
-  algo: {
-    secs: { A: [1, 23, 'Section A · Q1–23 (Counting)'], B: [24, 33, 'Section B · Q24–33 (Big-O)'], C: [34, 41, 'Section C · Q34–41 (Trees)'], D: [42, 52, 'Section D · Q42–52 (Searching and sorting)'], E: [53, 60, 'Section E · Q53–60 (Stacks and queues)'], F: [61, 82, 'Section F · Q61–82 (Mock exam)'] },
-    pastLabel: 'About these questions:',
-    pastNote: 'the 60 practice MCQs (Q1–60) and the mock exam (Q61–82) come from your own files, with their answers. Where an item asks for code, write your own answer first, then open the model answer. Question numbers continue across sections. Choose the option you think is correct, then check.',
-  },
+
 };

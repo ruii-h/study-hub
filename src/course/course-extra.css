@@ -173,3 +173,6 @@ td .pb+.pb,li .pb+.pb{margin-top:.45em}
 /* The lesson column is a flex child: without min-width:0 a wide table stretches the whole page past the screen */
 .tab-view>*,.theory-content,.theory-content>*{min-width:0}
 .theory-content{max-width:100%}
+
+.solbar{position:sticky;top:0;z-index:6;display:flex;justify-content:flex-end;padding:8px 0;background:var(--bg,var(--surface))}
+.pastbar{position:sticky;top:0;z-index:6;background:var(--bg,var(--surface));padding:6px 0}

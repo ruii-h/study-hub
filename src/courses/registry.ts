@@ -26,7 +26,7 @@ export const COURSES: CourseMeta[] = [
     id: 'algo', code: 'IS115', short: 'IS115', title: 'Algorithms & Programming',
     blurb: 'Counting, Big-O, sorting, recursion, trees, heaps, graphs and the limits of computation, with four live demos.',
     chapters: 12, cards: 122, storageKey: 'algo1_', accent: ['#58a6ff', '#0969da'],
-    tabs: ['Theory', 'Practice', 'Flashcards', 'Cheat-sheet', 'Past Exam'],
+    tabs: ['Theory', 'Practice', 'Flashcards', 'Cheat-sheet'],
   },
   {
     id: 'bpas', code: 'IS210', short: 'IS210', title: 'Business Process Analysis & Solutioning',

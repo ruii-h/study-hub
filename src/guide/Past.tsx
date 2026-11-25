@@ -33,7 +33,7 @@ function Mcq({ q, sec }: { q: any; sec: string }) {
           const v = L5[i], isA = ans.includes(v), isS = sel.includes(v);
           const cls = `eo ${!done && isS ? 'sel' : ''} ${sol ? (isA ? 'right' : '') : checked ? (isA && isS ? 'right' : isS ? 'wrong' : isA ? 'miss' : '') : ''}`;
           return (<div key={i}>
-            <label className={cls}><input type="checkbox" value={v} checked={isS} disabled={done} onChange={(e) => setSel((s) => (e.target.checked ? [...s, v] : s.filter((x) => x !== v)))} /><i>{v}.</i><span dangerouslySetInnerHTML={{ __html: o }} /></label>
+            <label className={cls}><input type="checkbox" value={v} checked={sol ? isA : isS} disabled={done} onChange={(e) => setSel((s) => (e.target.checked ? [...s, v] : s.filter((x) => x !== v)))} /><i>{v}.</i><span dangerouslySetInnerHTML={{ __html: o }} /></label>
             {checked && q.w?.[i] ? <div className={`why ${isA ? 'wy' : 'wn'}`}><b>{isA ? 'Why this is right' : 'Why this is wrong'}:</b> {q.w[i]}</div> : null}
           </div>);
         })}

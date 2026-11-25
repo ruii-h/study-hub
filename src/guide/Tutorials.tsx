@@ -5,6 +5,7 @@ import { useG } from './state';
 import { breakText } from './paragraphs';
 import { mergeCells, reveal, stackTables, transposeTables } from './enhance';
 import { chapterSlide } from './motion';
+import SolToggle, { useSolutions } from './SolToggle';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Item = { i: number; chip: string; title: string };
@@ -71,6 +72,7 @@ export default function Tutorials() {
   const htmlStr = useMemo(() => breakText(tut.html), [tut]);
   const outl = useMemo(() => outline(tut.html), [tut]);
   const [active, setActive] = useState('');
+  useSolutions(body, tut.n);
   const dir = useRef(0); const prev = useRef(tut.n);
   if (prev.current !== tut.n) { dir.current = tut.n > prev.current ? 1 : -1; prev.current = tut.n; }
 
@@ -92,7 +94,7 @@ export default function Tutorials() {
       <div className="theory-nav" id="nav" tabIndex={0} aria-label="Tutorial list"><SideList /></div>
       <div ref={scroller} id="theory-content" className="theory-content" tabIndex={0} aria-label="Tutorial content">
         <motion.div key={tut.n} {...chapterSlide(dir.current)}>
-          <div className="t-hero"><div className={`t-tag ${lesson.tag}`}>Tutorial {idx + 1} of {tuts.length}</div><h1 className="t-h1" tabIndex={-1}>{lesson.title}: tutorials &amp; exercises</h1>
+          <SolToggle /><div className="t-hero"><div className={`t-tag ${lesson.tag}`}>Tutorial {idx + 1} of {tuts.length}</div><h1 className="t-h1" tabIndex={-1}>{lesson.title}: tutorials &amp; exercises</h1>
             <div className="t-subtitle">Attempt each question first, then open the answer. The full working shows which part of the theory gives each step.</div>
             <div className="meta">✏️ {tut.count} exercises · chips show where each one comes from</div></div>
           <div className="row tut-actions"><button className="btn ghost" onClick={() => g.openChapter(tut.n, { back: { tab: 'tut', sel: tut.n, y: 0, label: 'Back to the tutorial', up: null } })}>📖 Revise Chapter {lesson.dn ?? tut.n} first</button>

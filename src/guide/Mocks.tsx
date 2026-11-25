@@ -5,6 +5,7 @@ import { useG } from './state';
 import { breakText } from './paragraphs';
 import { mergeCells, reveal, runMermaid, stackTables, transposeTables } from './enhance';
 import { chapterSlide } from './motion';
+import SolToggle, { useSolutions } from './SolToggle';
 
 type Item = { i: number; chip: string; title: string };
 type Sec = { id: string; title: string; items: Item[] };
@@ -34,23 +35,14 @@ export function MockNav() {
   const g = useG();
   const { D, mockSel } = g;
   const mocks = D.mocks || [];
-  const outl = useMemo(() => outline(mocks.find((t) => t.n === mockSel)?.html || ''), [mocks, mockSel]);
   return (<>
-    <div className="theory-nav-header">Mock exams</div>
-    <div className="theory-group"><div className="theory-group-title static">Full papers</div>
-      {mocks.map((m) => {
-        const on = m.n === mockSel;
-        return (<div key={m.n}>
-          <button className={`theory-item ${on ? 'active' : ''}`} aria-current={on ? 'true' : undefined} onClick={() => g.setMockSel(m.n)}>
-            <span className="theory-item-icon" aria-hidden="true">🎯</span><span className="tn">{m.n}</span><span className="tt">Mock exam {m.n}</span><span className="tq sc mid">{m.count}</span>
-          </button>
-          {on && <div className="tut-sub">{outl.map((s) => (<div key={s.id}>
-            {s.items.length > 0 && <div className="tut-sub-h">{s.title}</div>}
-            {s.items.map((it) => <button key={it.i} className="tut-sub-i" onClick={() => { goTo(it.i); g.setNavOpen(false); }}><span className="chip">{it.chip}</span><span className="ttl">{it.title}</span></button>)}
-          </div>))}</div>}
-        </div>);
-      })}
-    </div>
+    <div className="theory-nav-header">Exam practice</div>
+    {mocks.map((m, i) => {
+      const on = m.n === mockSel;
+      return (<button key={m.n} className={`theory-item ${on ? 'active' : ''}`} aria-current={on ? 'true' : undefined} onClick={() => g.setMockSel(m.n)}>
+        <span className="theory-item-icon" aria-hidden="true">{i < 3 ? '🎯' : i < 6 ? '📝' : '🏁'}</span><span className="tn">{i + 1}</span><span className="tt">{m.title}</span><span className="tq sc mid">{m.count}</span>
+      </button>);
+    })}
   </>);
 }
 
@@ -65,6 +57,7 @@ export default function Mocks() {
   const htmlStr = useMemo(() => breakText(mock.html), [mock]);
   const outl = useMemo(() => outline(mock.html), [mock]);
   const [active, setActive] = useState('');
+  useSolutions(body, mock.n);
   const dir = useRef(0); const prev = useRef(mock.n);
   if (prev.current !== mock.n) { dir.current = mock.n > prev.current ? 1 : -1; prev.current = mock.n; }
   const theme: string = ST.theme || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
@@ -82,21 +75,21 @@ export default function Mocks() {
   useEffect(() => { if (body.current && g.api?.loadMermaid) runMermaid(body.current, () => g.api!.loadMermaid(), theme); }, [mock.n, theme]); // eslint-disable-line
   useEffect(() => { (scroller.current?.querySelector('h1') as HTMLElement | null)?.focus({ preventScroll: true }); }, [mock.n]);
 
-  const pts = (mock.n === 1 ? 'Mock 1' : 'Mock ' + mock.n);
+  const pts = 'Exam practice';
   return (
     <>
       <div className="theory-nav" id="nav" tabIndex={0} aria-label="Mock exam list"><SideList /></div>
       <div ref={scroller} id="theory-content" className="theory-content" tabIndex={0} aria-label="Mock exam content">
         <motion.div key={mock.n} {...chapterSlide(dir.current)}>
-          <div className="t-hero"><div className="t-tag">{pts} of {mocks.length}</div><h1 className="t-h1" tabIndex={-1}>Mock exam {mock.n}</h1>
+          <SolToggle /><div className="t-hero"><div className="t-tag">{pts} · {idx + 1} of {mocks.length}</div><h1 className="t-h1" tabIndex={-1}>{(mock as any).title || `Mock exam ${mock.n}`}</h1>
             <div className="t-subtitle">Try each question under exam conditions first, then open the answer. Every answer carries its reasoning, so use it to find out why a wrong option is wrong.</div>
             <div className="meta">🎯 {mock.count} questions · chips show the question number and its marks</div></div>
           {outl.length > 1 && (
             <nav className="toc" aria-label="Sections in this mock exam"><div className="tocs">{outl.map((s) => <a key={s.id} href={'#' + s.id} className={active === s.id ? 'on' : ''} onClick={(e) => { e.preventDefault(); const c = document.getElementById('theory-content'), t = document.getElementById(s.id); if (c && t) { t.classList.add('in'); c.scrollTo({ top: t.offsetTop - 70, behavior: 'smooth' }); } }}>{s.title}</a>)}</div></nav>)}
           <div ref={body} dangerouslySetInnerHTML={{ __html: htmlStr }} />
           <div className="t-nav-footer">
-            {pv ? <button className="t-nav-btn" onClick={() => g.setMockSel(pv.n)}><small>Previous</small>← Mock exam {pv.n}</button> : <div />}
-            {nx ? <button className="t-nav-btn next" onClick={() => g.setMockSel(nx.n)}><small>Next mock</small>Mock exam {nx.n} →</button> : <div />}
+            {pv ? <button className="t-nav-btn" onClick={() => g.setMockSel(pv.n)}><small>Previous</small>← {(pv as any).title}</button> : <div />}
+            {nx ? <button className="t-nav-btn next" onClick={() => g.setMockSel(nx.n)}><small>Next</small>{(nx as any).title} →</button> : <div />}
           </div>
         </motion.div>
       </div>
