@@ -109,16 +109,16 @@ const firstAnswer = (bl) => {
 };
 // per-question overrides: number of leading blocks that belong to the question (key "mock.q")
 const SPLIT = {
-  '1.9': 2, '1.10': 1, '1.11': 1, '1.12': 2, '1.13': 0, '1.14': 0, '1.15': 0, '1.16': 0, '1.17': 0, '1.18': 0, '1.19': 2, '1.21': 0, '1.22': 0,
-  '2.4': 1, '2.5': 0, '2.6': 0, '2.7': 0, '2.11': 2, '2.12': 0, '2.13': 0, '2.14': 0, '2.18': 5, '2.19': 6, '2.20': 0, '2.21': 0,
+  '1.9': 3, '1.10': 3, '1.11': 3, '1.12': 3, '1.13': 1, '1.14': 1, '1.15': 1, '1.16': 1, '1.17': 1, '1.18': 1, '1.19': 3, '1.21': 1, '1.22': 3,
+  '2.4': 2, '2.5': 1, '2.6': 1, '2.7': 1, '2.11': 3, '2.12': 1, '2.13': 1, '2.14': 1, '2.18': 5, '2.19': 8, '2.20': 1, '2.21': 1,
+  '3.1': 2, '3.3': 3, '3.4': 8, '3.5': 1, '3.8': 2, '3.10': 2, '3.11': 1, '3.14': 3, '3.15': 3, '3.17': 2, '3.18': 5, '3.19': 3, '3.21': 2, '3.22': 2, '3.23': 7, '3.24': 5,
   '4.6': 0, '5.10': 1, '5.16': 0, '6.6': 3, '6.14': 3, '6.15': 0, '5.1': 11, '7.1': 3, '7.2': 2, '7.3': 2, '7.4': 2, '7.6': 1, '7.9': 1, '7.11': 1, '7.14': 1, '7.22': 1, '7.23': 2, '7.24': 1, '7.25': 1, '7.27': 3, '7.28': 2, '7.29': 2, '7.33': 2, '7.34': 2, '7.37': 1,
-  '3.1': 1, '3.3': 2, '3.4': 8, '3.5': 0, '3.8': 2, '3.10': 1, '3.11': 0, '3.14': 0, '3.15': 2, '3.17': 1, '3.18': 5, '3.19': 2, '3.22': 1, '3.23': 5, '3.24': 0,
 };
 // blocks removed (key -> indexes into the block list): the old mermaid / text description of a picture that is now drawn
-const DROP = { '7.13': [3, 4], '1.5': [1], '1.16': [1], '3.8': [2, 3] };
+const DROP = { '7.13': [3, 4], '1.5': [1], '1.16': [2], '3.8': [2, 3], '3.21': [1] };
 // reorder blocks (key -> new order of the original indexes, applied after DROP)
 const ORDER = {
-  '3.19': [0, 2, 1],
+  '3.19': [0, 1, 3, 2],
   // the four rotated seatings and the options first, the working after
   '5.1': (bl) => [...bl.slice(0, 10), bl[13], ...bl.slice(10, 13), ...bl.slice(14)],
   '7.33': [0, 2, 1, 3],
@@ -127,7 +127,12 @@ const ORDER = {
   '7.34': (bl) => { const f = bl[0]; const clean = { ...f, body: f.body.split('\n').filter((l) => !/^\s*style |n60 -\.->/.test(l)).join('\n') }; return [clean, bl[2], f, bl[1], bl[3]]; },
 };
 const RAW = {};
-const QXPRE = { '7.14': () => BSEARCH(), '7.15': () => BSEARCH() }; // shown before the options
+const QXPRE = {
+  '3.2': () => P('Which of the following statements are <b>FALSE</b>? Choose 1 or more.'),
+  '3.6': () => P('Keys are inserted into an empty binary search tree in the order given by each option. Which insertion order gives the worst-case (tallest) tree?'),
+  '3.9': () => P('The pre-order traversal of a binary search tree is 15, 10, 12, 11, 20, 18, 16, 19. Which option is its post-order traversal?'),
+  '3.16': () => P('Which of the following statements is <b>FALSE</b>?'),
+  '7.14': () => BSEARCH(), '7.15': () => BSEARCH() }; // shown before the options
 const BSEARCH = (key) => { const r = RAW['7.13']; return r ? render(r[3]) + render(r[4]) : ''; };
 // figures injected at the end of the question part
 const FIG = { '1.5': curveFig(), '1.16': topoFig(), '3.8': ringsFig(), '3.22': vennFig() };
@@ -142,38 +147,11 @@ const P = (t) => `<p>${t}</p>`;
 const blank = (t) => code(t, 'python');
 // extra question wording (the source only had a title for these), or a function of the block list
 const QX = {
-  '1.12': P('Write a recursive function <code>count_two_children(t)</code> that returns the number of nodes in the binary tree <code>t</code> that have exactly two children (Figure 2).'),
-  '1.13': P('Write a recursive function <code>count_descendents(t)</code> that sets <code>t.descendents</code> for every node of the tree to the number of descendants of that node.'),
-  '1.14': P('What is the worst-case time complexity of the two functions above, in terms of the number of nodes n?'),
-  '1.15': P('In at most 30 words, explain how topological sort differs from an ordinary sort.'),
-  '1.16': P('Give one valid topological ordering of the vertices of Figure 3.'),
-  '1.17': P('Each task takes one month and independent tasks can run at the same time. What is the least number of months needed to finish the whole project, and how do you find it?'),
-  '1.18': P('In under 50 words, explain why the schedule can become intractable when resources (workers) are limited.'),
-  '1.19': P('Start and end in Singapore (S) and visit the other four cities once each. How many different tours are possible?'),
-  '1.21': P('There are n submitted requests. How many combinations of requests would a brute-force search have to examine?'),
-  '1.22': P('In under 50 words, explain how this problem is similar to the Knapsack problem.'),
-  '2.4': P('What is the Big-O time complexity of <code>mystery(n)</code>?'),
-  '2.5': P('Fill in the table of values of <code>mystery(n)</code>.') + '<div class="t-table-wrap" tabindex="0"><table class="t-mini-table"><thead><tr><th>n</th><th>mystery(n)</th></tr></thead><tbody><tr><td>0</td><td>1</td></tr><tr><td>1</td><td>?</td></tr><tr><td>2</td><td>?</td></tr><tr><td>3</td><td>?</td></tr><tr><td>4</td><td>?</td></tr><tr><td>5</td><td>?</td></tr></tbody></table></div>',
-  '2.6': P('Write <code>mystery(n)</code> in recursive form.'),
-  '2.7': P('Which version, the iterative or the recursive one, has the higher time complexity? Explain.'),
-  '2.12': P('Give the order in which a depth-first search from A visits the vertices of the graph (neighbours in alphabetical order). Write the letters with no spaces.'),
-  '2.13': P('Give two different topological orderings of the graph.'),
-  '2.14': P('Write pseudocode for a recursive topological sort that does not use depth-first search.'),
-  '2.20': P('What is the Big-O time complexity of this greedy algorithm, where N is the number of dishes? State your assumptions.'),
-  '2.21': P('Propose a third criterion (Option 3) that does better, and show the dishes it chooses.'),
-  '3.1': P('The graph is stored as the adjacency list above. (a) How many nodes does it have? (b) How many edges? (c) What is its edge density?'),
-  '3.5': P('To find the k-th smallest number in an array of n numbers, you merge-sort the array and read position k. What is the time complexity?'),
-  '3.10': P('What is the worst-case time complexity of this code?'),
-  '3.11': P('How many odd integers from 3000 to 9999 have all four digits different?'),
-  '3.13': (bl) => P('The function above merges two sorted lists. Which rows give the correct minimum and maximum number of comparisons?') + render({ t: 'table', rows: bl[3].rows.map((r) => r.slice(0, -1)) }),
-  '3.14': P('Fill in the blanks so that <code>rec_remove</code> removes every occurrence of <code>target</code> from <code>arr</code> and returns how many were removed.')
-    + blank('def rec_remove(arr, target, i=0):\n    if ______:                       # (a)\n        return 0\n    elif ______:                     # (b)\n        del arr[i]\n        return 1 + rec_remove(______)    # (c)\n    else:\n        return rec_remove(______)        # (d)'),
-  '3.15': P('Fill in the blanks (a) to (d) of this level-by-level (breadth-first) traversal.')
-    + blank('def level_by_level_traverse(root):\n    q = Queue()\n    visit(root)\n    q.enqueue(root)\n\n    while q.count() > 0:\n        node = q.dequeue()\n        if node.left != None:\n            ______    # (a)\n            ______    # (b)\n        if node.right != None:\n            ______    # (c)\n            ______    # (d)'),
-  '3.17': P('(a) How many comparisons are needed to find 32? (b) How many to search for 78? (c) Which two nodes could replace the root 43 if it were deleted?'),
+  '2.5': '<div class="t-table-wrap" tabindex="0"><table class="t-mini-table"><thead><tr><th>n</th><th>mystery(n)</th></tr></thead><tbody><tr><td>0</td><td>1</td></tr><tr><td>1</td><td>?</td></tr><tr><td>2</td><td>?</td></tr><tr><td>3</td><td>?</td></tr><tr><td>4</td><td>?</td></tr><tr><td>5</td><td>?</td></tr></tbody></table></div>',
+  '3.14': blank('def rec_remove(arr, target, i=0):\n    if ______:                       # (a)\n        return 0\n    elif ______:                     # (b)\n        del arr[i]\n        return 1 + rec_remove(______)    # (c)\n    else:\n        return rec_remove(______)        # (d)'),
+  '3.15': blank('def level_by_level_traverse(root):\n    q = Queue()\n    visit(root)\n    q.enqueue(root)\n\n    while q.count() > 0:\n        node = q.dequeue()\n        if node.left != None:\n            ______    # (a)\n            ______    # (b)\n        if node.right != None:\n            ______    # (c)\n            ______    # (d)'),
+  '3.13': (bl) => render({ t: 'table', rows: bl[4].rows.map((r) => r.slice(0, -1)) }),
   '7.37': () => P('Use the tree of Q36 and delete 50 with its inorder successor.') + (RAW['7.36'] ? render(RAW['7.36'][2]) : ''),
-  '3.22': P('Assuming P ≠ NP, which Venn diagram shows the correct positions of X and Y?'),
-  '3.24': P('Assign T tasks to D developers. Developer d needs time[d][t] hours for task t and has a fixed number of working hours. (a) How many assignments does brute force have to examine? (b) Give a heuristic (greedy) algorithm and its worst-case time complexity.'),
 };
 
 // ---- parse the markdown into mocks -> sections -> questions ----

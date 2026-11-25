@@ -113,6 +113,10 @@ The figure: the x-axis is input size (2 to 20) and the y-axis is the number of o
 
 ### Q9 (3 pts) – Stack-based binary search
 
+*Binary search is an algorithm to search an array based on the principle of decomposition. The following is a stack-based version of binary search, `rbsearch_stack` (Figure 1), which returns the index position where the search key k can be found in the input array a (or -1 if the key is not found). Line 8 prints out the content of the stack during each execution of the while loop. Suppose we call `rbsearch_stack(a, k)` with a = [2, 19, 27, 31, 45, 62, 67, 74, 92] and k = 74. **Show the contents of the stack after every call to line 8** for iterations 1, 2 and 3.*
+
+Format: an answer like `9,-1` means 9 is at the top of the stack and -1 is at the bottom. Omit spaces in your answers.
+
 ```python
 def rbsearch_stack(a, k):
     lower = -1
@@ -149,6 +153,10 @@ Input: `a = [2, 19, 27, 31, 45, 62, 67, 74, 92]`, `k = 74`. Stack contents (top 
 
 ### Q10 (3 pts) – FIFO queue, single teller
 
+*A queue can be used to simulate customers waiting in a single queue in front of a single teller (server). Given the arrival time and transaction duration of each customer (time starts at 0), **show the content of the queue at the various time points** in the table. The customer being served stays at the front of the queue until the end time of her transaction.*
+
+Format: omit spaces in your answer; write `Empty` if the queue is empty; e.g. `C1,C2` means there are 2 elements in the queue, C1 at the front (head) and C2 at the back (tail).
+
 | Customer | Arrival | Duration | Service period |
 |---|---|---|---|
 | C1 | 5 | 5 | 5–10 |
@@ -174,6 +182,10 @@ Input: `a = [2, 19, 27, 31, 45, 62, 67, 74, 92]`, `k = 74`. Stack contents (top 
 | 39 | **Empty** (#9) |
 
 ### Q11 (3 pts) – Priority queue (1 = highest priority, no pre-emption, FIFO within same priority)
+
+*Now suppose the bank maintains a **priority queue**, where a customer with the HIGHEST priority (smallest value, 1 being the highest, 2 next, etc.) is always served next whenever the server becomes available. Customers with the same priority are served by time of arrival (first-come-first-served). There is no pre-emption: when a customer is being served and a higher-priority customer arrives, the latter waits until the former completes the transaction. **Show the content of the priority queue** at the various time points in the table (the customer being served stays at the front until the end time of her transaction).*
+
+Format: the sample answers for the first two time points are `C1` and `C1,C2`; omit spaces; write `Empty` if the queue is empty; do not show elements that have already been dequeued; if there are multiple elements, place the element with higher priority nearer the front.
 
 | Customer (Priority) | Arrival | Duration |
 |---|---|---|
@@ -209,6 +221,8 @@ C1 finishes at 10, so C3 (priority 1) is served ahead of C2. At 23, C2 finishes 
 
 ### Q12 (3 pts) – `count_two_children(t)`
 
+*On planet X, each inhabitant can reproduce at most 2 children, so a family tree can be represented by a binary tree (Figure 2). Each tree node t has four attributes: `t.key`, `t.leftChild`, `t.rightChild` and `t.descendents` (the key, left child pointer, right child pointer and number of descendants). For example, in Figure 2 there are 4 inhabitants with exactly two children (nodes 1, 2, 6 and 8), and the numbers of descendants for nodes 1 to 10 are 9, 3, 1, 0, 0, 4, 0, 2, 0 and 0. **Given a family tree rooted at t, design a RECURSIVE divide-and-conquer algorithm `count_two_children(t)` that returns the number of inhabitants who have EXACTLY two children.***
+
 Figure 2 (the family tree; node 3 has only a left child, 4):
 
 ```mermaid
@@ -241,6 +255,8 @@ For Figure 2 it returns 4 (nodes 1, 2, 6, 8).
 
 ### Q13 (4 pts) – `count_descendents(t)`
 
+*Design a RECURSIVE divide-and-conquer algorithm `count_descendents(t)` that **sets the number of descendants for each inhabitant** in the tree. That is, you must set the `descendents` attribute to the correct value for every single node in the tree.*
+
 ```python
 def count_descendents(t):
     """Sets t.descendents for every node.
@@ -257,6 +273,8 @@ Check: leaf → 0; node 8 → 2; root 1 → 9.
 
 ### Q14 (2 pts) – Worst-case time complexity
 
+*What is the worst-case time complexity of your algorithms for the previous two questions? Explain.*
+
 **O(n)** for both algorithms, where n is the number of nodes. Each node is visited exactly once and does O(1) work (a few comparisons and an assignment). Recurrence: T(n) = T(n_left) + T(n_right) + O(1) = O(n). This holds for any tree shape.
 
 ---
@@ -265,9 +283,13 @@ Check: leaf → 0; node 8 → 2; root 1 → 9.
 
 ### Q15 (2 pts) – Topological sort vs ordinary sort (≤ 30 words)
 
+*In no more than 30 words, explain the difference between a topological sort and an ordinary sort (such as insertion or merge sort).*
+
 > Topological sort orders DAG vertices so each edge's start precedes its end (partial order, not unique). Ordinary sort orders elements by key comparison into one total order.
 
 ### Q16 (3 pts) – A valid topological ordering of Figure 3
+
+*Refer to the directed acyclic graph (DAG) in Figure 3. **Give one valid topological ordering** of the DAG in Figure 3.*
 
 Edges read from the figure: m→q, m→r, m→x; n→o, n→q, n→u; o→r, o→s, o→v; p→o, p→s, p→z; q→t; r→u, r→y; s→r; u→t; v→w, v→x; w→z; y→v.
 
@@ -304,6 +326,8 @@ Many other orderings are valid, for example `p, n, m, o, s, r, y, v, w, z, x, q,
 
 ### Q17 (3 pts) – Least number of months to finish the project
 
+*Suppose a DAG is used to model a project network, where the nodes are tasks and the edges are precedence relationships. In the example above, you can start task q only upon completion of tasks m and n. Suppose you have unlimited resources and can execute as many tasks as you want at the same time, and each task takes exactly 1 month to complete. **Discuss how you may use the topological ordering to determine the least number of months needed to complete the entire project. Using your approach, how long does it take to complete the project given in Figure 3?***
+
 **Approach:** Process the vertices in topological order. For each task, earliest finish month = 1 + max(earliest finish of all its predecessors), or 1 if it has no predecessors. The project length is the largest value, which is the length of the longest (critical) path.
 
 | Task | m | n | p | o | q | s | r | u | y | v | t | w | x | z |
@@ -314,6 +338,8 @@ Many other orderings are valid, for example `p, n, m, o, s, r, y, v, w, z, x, q,
 
 ### Q18 (2 pts) – Why limited resources can make it intractable (< 50 words)
 
+*Now suppose that, due to a manpower crunch, you have only a limited resource capacity such that not all tasks can be executed concurrently. (For example, think of 3 tasks that can be executed concurrently, each requiring 1 man, but only 2 workers are available. Workers cannot multi-task, so one of the tasks must be put on hold until a resource becomes available.) **In less than 50 words, discuss why this problem might become computationally intractable.***
+
 > With limited workers, we must choose which ready tasks to run now and which to delay. The number of possible task-to-worker assignments and orderings grows exponentially. Resource-constrained scheduling is NP-hard, so no known polynomial-time algorithm guarantees the optimal schedule.
 
 ---
@@ -321,6 +347,8 @@ Many other orderings are valid, for example `p, n, m, o, s, r, y, v, w, z, x, q,
 ## Part E – Heuristics (12 marks)
 
 ### Q19 (1 pt) – Number of possible tours
+
+*You have just completed the Computational Thinking course and desperately need a holiday. You and a few friends agree to take a road trip from Singapore (S) to 4 cities in Malaysia, namely Kuala Lumpur (K), Melaka (M), Ipoh (I) and Penang (P), and finally return to Singapore. The table below gives the distance between any two cities in tens of kilometres. To save money on accommodation and petrol, you plan to visit each Malaysian city exactly once and want to find the shortest possible tour. **What is the total number of possible tours starting and ending in Singapore?***
 
 Distances between cities, in tens of km:
 
@@ -372,9 +400,17 @@ Equivalent rotations or reversals, such as `SMPIK` or `KSMPI`, describe the same
 
 ### Q21 (1 pt) – Number of possible request combinations
 
+*Within a city to be visited, you are also in charge of designing the schedule for visiting the attractions. You ask your friends to submit their requests. Each request specifies one attraction to be visited, a starting time and an ending time, e.g. (Petronas Tower, start 9am, end 11am). Suppose there are n such requests, and there is no duplicate attraction among the requests. Ignoring the start and end time of each request, **how many possible request combinations are there in total to form a schedule?** State your answer in terms of n.*
+
 Each request is either included or excluded, so there are **2ⁿ** combinations (2^n; subsets of n requests).
 
 ### Q22 (2 pts) – Similarity to the Knapsack problem (< 50 words)
+
+*Clearly, you cannot accept all requests because some of them conflict with one another. Two requests conflict if they overlap in time. For example, (Petronas Tower, 9am–11am) conflicts with (Sunway Lagoon, 10am–11:30am), but does NOT conflict with (KLCC, 11am–1pm). For simplicity, assume you can zip from one attraction to the next with zero travel time, and there is no waiting time to get into an attraction. Your task is to design a schedule that accommodates as many requests as possible without any conflict.*
+
+*For the Knapsack problem, we are given a set of items, each with a weight and a value. The objective is to determine which subset of items to include in a knapsack (a bag) so as to maximise the total value of the included items, while keeping the total weight of the knapsack within a specified limit.*
+
+***In less than 50 words, explain the similarity between this scheduling problem and the Knapsack problem.***
 
 > Both are combinatorial optimisation problems: choose a subset from n candidates to maximise value under a constraint. Requests are items (value 1 each); "no conflicts" plays the role of the weight limit. Both have 2ⁿ candidate subsets, so brute force is infeasible and greedy heuristics are used.
 
@@ -475,6 +511,8 @@ def method(n, m):
 
 ### Q4 (1 pt) – Big-O of `mystery(n)` (iterative)
 
+*Consider the function below. **What is the Big-O time complexity of this iterative algorithm?** Give your answer like this: O(n^4). Omit spaces in your answer and use ^ to denote power.*
+
 ```python
 def mystery(n):
     if n == 0:
@@ -498,6 +536,8 @@ def mystery(n):
 
 ### Q5 (2 pts) – Fill in the table
 
+*For the same `mystery()` function in Q4, complete the following table for n = 0 to 5. The first one (n = 0) has been done for you. Fill in the remaining 5 values in the 5 answer blanks.*
+
 | n | mystery(n) |
 |---|---|
 | 0 | 1 |
@@ -513,6 +553,8 @@ Working:
 - n=5: 67 + 15² + 5³ = 417
 
 ### Q6 (2 pts) – Recursive form of `mystery(n)`
+
+*You are given the iterative form of `mystery(n)` in Q4. **Write the algorithm (in pseudocode or Python code) for the RECURSIVE form of `mystery(n)`.***
 
 ```
 mystery(n):
@@ -538,6 +580,8 @@ def mystery(n):
 Check: mystery(3) = 5 + 3² + 1³ = 15 ✓.
 
 ### Q7 (2 pts) – Which version has higher complexity?
+
+*Which version of `mystery(n)` has higher complexity: the iterative version (given in Q4) or the recursive version (your answer to Q6)? Show clearly how you derived your answer.*
 
 **The recursive version.**
 
@@ -615,6 +659,8 @@ flowchart LR
 
 ### Q11 (2 pts) – Adjacency matrix
 
+*A directed graph can be used to model dependencies between tasks. In such a graph, a task is represented by a vertex. There is an edge from one vertex (the first task) to another vertex (the second task) if it is necessary to complete the first task before the second. The figure shows such a task dependency graph. **Complete the adjacency matrix representation for the graph** in the table (the edges are binary, i.e. they either exist or do not). Reproduce the "text table" in your answer field and replace all the "?"s with your answers.*
+
 Edges read from the figure: A→B, A→C, A→D, B→F, B→G, C→D, C→E, D→E, D→H, E→H, F→E, G→H.
 
 ```mermaid
@@ -662,11 +708,15 @@ From :A01110000
 
 ### Q12 (1 pt) – DFS from A
 
+*Refer to the same graph in Q11. **What is the sequence of vertices visited by a depth-first search (DFS) starting from vertex A?** Assume that the DFS method processes vertices in the same order as in the adjacency matrix (which is alphabetical ordering). Give your answer like this: ABCDE (omit spaces and commas).*
+
 **Answer: `ABFEHGCD`** (this matches the blue correct answer).
 
 Trace: A → B → F → E → H, back to B → G (H already visited), back to A → C → D.
 
 ### Q13 (2 pts) – Two different topological orderings
+
+*Refer to the same graph in Q11. **List TWO different topological orderings** that exist in that graph.*
 
 1. `A, B, C, D, F, G, E, H`
 2. `A, C, D, B, G, F, E, H`
@@ -674,6 +724,8 @@ Trace: A → B → F → E → H, back to B → G (H already visited), back to A
 Constraints used: A before B, C, D; C before D; B before F, G; C and D before E; D before H; F before E; E before H; G before H.
 
 ### Q14 (2 pts) – Recursive topological sort (no DFS)
+
+*Write a pseudocode for **recursive** topological sorting, which does **not** make use of the DFS traversal method.*
 
 ```
 topoSort(G):
@@ -715,7 +767,7 @@ Coins: $1, 60¢, 35¢, 5¢, 1¢. *For which change amount does greedy FAIL to fi
 **Why:** greedy gives $1 + $1 + 60¢ + 5¢×4 = 7 coins. Optimal gives $1 + $1 + 35¢ + 35¢ + 5¢ + 5¢ = 6 coins.
 
 ### Q17 (1 pt)
-*12 cities (A to L), split into 3 tours of 4 cities each for 3 salesmen with different speeds. How many possibilities must we examine?*
+*There are 12 cities (A to L). The distance between two cities is the same in opposing directions. We have three salesmen moving at different speeds. They split the 12 cities into 3 tours of 4 cities each. For example, one possible solution is: the first salesman tours A B C D A, the second tours E F G H E, and the third tours I J K L I. We want to find a solution that allocates cities to salesmen and orders the cities to visit so as to minimise the total time taken by the three salesmen to complete their tours. **How many possibilities do we need to examine?***
 
 - **(¹²C₄ × ⁸C₄ × ⁴C₄) × (3!/2)³** ✅
 - (¹²C₄ × ⁸C₄ × ⁴C₄ / 3!) × (3!/2)³
@@ -801,6 +853,10 @@ Distance table (from the screenshot):
 
 ### Q19 (2 pts) – BIG-O Combo (budget ≤ $10)
 
+*You are the manager of the restaurant Think Tai Fung. The menu below specifies each dish's price and calorie count. To attract more customers, you would like to advertise special promotional combos. A combo contains a combination of dishes, where the total price is the sum of the individual dish prices, the total calorie count is the sum of the individual dish calories, and, to increase variety, a combo cannot contain the same dish twice. For example, the combination F + W has a total price of $7.60 and 1525 calories, and B + M + W has a total price of $6.50 and 1325 calories.*
+
+*One combo you wish to create is the **BIG-O Combo**, designed to appeal to greedy customers. It packages the combination of dishes with as many calories as possible for $10 or below (<= $10). Since brute force may take too long, an approximation is good enough. Use the greedy algorithm below, and give the final solution for each option in the format: "Option 1: cheapest / Combination of dish codes / Total price / Total calories", and the same for Option 2.*
+
 | Dish | Code | Price | Calories |
 |---|---|---|---|
 | Fried Rice | F | 4.20 | 850 |
@@ -861,6 +917,8 @@ Total calories: 1790
 
 ### Q20 (1 pt) – Big-O of the greedy algorithm
 
+*For either option ("cheapest" or "highest calories"), **what is the Big-O complexity of the greedy algorithm if there are N dishes in the menu?** State the assumptions you are making, if any.*
+
 Let N be the number of dishes.
 
 - **Naive version (the pseudocode as written): O(N²).** The while loop runs up to N times, and each iteration scans D to find the cheapest or highest-calorie dish, which is O(N). The price check and removal are O(1) or O(N) at worst.
@@ -869,6 +927,8 @@ Let N be the number of dishes.
 *Assumptions:* adding, comparing prices and removing a dish take O(1). Searching for the next dish is a linear scan (naive) or the dishes are pre-sorted (fast).
 
 ### Q21 (2 pts) – New criterion (Option 3): highest calories per dollar
+
+*Propose a **new option (Option 3)** for the greedy criterion that may result in a better solution. Using the same menu, **show that your new criterion arrives at a better solution than both Option 1 ("cheapest") and Option 2 ("highest calories")**.*
 
 **Idea:** choose the dish with the best calories-per-dollar ratio, like a knapsack value-to-weight ratio.
 
@@ -912,6 +972,8 @@ Option 3 gives **1950 calories**, which is more than Option 1 (1365) and Option 
 
 ## Q1 – Adjacency list
 
+*The adjacency list below represents a graph G. (a) How many nodes and (b) how many edges are there in graph G? Give your answers as integers. Given the definition of edge density = (no. of edges in the graph) / (max possible no. of edges in the graph), (c) what is the edge density of graph G? Give your answer as a decimal value (e.g. 0.56).*
+
 ```
 V : W, Z
 W : Y
@@ -935,6 +997,8 @@ Working: max possible edges in a directed graph = n(n−1) = 5×4 = 20, so densi
 - **In order to come up with a valid topological order for a graph, all the vertices must be connected to at least one other vertex.** ✅ *(FALSE: isolated vertices are fine and can go anywhere in the order)*
 
 ## Q3 – Number of valid topological orders
+
+*Consider the following graph (vertices V1–V5, edges E1–E6). **How many valid topological orders are there?** Give your answer as an integer.*
 
 Edges (from the figure): V1→V2 (E1), V1→V3 (E2), V2→V3 (E3), V1→V4 (E6), V3→V5 (E5), V5→V4 (E4).
 
@@ -1029,6 +1093,8 @@ Give each answer as a list of letters with no commas or spaces (e.g. HGFEDC).
 
 ## Q5 – kth smallest number using merge sort
 
+*Using merge sort, what is the time complexity to find the kth smallest number of an array of n distinct numbers?* Options: O(n), O(n log(n)), O(kn log(n)), O(kn log(kn)), O(log(n)), O(kn), O(k log(n)), O(n log(k)), O(n + k), O(log(n) + log(k)).
+
 Sort the whole array with merge sort, O(n log n), then read position k, O(1).
 
 **Answer: O(n log(n))**
@@ -1043,6 +1109,8 @@ Sort the whole array with merge sort, O(n log n), then read position k, O(1).
 **Why:** sorted input makes every new node a right child, so the BST becomes a linked list and searching takes O(n).
 
 ## Q7 – Hermione's problem X reduced to TSP, with a polynomial-time algorithm for X
+
+*Hermione Granger is a brilliant student. After taking the Computational Thinking course, she discovered that there is a problem X that can be reduced to the TSP (Travelling Salesman Problem), and that she can design an algorithm that solves X in polynomial time. **What does this imply?***
 
 - The TSP problem can be solved in polynomial time, and she has solved P vs NP.
 - Her discovery must be wrong.
@@ -1079,6 +1147,8 @@ Working for (b):
 
 ## Q10 – Worst-case time complexity
 
+*What is the worst-case time complexity of the following code?* Options: O(N), O(N²), O(N log N), O(log N), O(N³), O(N⁶), O(6ᴺ).
+
 ```python
 for i in range(0, N, 2):        # step = 2
     for j in range(1, N, 3):    # step = 3
@@ -1090,6 +1160,8 @@ The outer loop runs N/2 times and the inner loop runs N/3 times, so N²/6 prints
 **Answer: O(N²)**
 
 ## Q11 – Odd integers with distinct digits from 3000 to 9999
+
+*How many odd integers with distinct digits are there in the range 3000 to 9999 (inclusive)? For example, 3015 is an odd integer with distinct digits, while 3055 is an odd integer with duplicate digits.*
 
 **Answer: 1736**
 
@@ -1118,6 +1190,8 @@ def what(n):
 **Why:** T(n) = 3·T(n/3) + O(1) as the code is written (it makes three recursive calls, each on n//3). By the master theorem a = 3, b = 3, so T(n) = Θ(n^(log₃ 3)) = Θ(n), which is linear.
 
 ## Q13 – Comparisons made by `merge(arr1, arr2)` (choose 1 or more)
+
+*Here is the `merge` function used in the merge sort algorithm (as given in your slides). Which of the following information about the minimum and maximum number of comparisons (in bold on line 06) performed by the function call `merge(arr1, arr2)` on two sorted arrays arr1 and arr2 is/are true? Choose 1 or more options.*
 
 The merge function from the slides (the bold part of the question is line 06):
 
@@ -1149,6 +1223,17 @@ Rule: the **minimum** number of comparisons is min(len1, len2), when one array i
 
 ## Q14 – `rec_remove` fill-in-the-blanks
 
+*`rec_remove` is a recursive function that takes a list of integers and a target integer. It removes all occurrences of the target integer from the list and returns the number of integers removed. For example:*
+
+```python
+a = [5, 1, 2, 3, 5, 5, 6, 5, 8, 7, 5, 4, 5]
+x = rec_remove(a, 5)   # x stores 6 because 6 integers have been removed
+print(x)               # prints 6
+print(a)               # prints [1, 2, 3, 6, 8, 7, 4]
+```
+
+*Fill in the missing code in `rec_remove` below (1 mark for each answer). Omit spaces in your answers.*
+
 ```python
 def rec_remove(arr, target, i=0):
     if len(arr)==i:                       # (a)
@@ -1170,6 +1255,8 @@ def rec_remove(arr, target, i=0):
 After a deletion the next element slides into position i, so i stays the same. Otherwise i moves to the next position.
 
 ## Q15 – Level-by-level traversal
+
+*Complete the function below, which traverses the nodes of a binary tree in a level-by-level manner starting from the root. For the binary tree below, the function visits the nodes in the order HCKEGABDF (i.e. `visit(H)` is called first, followed by `visit(C)`, `visit(K)` and so on). Fill in the missing code (1 mark for each answer). Omit spaces in your answers.*
 
 The tree:
 
@@ -1220,6 +1307,8 @@ def level_by_level_traverse(root):
 **Why:** a BST can be empty (zero nodes), so "must have at least one node" is false. The other three statements are true. A perfect binary tree with 4 levels has 2⁴ − 1 = 15 nodes. DFS and BFS from the same start both visit exactly the vertices reachable from it. A round trip through n cities uses n edges.
 
 ## Q17 – BST (root 43)
+
+*Consider the following Binary Search Tree (BST). (a) [1 mark] How many comparisons are needed to find 32? (b) [1 mark] How many comparisons are needed to find 78? (c) [1 mark] When deleting a node with two children, we need to select another node in the tree to replace the deleted node. The resultant tree must still be a BST. If we delete node 43, which two nodes on the tree can be used to replace node 43? Give your answer as two integers separated by a comma with no space (e.g. 31,35).*
 
 ```mermaid
 graph TD
@@ -1312,6 +1401,8 @@ Vertices left in the queue: F, T, F, G, which is **FFGT** when written in any or
 
 ## Q19 – Topological orderings of the bipartite DAG
 
+*Given a directed graph whose nodes are divided into two sets: S = {1, 2, …, n} and Q = {n+1, n+2, …, n+m}, where n and m are two positive integers. There are edges connecting each node in S to every node in Q, and there are no edges connecting nodes within S and no edges connecting nodes within Q. **How many possible topological orderings are there?***
+
 S = {1,…,n}, Q = {n+1,…,n+m}. Every S node points to every Q node, and there are no edges inside S or Q.
 
 All S nodes must come before all Q nodes. Within each group the order is free: n! orderings of S times m! orderings of Q.
@@ -1326,6 +1417,8 @@ All S nodes must come before all Q nodes. Within each group the order is free: n
 
 ## Q20 – Complexity of the 2-opt local search for TSP
 
+*A student runs the 2-opt method to solve a Travelling Salesman Problem (TSP) instance of n cities. He stops when he reaches the local optimal (i.e. he can no longer find any neighbour which is a shorter cycle than the current solution). **What is the total complexity of his computation?***
+
 - n²
 - n³
 - n!
@@ -1335,6 +1428,8 @@ All S nodes must come before all Q nodes. Within each group the order is free: n
 **Why:** each improvement step takes O(n²) (checking all pairs of edges), but the number of improvement steps is not bounded by a simple polynomial or factorial. So no single listed option is the total complexity.
 
 ## Q21 – Tour from city 1 visiting exactly 2 other cities (3 cities in total)
+
+*There are n cities indexed as {1, 2, …, n}. A tourist wants to find the shortest tour leaving from City 1 and visiting 2 other cities, then going back to City 1 (i.e. exactly 3 cities are visited in the tour). **Assuming P ≠ NP, which one of the following statements is correct?***
 
 *Assuming P ≠ NP, which statement is correct?*
 
@@ -1346,6 +1441,8 @@ All S nodes must come before all Q nodes. Within each group the order is free: n
 **Why:** only (n−1)(n−2) tours (pick the ordered pair of the 2 other cities) need to be checked, which is O(n²), so the problem is solvable in polynomial time.
 
 ## Q22 – Venn diagram for X and Y (assuming P ≠ NP)
+
+*X and Y are two problems with problem input size n. The table shows the most efficient known algorithms that can be used to solve them, as well as the most efficient known algorithms that can be used to verify whether proposed solutions to these problems are correct. **Assuming P ≠ NP, which Venn diagram below shows the correct positions of "X" and "Y"?***
 
 | | Problem X | Problem Y |
 |---|---|---|
@@ -1380,7 +1477,17 @@ The grid has 9 columns (A–I) and 6 rows (A–F), which is 54 cells. Each numbe
 
 The highest cell is (D,F) = 12. The cell labels read (row, column).
 
-The algorithm: start at a random cell, repeatedly move to the highest neighbouring cell, and stop when the current cell is higher than all its neighbours.
+The terrain problem: find the highest point (the global optimal) in the grid. The following algorithm has been proposed:
+
+1. Choose a starting cell randomly as the current cell.
+2. Repeat:
+   - a. Check all the current cell's adjacent neighbouring cells. A cell has 8 adjacent neighbours unless it is on the edge of the grid.
+   - b. Determine which is the highest neighbour.
+   - c. If the current cell is higher than the highest neighbour, go to step 3.
+   - d. Otherwise, set this highest neighbour as the new current cell.
+3. Return the current cell as the solution.
+
+***Which two of the following statements are true? (Choose 2.) This algorithm…***
 
 - will always return the global optimal
 - is very likely to return the global optimal, especially if the grid is very large
@@ -1398,6 +1505,20 @@ The algorithm: start at a random cell, repeatedly move to the highest neighbouri
 - **No guarantee of the global optimal:** the global optimal is reached only if the walk happens to start on its slope.
 
 ## Q24 – Assigning T tasks to D developers
+
+*Suppose you are managing a software development project, and you have D developers and T tasks to assign. Each developer can complete several tasks as long as they are done within their total working hours. Each task may cost each developer a different amount of time. Your goal is to assign all tasks to developers such that (1) the total time taken to complete all tasks is minimised, and (2) the total time for each developer does not exceed their working hours.*
+
+*Example scenario: 4 tasks (T = 4) and 2 developers (D = 2), whose total working hours are 14 and 18 respectively. The time (in hours) each developer needs for each task is:*
+
+| | Task 1 | Task 2 | Task 3 | Task 4 |
+|---|---|---|---|---|
+| Developer 1 | 5 | 9 | 7 | 8 |
+| Developer 2 | 4 | 8 | 6 | 12 |
+
+*One proposed solution: Developer 1 gets Tasks 1, 3, 4; Developer 2 gets Task 2. This is invalid because Developer 1 needs 20 hours (5 + 7 + 8) for the three tasks, which is more than their 14 working hours. It is possible for a problem scenario to have no valid solution.*
+
+- *(a) [1 mark] The problem can be solved by a brute-force algorithm that tries all possible assignments of tasks. How many different assignments are there in total, including valid and invalid ones? (All tasks are assigned.)*
+- *(b) [5 marks] Come up with a **heuristic** algorithm in pseudocode that solves this problem. It need not result in the optimal solution. State the Big-O worst-case time complexity of your proposed algorithm.*
 
 ### (a) Brute-force number of assignments
 

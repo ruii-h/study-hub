@@ -45,7 +45,7 @@ export function mcqify(html, log = []) {
     ci.sort((x, y) => x - y);
     // statement lists in the stem (the options refer to them by number): keep them, but make the numbers visible
     const stem = q.slice(0, u.index).replace('<p>Options:</p>', '')
-      .replace(/<ol>([\s\S]*?)<\/ol>/g, (m, inner) => { let items = [...inner.matchAll(/<li>([\s\S]*?)<\/li>/g)].map((x) => x[1]); if (items.length === 1) items = items[0].split(/\s+(?=\d\. )/).map((x) => x.replace(/^\d\. /, '')); return '<div class="mcq-sth">Statements</div><ol class="mcq-st">' + items.map((x) => '<li>' + x + '</li>').join('') + '</ol>'; })
+      .replace(/<ol>([\s\S]*?)<\/ol>/g, (m, inner) => { if (/<ul>/.test(m)) return m.replace('<ol>', '<ol class="mcq-st">'); let items = [...inner.matchAll(/<li>([\s\S]*?)<\/li>/g)].map((x) => x[1]); if (items.length === 1) items = items[0].split(/\s+(?=\d\. )/).map((x) => x.replace(/^\d\. /, '')); return '<div class="mcq-sth">Statements</div><ol class="mcq-st">' + items.map((x) => '<li>' + x + '</li>').join('') + '</ol>'; })
       .replace(/<ul>/g, '<ul class="mcq-st">');
     lis.forEach((x, i) => { lis[i] = x.replace(/\s*\((cannot be|possible)\)/gi, ''); }); // the answer hints are shown only after checking
     const multi = ci.length > 1 || /select all|choose (1 or more|2|two|3|three)|select \d|\(select/i.test(text(stem + ' ' + title));

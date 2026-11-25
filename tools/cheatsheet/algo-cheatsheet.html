@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>IS115 Algorithms cheat sheet</title>
+<style>
+@page{size:A4 landscape;margin:0}
+*{box-sizing:border-box}
+:root{--fs:7.7pt}
+html,body{margin:0;padding:0;background:#fff}
+body{font:var(--fs)/1.22 "Segoe UI",Arial,sans-serif;color:#111;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.pg{width:297mm;height:210mm;padding:3.5mm 3.5mm 3mm;column-count:4;column-gap:3.2mm;column-fill:auto;page-break-after:always;overflow:hidden;position:relative}
+.pg:last-child{page-break-after:auto}
+.s{margin:0 0 2.2mm;border-left:2px solid var(--a,#475569);padding-left:2.5px}
+.h{display:flex;align-items:baseline;gap:4px;margin:0 0 1.5px;padding:1px 4px;color:#fff;font-weight:800;font-size:1.12em;border-radius:2px;break-after:avoid;background:var(--a,#475569)}
+.h small{font-weight:600;font-size:.72em;opacity:.9;margin-left:auto}
+.c1,.c2,.c3,.c4,.c5,.c6{--a:#475569}
+.c7{--a:#0f766e}.c8{--a:#c2410c}.c9{--a:#7e22ce}.c10{--a:#4338ca}.c11{--a:#15803d}.c12{--a:#b91c1c}.x{--a:#111}
+p{margin:0 0 1.5px}
+ul{margin:0 0 1.8px;padding-left:8px}
+li{margin:0 0 .5px}
+b{font-weight:700}
+.k{color:var(--a);font-weight:700}
+.w{color:#b91c1c;font-weight:700}
+.g{color:#15803d;font-weight:700}
+code{font-family:Consolas,"Courier New",monospace;font-size:.92em;background:#eef2f6;padding:0 1.2px;border-radius:1px}
+pre{margin:1px 0 2.2px;padding:1.5px 3px;background:#f1f5f9;border:.4px solid #cbd5e1;border-radius:2px;font:.86em/1.18 Consolas,"Courier New",monospace;white-space:pre-wrap;break-inside:avoid}
+table{border-collapse:collapse;width:100%;margin:1px 0 2.2px;font-size:.93em;line-height:1.15;break-inside:avoid}
+th,td{border:.4px solid #94a3b8;padding:.4px 2px;text-align:left;vertical-align:top}
+th{background:#e2e8f0;font-weight:700}
+.sub{font-weight:800;color:var(--a);margin:2px 0 .5px;break-after:avoid}
+.box{border:.6px solid var(--a);background:#f8fafc;border-radius:2px;padding:1px 3px;margin:1px 0 2.2px;break-inside:avoid}
+.ord{font-family:Consolas,monospace;font-weight:700;background:#fff;text-align:center;border:.4px dashed #94a3b8;padding:1px;margin:1px 0 2px}
+sup,sub{font-size:.7em;line-height:0}
+</style></head><body>
+
+<!-- ===================== PAGE 1: chapters 2-7 ===================== -->
+<div class="pg" id="p1">
+
+<div class="s c2"><div class="h">2 · Big-O</div>
+<p>Count <b>operations</b>. <b>Worst case</b> is the default. Drop constants and lower terms; <b>keep independent variables</b> (O(n+m), O(nm)).</p>
+<p class="sub">Growth order (slow → fast)</p>
+<div class="ord">1 &lt; log log n &lt; log n &lt; n<sup>1/3</sup> &lt; √n &lt; n &lt; n log n &lt; n² &lt; n² log n &lt; n³ &lt; 2ⁿ &lt; n! &lt; nⁿ</div>
+<ul>
+<li>Any polynomial &gt; any power of log · exponential &gt; polynomial · factorial &gt; exponential. Log base is only a constant factor.</li>
+<li>2<sup>log₂n</sup> = n · 2<sup>log₄n</sup> = √n · n√n = n<sup>1.5</sup> · n!·n²⁰ = O(n!) · n<sup>1000</sup> &lt; 2ⁿ · n<sup>√n</sup> &gt; n³.</li></ul>
+<div class="box"><span class="w">⚠ TRAPS</span> 2ⁿ⁺¹ = O(2ⁿ) ✔ · 2²ⁿ = 4ⁿ ≠ O(2ⁿ) ✘ · (2n)! ≠ O(n!) ✘ · 3ⁿ ≠ O(2ⁿ) ✘ · log(n²) = 2 log n · log(n!) = Θ(n log n) · (log n)² ≠ O(log n) · “O(n²) is always faster than O(2ⁿ)” is FALSE (only for large n).</div>
+<p class="sub">Formulas</p>
+<ul>
+<li>Σi = n(n+1)/2 = O(n²) · Σi² = n(n+1)(2n+1)/6 = O(n³) · Σ1/i = O(log n) · 1+2+4+…+2ᵏ = 2ᵏ⁺¹−1 = O(2ᵏ).</li>
+<li>log(ab) = log a + log b · log(a/b) = log a − log b · log aᵏ = k log a · log_b a = log_c a / log_c b · a<sup>log_a x</sup> = x.</li></ul>
+<p class="sub">Loop patterns</p>
+<table><tr><th>Code</th><th>Cost</th></tr>
+<tr><td>range(n), range(10,n), step c</td><td>O(n)</td></tr><tr><td>range(20)</td><td>O(1)</td></tr>
+<tr><td>i*=c or i//=c</td><td>O(log n) (n=256, ÷2 → 8 steps)</td></tr>
+<tr><td>i=i*i, or √ recursion</td><td>O(log log n)</td></tr>
+<tr><td>while i*i&lt;=n</td><td>O(√n)</td></tr>
+<tr><td>nested, independent</td><td>multiply → O(n²)</td></tr>
+<tr><td>inner range(i)</td><td>Σi = O(n²)</td></tr>
+<tr><td>inner range(i*i)</td><td>Σi² = O(n³)</td></tr>
+<tr><td>inner <code>while j&lt;2**i: j*=2</code></td><td>i steps per pass → Σi = O(n²)</td></tr>
+<tr><td>inner range(2**i)</td><td>Σ2ⁱ = O(2ⁿ)</td></tr>
+<tr><td>linear outer + log inner</td><td>O(n log n)</td></tr>
+<tr><td>inner n/i for each i</td><td>O(n log n)</td></tr>
+<tr><td>2 blocks in sequence</td><td>ADD, keep the dominant</td></tr>
+<tr><td>call g(i) in a loop, g = O(i)</td><td>Σ cost g(i) = O(n²)</td></tr>
+<tr><td><code>for i in range(n): f(n-1)</code></td><td>n·T(n−1) → O(n!)</td></tr>
+<tr><td>n nested loops of n</td><td>O(nⁿ)</td></tr>
+<tr><td>slicing, insert(0), pop(0), <code>x in list</code></td><td>O(n) each (hidden!)</td></tr>
+<tr><td>early-return search</td><td>best O(1), worst O(n)</td></tr></table>
+<p>Doubling n: O(n) ×2 · O(n²) ×4 · O(n³) ×8 · O(2ⁿ) squares.</p>
+
+<p>3n²+5n+2 = O(n²) · O(n)+O(n²) = O(n²) · loop n then loop m = O(n+m) · fixed-size call (k) in a loop of n = O(kn).</p></div>
+
+<div class="s c3"><div class="h">3 · Searching &amp; sorting</div>
+<ul>
+<li><b>Linear search</b> O(n), any list. <b>Binary search</b> O(log n), <b>sorted only</b>, mid = (lo+hi)//2, ≤ ⌊log₂n⌋+1 comparisons (n=1000 → ≈10; doubling n adds 1).</li>
+<li><b>Insertion sort:</b> insert the next item into the sorted left part. <span class="g">best O(n)</span> (sorted), <span class="w">worst O(n²)</span> (reversed). Swaps = #inversions; a failing compare still counts.</li>
+<li><b>Selection sort</b> always O(n²): n(n−1)/2 compares, ≤ n−1 swaps. After k passes the first k are final.</li>
+<li><b>Merge sort:</b> log₂n levels × n work = <b>O(n log n)</b>, best = worst, extra O(n) space. Merging sizes a, b: at most <b>a+b−1</b> compares. Recursive: sort LEFT fully, then RIGHT, then merge (calls finish in post-order).</li></ul>
+<pre>def merge_sort(a):
+  if len(a)&lt;=1: return a
+  mid=len(a)//2
+  L=merge_sort(a[:mid]); R=merge_sort(a[mid:])
+  out=[]; i=j=0
+  while i&lt;len(L) and j&lt;len(R):
+    if L[i]&lt;=R[j]: out.append(L[i]); i+=1
+    else: out.append(R[j]); j+=1
+  return out+L[i:]+R[j:]</pre>
+<pre>bottom-up: [41,31,93,15,40,32,9] → [31,41][15,93][32,40][9]
+ → [15,31,41,93][9,32,40] → [9,15,31,32,40,41,93]
+merge [2,7,11]+[3,5,9]: 2,3,5,7,9 then copy 11
+binary search A=[7,16,28,35,49,63,78,90], t=48:
+ mid=3 (35)&lt;48 → lo=4 · mid=5 (63)&gt;48 → hi=4
+ mid=4 (49)&gt;48 → hi=3 · lo&gt;hi → −1</pre>
+<table><tr><th></th><th>best</th><th>worst</th><th>needs</th></tr>
+<tr><td>linear search</td><td>1</td><td>n</td><td>nothing</td></tr><tr><td>binary search</td><td>1</td><td>log n</td><td>sorted</td></tr>
+<tr><td>insertion</td><td>n</td><td>n²</td><td></td></tr><tr><td>selection</td><td>n²</td><td>n²</td><td></td></tr><tr><td>merge</td><td>n log n</td><td>n log n</td><td>extra O(n)</td></tr></table>
+<p>Closest pair: brute O(n²) → sort + scan adjacent O(n log n). Duplicates / median / k-th smallest → sort first. Find min O(n); k× find-min O(kn).</p></div>
+
+<div class="s c4"><div class="h">4 · Recursion</div>
+<table><tr><th>Recurrence</th><th>Result</th></tr>
+<tr><td>T(n−1)+c (factorial, sum)</td><td>O(n)</td></tr><tr><td>T(n/2)+c (binary search)</td><td>O(log n)</td></tr>
+<tr><td>T(n−1)+n (slice / loop each call)</td><td>O(n²)</td></tr><tr><td>T(n/2)+n</td><td>O(n)</td></tr>
+<tr><td>2T(n/2)+c</td><td>O(n)</td></tr><tr><td>2T(n/2)+n (merge sort)</td><td>O(n log n)</td></tr>
+<tr><td>2T(n−1)+c (Hanoi)</td><td>O(2ⁿ)</td></tr><tr><td>T(n−1)+T(n−2) (naive fib)</td><td>O(2ⁿ)</td></tr>
+<tr><td>n·T(n−1)</td><td>O(n!)</td></tr><tr><td>3T(n/3)+c</td><td>O(n)</td></tr>
+<tr><td>T(√n)+1 (n=256: 5 calls)</td><td>O(log log n)</td></tr><tr><td>T(n−2)+1</td><td>O(n)</td></tr></table>
+<p>Ask: ① calls per call? ② n shrinks by −1 or ÷2? ③ extra work 1 or n? Answer = levels × work per level. Master: T=aT(n/b)+f(n): f smaller → n<sup>log_b a</sup>; equal → × log n; f bigger → f(n).</p>
+<p><span class="w">⚠</span> <code>power(a,n//2)*power(a,n//2)</code> = 2 calls → O(n); save it in a variable (1 call) → O(log n). Only one branch runs? Trace which before using the table. Space = depth. Missing base / n−2 on odd n → RecursionError.</p><p><b>Naive fib</b> (F0=0, F1=1): calls C(n)=C(n−1)+C(n−2)+1 → n=0…9: 1,1,3,5,9,15,25,41,67,109; <b>#calls = 2F(n+1)−1</b>. Memoised / iterative O(n); read the base cases.</p>
+<pre>mystery(n): 0→1; even → m(n//2)+m(n//2); odd → m(n//2)*m(n//2)
+ m(1)=1, m(2)=2, m(5)=4, m(10)=8, m(20)=16
+def activity(n):          activity(2) prints:
+  if n==0: return           enter 2, enter 1,
+  print("enter",n)          leave 1, leave 2
+  activity(n-1)
+  print("leave",n)</pre></div>
+
+<div class="s c5"><div class="h">5 · Priority queue</div>
+<ul>
+<li>Returns the <b>best priority</b> (smallest number first; tie → arrival order). An ADT is its operations, not its implementation.</li></ul>
+<table><tr><th>Implementation</th><th>insert</th><th>removeMin</th><th>min</th></tr>
+<tr><td>unsorted list</td><td>O(1)</td><td>O(n)</td><td>O(n)</td></tr>
+<tr><td>sorted list</td><td>O(n)</td><td>O(1)</td><td>O(1)</td></tr>
+<tr><td>heap</td><td>O(log n)</td><td>O(log n)</td><td>O(1)</td></tr></table>
+<p>n inserts + n removals: unsorted → selection sort O(n²) · sorted → insertion sort O(n²) · heap → heap sort O(n log n).</p></div>
+
+<div class="s c6"><div class="h">6 · Trees &amp; BSTs</div>
+<ul>
+<li>Root, leaf, parent/child, ancestor/descendant, siblings. <b>Level:</b> root = 1. <b>Height</b> = max level (empty = 0). n nodes → n−1 edges.</li>
+<li><b>Full:</b> every node has 0 or 2 children. <b>Complete:</b> all levels full except the last, packed left. <b>Perfect:</b> all leaves at the same depth, 2<sup>h</sup>−1 nodes. <b>Balanced:</b> subtree heights differ by ≤ 1.</li>
+<li><b>Preorder</b> P L R (first = root) · <b>Inorder</b> L P R (<b>sorted on a BST</b>) · <b>Postorder</b> L R P (last = root). All O(n).</li>
+<li><b>BST:</b> left &lt; node &lt; right. Search/insert: walk, O(height); insert goes where the search failed.</li>
+<li><b>Delete:</b> leaf → cut · one child → parent adopts it · two children → replace with the <b>successor</b> (leftmost of the right subtree) or <b>predecessor</b> (rightmost of the left).</li>
+<li>Balanced O(log n); <span class="w">sorted insertion order → a chain, O(n)</span>. <b>Height formulas:</b> n nodes → height between <b>⌈log₂(n+1)⌉</b> (min, = ⌊log₂n⌋+1) and <b>n</b> (chain). Perfect tree of height h: <b>2<sup>h</sup>−1</b> nodes, 2<sup>h−1</sup> leaves; max nodes at level L = 2<sup>L−1</sup>. Full: leaves = internal+1. height(node) = 0 if None else 1+max(hL,hR).</li>
+<li>Level order (breadth first) uses a <b>queue</b>. Rebuild a tree from preorder + inorder: first preorder item = root, split the inorder list around it.</li></ul>
+<pre>def search(node,k):
+  if node is None: return None
+  if k==node.key: return node
+  return search(node.left if k&lt;node.key else node.right, k)</pre>
+<pre>insert 8,3,10,1,6  → 8(3(1,6),10)
+pre 8 3 1 6 10 · in 1 3 6 8 10 · post 1 6 3 10 8
+delete 8: successor 10, predecessor 6
+preorder 35,20,12,28,48,42,55 → post 12,28,20,42,55,48,35</pre></div>
+
+<div class="s c7"><div class="h">7 · Heaps<small>HIGH WEIGHT</small></div>
+<ul>
+<li><b>Min-heap = complete shape + every parent ≤ its children.</b> Min at the root; height ⌊log₂n⌋+1. <b>Not sorted</b> (inorder isn’t sorted), searching an arbitrary key is O(n).</li>
+<li><b>Array, 0-based:</b> left of j = <b>2j+1</b> · right = <b>2j+2</b> · parent = <b>⌊(j−1)/2⌋</b> · last parent = <b>⌊n/2⌋−1</b>. A child exists only if its index &lt; n (10 entries: index 4 has left child 9, right 10 invalid).</li></ul>
+<table><tr><th>Operation</th><th>Steps</th><th>Cost</th></tr>
+<tr><td><b>insert</b></td><td>append at index n, then <b>up-heap</b>: swap with the parent while smaller</td><td>O(log n), best O(1)</td></tr>
+<tr><td><b>removeMin</b></td><td>save the root, move the <b>last</b> entry to the root, shorten, <b>down-heap</b>: swap with the <b>smaller</b> child while it is smaller than the key</td><td>O(log n)</td></tr>
+<tr><td>min, size, isEmpty</td><td></td><td>O(1)</td></tr>
+<tr><td><b>BuildHeap</b></td><td>down-heap from index ⌊n/2⌋−1 back to 0 (leaves are already heaps)</td><td><b>O(n)</b></td></tr></table>
+<ul><li>Swap with the <b>smaller</b> child because it becomes the parent of its sibling. BuildHeap is O(n), not O(n log n): most nodes sit near the leaves and fall only a little (15 nodes: ≤ 11 swaps). n separate inserts = O(n log n).</li></ul>
+<pre>insert 3 into [4,7,9,15,10,12]
+ → [4,7,9,15,10,12,3] → swap 9 → [4,7,3,15,10,12,9]
+ → swap 4 → [3,7,4,15,10,12,9]
+removeMin: 9 to root [9,7,4,15,10,12]; kids 7,4 → swap 4
+ → [4,7,9,15,10,12]   (9 ≤ 12, stop)
+BuildHeap [9,4,7,1,6,3]: i=2 7↔3 · i=1 4↔1 · i=0 9↔1,9↔4
+ → [1,4,3,9,6,7]</pre>
+<pre>def up(h,j):
+  while j&gt;0 and h[j]&lt;h[(j-1)//2]:
+    h[j],h[(j-1)//2]=h[(j-1)//2],h[j]; j=(j-1)//2
+def down(h,j):
+  n=len(h)
+  while 2*j+1&lt;n:
+    c=2*j+1
+    if c+1&lt;n and h[c+1]&lt;h[c]: c+=1     # smaller child
+    if h[c]&gt;=h[j]: break
+    h[j],h[c]=h[c],h[j]; j=c</pre>
+<p><b>Why log n:</b> each row has twice as many boxes as the one above (1, 2, 4, 8…), so a million items need only about 20 rows, and every repair walks one root-to-leaf path. <code>[2,5,4,1]</code> is <b>not</b> a heap (1 is below 5).</p>
+<p class="sub">Sorting with a priority queue (phase 1: put all in; phase 2: take the min out n times)</p>
+<p>Heap sort of [9,4,7,1,6,3]: BuildHeap → [1,4,3,9,6,7], then removeMin ×6 → 1,3,4,6,7,9. A <b>max-heap</b> is the mirror (parent ≥ children).</p>
+<table><tr><th>Queue</th><th>Phase 1</th><th>Phase 2</th><th>Sort</th></tr>
+<tr><td>unsorted list</td><td>n·O(1)</td><td>n·O(n)</td><td>selection, O(n²)</td></tr>
+<tr><td>sorted list</td><td>n·O(n)</td><td>n·O(1)</td><td>insertion, O(n²)</td></tr>
+<tr><td>heap</td><td>n·O(log n)</td><td>n·O(log n)</td><td><b>heap sort, O(n log n)</b></td></tr></table>
+<table><tr><th></th><th>BST</th><th>Min-heap</th></tr>
+<tr><td>Rule</td><td>left &lt; node &lt; right</td><td>parent ≤ children</td></tr>
+<tr><td>Shape</td><td>none, can be a chain</td><td>must be complete</td></tr>
+<tr><td>Fast at</td><td>search any key</td><td>find / remove the min</td></tr></table></div>
+
+</div>
+
+<!-- ===================== PAGE 2: chapters 8-12 ===================== -->
+<div class="pg" id="p2">
+
+<div class="s c8"><div class="h">8 · Hash maps<small>HIGH WEIGHT</small></div>
+<ul>
+<li><b>Hash function, 2 stages:</b> (1) key → integer (a word is a base-26 number, a=0…z=25); (2) <b>row = integer % N</b>, always 0…N−1. Good = <b>uniform</b> and <b>deterministic</b>.</li>
+<li>N=5: cat → 1371 % 5 = <b>1</b>, dog → 2398 % 5 = <b>3</b>, cow → 1738 % 5 = <b>3</b> (<b>collision</b>).</li>
+<li><b>Collisions are inevitable</b> (birthday paradox: 100 keys, N=1000 → 99.3% chance of at least one). A bigger table helps less than expected.</li></ul>
+<table><tr><th></th><th>Separate chaining</th><th>Linear probing</th></tr>
+<tr><td>Colliding keys</td><td>same row’s <b>bucket</b> (list)</td><td><b>next free row</b>: (h+i) % N, i=1,2,… (wraps to 0)</td></tr>
+<tr><td>Per row</td><td>any number</td><td>at most 1</td></tr>
+<tr><td>Load λ = n/N</td><td>avg bucket length, <b>can exceed 1</b></td><td>cannot exceed 1 (table fills)</td></tr>
+<tr><td>Lookup</td><td>scan one bucket</td><td>follow the probes; <b>stop at a never-used empty row</b></td></tr>
+<tr><td>Delete</td><td>remove from the bucket</td><td>leave a <b>deletion marker</b></td></tr>
+<tr><td>Weakness</td><td>long buckets</td><td>clustering</td></tr></table>
+<table><tr><th>Probe sees…</th><th>Action</th></tr>
+<tr><td>the matching key</td><td>return its value</td></tr><tr><td>a different key, or a deletion marker</td><td>continue to the next row</td></tr>
+<tr><td>a never-used empty row</td><td>stop: key absent</td></tr></table>
+<p><span class="w">Why a marker:</span> emptying the row would make a later lookup stop too early and wrongly say “not here”.</p>
+<pre>insert cat,dog,cow (N=5)
+chaining: row1=[cat]  row3=[dog,cow]
+probing:  row1=cat  row3=dog  row4=cow
+delete dog (probing) → row3=marker; get(cow): row3 marker →
+ continue → row4 found ✓   (an empty row3 would say “absent”)</pre>
+<table><tr><th>Operation</th><th>Unsorted list</th><th>Hash: expected</th><th>Hash: worst</th></tr>
+<tr><td>get / put / remove</td><td>O(n)</td><td><b>O(1)</b></td><td>O(n)</td></tr>
+<tr><td>size / isEmpty</td><td>O(1)</td><td>O(1)</td><td>O(1)</td></tr>
+<tr><td>keySet / values / entrySet</td><td>O(n)</td><td>O(n)</td><td>O(n)</td></tr></table>
+<p><b>No sorted order</b> (keys are scattered): use a BST for ordered data. Python <code>dict</code>/<code>set</code> are hash tables with expected O(1) membership, so “find a partner value” in one pass is O(n).</p>
+<table><tr><th>I need…</th><th>Use</th><th>Cost</th></tr>
+<tr><td>newest first / undo</td><td>stack</td><td>O(1)</td></tr><tr><td>oldest first / by level</td><td>queue</td><td>O(1)</td></tr>
+<tr><td>best next</td><td>heap / PQ</td><td>O(log n)</td></tr><tr><td>sorted + insert/search</td><td>balanced BST</td><td>O(log n)</td></tr>
+<tr><td>exact lookup by key</td><td>hash table</td><td>O(1) avg</td></tr></table></div>
+
+<div class="s c9"><div class="h">9 · Graphs: BFS, DFS, topological sort<small>HIGH WEIGHT</small></div>
+<ul>
+<li><b>Path length</b> = number of edges (= vertices−1). <b>Simple path:</b> no repeated vertex. <b>Cycle:</b> starts and ends at the same vertex. <b>DAG:</b> directed, no cycle. Weighted: edges carry a cost.</li>
+<li>Directed: <b>Σ in-degree = Σ out-degree = |E|</b>. Max edges: directed n(n−1); undirected n(n−1)/2; DAG n(n−1)/2.</li></ul>
+<table><tr><th></th><th>Adjacency list</th><th>Adjacency matrix</th></tr>
+<tr><td>Space</td><td>O(V+E)</td><td>O(V²)</td></tr><tr><td>Is edge u→v?</td><td>O(out-degree)</td><td>O(1)</td></tr>
+<tr><td>Neighbours of u</td><td>O(out-degree)</td><td>O(V)</td></tr><tr><td>Undirected</td><td>in both lists</td><td>symmetric</td></tr>
+<tr><td>Weighted</td><td>(nbr, weight)</td><td>weight; ∞ = no edge</td></tr></table>
+<table><tr><th></th><th>BFS</th><th>DFS</th></tr>
+<tr><td>Container</td><td><b>queue</b> (FIFO)</td><td><b>stack</b> (LIFO) or recursion</td></tr>
+<tr><td>Marks visited</td><td>when <b>enqueued</b></td><td>(stack version) when <b>popped</b>; test “visited?” after every pop</td></tr>
+<tr><td>Explores</td><td>layer by layer</td><td>one path deep, then backtracks</td></tr>
+<tr><td>Fewest edges?</td><td>yes (unweighted)</td><td>no</td></tr>
+<tr><td>Time</td><td colspan="2">list <b>O(V+E)</b> (never V×E) · matrix O(V²)</td></tr></table>
+<p><b>Stack DFS (Week 9):</b> push neighbours in <b>reverse</b> list order so the first-listed is explored first. If a question says “push in alphabetical order”, follow it literally (the last one is explored first).</p>
+<p>Graph: A→B,C · B→C,D,E · C→A,D · D→B,F · E→D. <b>BFS</b> A B C D E F (layers A | B C | D E | F). <b>DFS</b> A B C D F E.</p>
+<pre>BFS: seen={s}; q=[s]
+ while q: u=q.popleft()        # oldest first
+  for v in g[u]:
+   if v not in seen: seen.add(v); q.append(v)
+DFS: stack=[s]
+ while stack: u=stack.pop()    # newest first
+  if u in seen: continue
+  seen.add(u)
+  for v in reversed(g[u]): stack.append(v)</pre>
+<p class="sub">Topological ordering</p>
+<ul><li>Lists every vertex so for <b>every edge u→v, u comes first</b>. Exists <b>iff the graph is a DAG</b>; not unique; the first vertex has in-degree 0.</li>
+<li><b>DFS method:</b> push each vertex when its call <b>finishes</b>; <b>reverse the finish order</b> (pop the stack).</li>
+<li><span class="w">Visit sequence ≠ topological order</span>; don’t forget to reverse. DAG A:[B,C] B:[C,D,E] C:[D] D:[F] E:[D] F:[] → A B E C D F (or A B C E D F).</li>
+<li>9-vertex example (alphabetical lists): visit A B G F E I C D H; finish G B E I F A H D C; <b>topological C D H A F I E B G</b>.</li></ul></div>
+
+<div class="s c10"><div class="h">10 · Graph search &amp; uniform cost search</div>
+<ul>
+<li>Model: <b>states, legal moves, goal state</b>; ignore invalid and repeated states. <b>Fewest edges ≠ lowest weight</b>: add up the weights.</li>
+<li><b>UCS</b> = BFS with a <b>priority queue</b> ordered by total cost so far. Entries <code>vertex(cost, from)</code>. Needs <b>non-negative</b> weights; it is Dijkstra stopped at the target.</li>
+<li>If a queued vertex is reached more cheaply, <b>keep the cheaper entry</b> (with its new from-vertex).</li>
+<li><span class="w">Stop when the target is DEQUEUED</span>, not when it is first enqueued. Path = follow the “from” links back.</li></ul>
+<table><tr><th></th><th>BFS</th><th>DFS</th><th>UCS</th></tr>
+<tr><td>Frontier</td><td>queue</td><td>stack</td><td>priority queue</td></tr>
+<tr><td>Next</td><td>oldest</td><td>newest</td><td>cheapest so far</td></tr>
+<tr><td>Weights</td><td>no</td><td>no</td><td>yes</td></tr>
+<tr><td>Guarantee</td><td>fewest edges</td><td>none</td><td>lowest total cost</td></tr>
+<tr><td>Stops</td><td>goal found</td><td>goal found</td><td>goal dequeued</td></tr></table>
+<pre>frontier=[(0,s)]; best={s:0}
+while frontier:
+  cost,u=heappop(frontier)
+  if u==goal: break            # dequeued, not enqueued
+  for v,w in g[u]:
+    if cost+w &lt; best.get(v,inf):   # cheaper way to v
+      best[v]=cost+w; prev[v]=u; heappush(frontier,(cost+w,v))</pre>
+<pre>A–B 4, A–C 1, B–C 2, B–D 1, C–D 5     A → D
+dequeue A(0): B(4,A) C(1,A)
+dequeue C(1): B(3,C) beats B(4);  D(6,C)
+dequeue B(3): D(4,B) beats D(6)
+dequeue D(4) = goal → path A,C,B,D cost 4
+(A,B,D costs 5: fewer hops, but not cheaper)</pre></div>
+
+<div class="s c11"><div class="h">11 · Heuristics: TSP, greedy, local search<small>HIGH WEIGHT</small></div>
+<ul>
+<li><b>TSP tours:</b> (n−1)!/2 symmetric, (n−1)! asymmetric. Exhaustive = optimal, <b>O(n!)</b>. Random search of k tours: <b>O(kn)</b>.</li>
+<li><b>Pick two of general / optimal / fast.</b> Heuristics = fast + general, not guaranteed optimal.</li></ul>
+<table><tr><th>n</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>25</th></tr>
+<tr><td>(n−1)!/2</td><td>3</td><td>12</td><td>60</td><td>360</td><td>2520</td><td>20160</td><td>181440</td><td>3.1·10²³</td></tr></table>
+<ul>
+<li><b>Nearest neighbour</b> (greedy construction): go to the closest unvisited city, finally home. n−1 steps × scan n = <b>O(n²)</b>. Looks one step ahead only, so the forced <b>last leg</b> can be long. State tie-breaks; <b>count the return leg</b>.</li>
+<li><b>Cheapest-side insertion:</b> start with the closest pair; repeat: take the outside city x <b>closest</b> to a tour city y, insert x on the side of y that adds less: <b>Δ = d(n,x) + d(x,y) − d(n,y)</b> (check both sides). <b>O(n³)</b>. Example Δ = 11+10−6 = 15. The two methods may disagree.</li>
+<li><b>Local search:</b> start from a complete solution, repeat small improving changes until a <b>local optimum</b>. Can stop any time; can be stuck below the global optimum; a bad start needs many steps.</li>
+<li><b>2-opt:</b> delete 2 edges, reconnect (= reverse a segment). <b>Δ = new legs − old legs</b>, keep it if Δ &lt; 0 (e.g. 13+13 − 12−28 = −14). Neighbours = <b>n(n−3)/2 = O(n²)</b>. Removes crossings.</li>
+<li><b>Hill climbing</b> (grid): move to the highest neighbour, stop when none is higher. Random start, ends at a <b>local peak</b>; a heuristic, not brute force, no global guarantee.</li></ul>
+<pre>tour=[start]; unvisited=all−{start}
+while unvisited:           # n−1 steps
+  nxt=min(unvisited,key=lambda c: d[tour[-1]][c])   # scan n
+  tour.append(nxt); unvisited.remove(nxt)
+length = Σ d[tour[i]][tour[i+1]] + d[last][start]   # return leg!</pre>
+<table><tr><th>Greedy rule</th><th>Fails because</th></tr>
+<tr><td>Coins 100,60,35,5,1: biggest that fits</td><td>70¢: 60+5+5 = 3 coins; 35+35 = <b>2</b></td></tr>
+<tr><td>0/1 knapsack: best value per kg</td><td>the local best blocks a better pair</td></tr>
+<tr><td>Max-sum root-to-leaf: bigger child</td><td>50 vs 91 on another branch</td></tr>
+<tr><td>Interval scheduling: <b>earliest finish first</b></td><td><span class="g">optimal</span>; earliest start / shortest / fewest conflicts all fail</td></tr></table></div>
+
+<div class="s c12"><div class="h">12 · Limits of computation<small>HIGH WEIGHT</small></div>
+<ul>
+<li><b>Efficient = polynomial</b> time; <b>tractable</b> = a polynomial algorithm is known. 2ⁿ and n! are hopeless even for small n: <b>20! ≈ 2.4×10¹⁸</b> steps (~77 years).</li>
+<li><b>P:</b> can be <b>solved</b> in polynomial time. <b>NP:</b> a proposed answer can be <b>verified</b> in polynomial time (subset sum: just add them up). <b>P ⊆ NP.</b> NP ≠ “not polynomial”.</li></ul>
+<table><tr><th>Class</th><th>Meaning</th><th>How you show it</th></tr>
+<tr><td>P</td><td>fast to solve</td><td>give a fast algorithm</td></tr>
+<tr><td>NP</td><td>fast to check</td><td>give a fast checker</td></tr>
+<tr><td>NP-complete</td><td>in NP + hardest in NP</td><td>in NP, and reduce a known NP-complete problem to it</td></tr>
+<tr><td>NP-hard</td><td>≥ all of NP</td><td>reduce a known NP-complete problem to it</td></tr></table>
+<div class="box"><b>Reduction A → B:</b> convert any A-instance into a B-instance fast, so a B-solver also solves A. <b>B is at least as hard as A</b> (arrow: easier → harder). E.g. subtraction → addition (A−B = A+(−B)); sorting → topological sort; <b>Hamiltonian cycle → TSP</b> (distance 1 if an edge exists, else 2; ask for a tour ≤ n).</div>
+<div class="box"><b>NP-complete</b> = (1) in NP <b>and</b> (2) <b>every problem in NP reduces to it</b> (the hardest in NP). Ex: subset sum, SAT, Hamiltonian cycle, TSP (decision). <b>NP-hard</b> = (2) only; may not be checkable (optimisation TSP, min graph colouring). <b>NP-complete = NP-hard ∩ NP.</b></div>
+<ul>
+<li><b>A fast algorithm for any one NP-complete problem ⇒ all of NP is fast ⇒ P = NP</b> (open, unproven). If P ≠ NP, heuristics stay necessary.</li>
+<li><b>Prove Z is NP-complete:</b> (1) show Z ∈ NP; (2) reduce a <b>known</b> NP-complete problem to Z.</li>
+<li><b>X ∈ P, Y NP-complete:</b> X ∈ NP ✓ · Y ∈ NP ✓ · X → Y ✓ · X NP-complete ✗ (not necessarily) · Y → X would imply P = NP ✗.</li>
+<li>Reducing X to TSP only shows TSP is at least as hard as X; a fast algorithm for X says nothing about TSP.</li>
+<li><b>Advice for an NP-hard problem:</b> exact search (backtracking) for small inputs · greedy / heuristics for large ones · reduce it to a known problem and reuse its solver. Python vs Java does not change the difficulty.</li></ul></div>
+
+<div class="s x"><div class="h">Exam traps</div>
+<ul>
+<li><b>Heap:</b> children 2j+1, 2j+2; swap with the <b>smaller</b> child; last parent ⌊n/2⌋−1; BuildHeap O(n).</li>
+<li><b>Hash:</b> row = integer % N; probing stops only at a <b>never-used</b> row; deletion needs a marker; chaining λ can exceed 1.</li>
+<li><b>BFS</b> marks on enqueue; stack <b>DFS</b> marks on pop. DFS push order: reversed list order (unless told otherwise).</li>
+<li><b>Topological sort:</b> reverse the <b>finish</b> order, not the visit order.</li>
+<li><b>UCS</b> stops when the goal is <b>dequeued</b>; replace a queued entry only if the new cost is cheaper.</li>
+<li>TSP totals include the <b>return leg</b>; state your tie-breaks.</li>
+<li>Greedy ≠ optimal in general; heuristics are fast with no guarantee.</li>
+<li>NP = “verifiable”, not “not polynomial”; reductions go <b>easier → harder</b>.</li></ul></div>
+
+</div>
+
+<script>
+(function(){
+ var out=[];
+ document.querySelectorAll('.pg').forEach(function(p,i){
+  var r=p.getBoundingClientRect(), maxR=0, cols={};
+  p.querySelectorAll('.s').forEach(function(s){var q=s.getBoundingClientRect(); maxR=Math.max(maxR,q.right-r.left);});
+  // height used in the last column
+  var last=0; p.querySelectorAll('.s,table,pre,p,li').forEach(function(s){var q=s.getBoundingClientRect(); if(q.left-r.left>maxR-(r.width/4)-5){last=Math.max(last,q.bottom-r.top);}});
+  out.push('p'+(i+1)+': scrollW='+p.scrollWidth+' clientW='+p.clientWidth+' maxRight='+Math.round(maxR)+' lastColBottom='+Math.round(last)+' of '+Math.round(r.height));
+ });
+ var pre=document.createElement('pre');pre.id='metrics';pre.style.display='none';pre.textContent=out.join(' | ');document.body.appendChild(pre);
+})();
+</script>
+</body></html>
