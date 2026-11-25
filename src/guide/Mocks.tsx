@@ -1,10 +1,8 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
 import { SideList } from './Guide';
 import { useG } from './state';
 import { breakText } from './paragraphs';
 import { mergeCells, reveal, runMermaid, stackTables, transposeTables } from './enhance';
-import { chapterSlide } from './motion';
 import SolToggle, { useSolutions } from './SolToggle';
 
 type Item = { i: number; chip: string; title: string };
@@ -80,7 +78,7 @@ export default function Mocks() {
     <>
       <div className="theory-nav" id="nav" tabIndex={0} aria-label="Mock exam list"><SideList /></div>
       <div ref={scroller} id="theory-content" className="theory-content" tabIndex={0} aria-label="Mock exam content">
-        <motion.div key={mock.n} {...chapterSlide(dir.current)}>
+        <div key={mock.n}>
           <SolToggle /><div className="t-hero"><div className="t-tag">{pts} · {idx + 1} of {mocks.length}</div><h1 className="t-h1" tabIndex={-1}>{(mock as any).title || `Mock exam ${mock.n}`}</h1>
             <div className="t-subtitle">Try each question under exam conditions first, then open the answer. Every answer carries its reasoning, so use it to find out why a wrong option is wrong.</div>
             <div className="meta">🎯 {mock.count} questions · chips show the question number and its marks</div></div>
@@ -91,7 +89,7 @@ export default function Mocks() {
             {pv ? <button className="t-nav-btn" onClick={() => g.setMockSel(pv.n)}><small>Previous</small>← {(pv as any).title}</button> : <div />}
             {nx ? <button className="t-nav-btn next" onClick={() => g.setMockSel(nx.n)}><small>Next</small>{(nx as any).title} →</button> : <div />}
           </div>
-        </motion.div>
+        </div>
       </div>
     </>
   );

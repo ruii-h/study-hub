@@ -34,7 +34,7 @@ function Mcq({ q, sec }: { q: any; sec: string }) {
           const cls = `eo ${!done && isS ? 'sel' : ''} ${sol ? (isA ? 'right' : '') : checked ? (isA && isS ? 'right' : isS ? 'wrong' : isA ? 'miss' : '') : ''}`;
           return (<div key={i}>
             <label className={cls}><input type="checkbox" value={v} checked={sol ? isA : isS} disabled={done} onChange={(e) => setSel((s) => (e.target.checked ? [...s, v] : s.filter((x) => x !== v)))} /><i>{v}.</i><span dangerouslySetInnerHTML={{ __html: o }} /></label>
-            {checked && q.w?.[i] ? <div className={`why ${isA ? 'wy' : 'wn'}`}><b>{isA ? 'Why this is right' : 'Why this is wrong'}:</b> {q.w[i]}</div> : null}
+            {done && q.w?.[i] ? <div className={`why ${isA ? 'wy' : 'wn'}`}><b>{isA ? 'Why this is right' : 'Why this is wrong'}:</b> {q.w[i]}</div> : null}
           </div>);
         })}
       </div>
@@ -71,8 +71,8 @@ export default function Past() {
   const a1 = Object.keys(P).length, c1 = Object.values(P).filter((v: any) => v).length;
   return (
     <div className="pane" id="pastm" tabIndex={0}>
-      <div className="pastbar"><h1 className="t-h1" style={{ fontSize: 26, margin: 0 }}>Past exam questions</h1>
-        <label className="switch"><span>Show solutions</span><input type="checkbox" role="switch" checked={!!ST.psol} onChange={(e) => g.patch('ST', (o) => ({ ...o, psol: e.target.checked ? 1 : 0 }))} /><i /></label></div>
+      <h1 className="t-h1" style={{ fontSize: 26, margin: '0 0 6px' }}>Past exam questions</h1>
+      <div className="solbar"><label className="switch"><span>Show solutions</span><input type="checkbox" role="switch" checked={!!ST.psol} onChange={(e) => g.patch('ST', (o) => ({ ...o, psol: e.target.checked ? 1 : 0 }))} /><i /></label></div>
       <div className="warnbox"><b>{ex?.pastLabel || 'Important:'}</b> <span dangerouslySetInnerHTML={{ __html: D.pastNote || '' }} /></div>
       <div className="pills" role="group" aria-label="Exam sections">
         {keys.map((k) => <button key={k} className={k === sec ? 'on' : ''} aria-pressed={k === sec} onClick={() => g.setPastSec(k)}>{secs[k][2].split(' · ')[0]} · {secs[k][3] || `Q${secs[k][0]}–${secs[k][1]}`}</button>)}
