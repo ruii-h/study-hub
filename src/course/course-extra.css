@@ -175,3 +175,6 @@ td .pb+.pb,li .pb+.pb{margin-top:.45em}
 .theory-content{max-width:100%}
 
 .solbar{position:sticky;top:0;z-index:6;display:flex;justify-content:flex-end;padding:8px 0;background:var(--bg,var(--surface))}
+
+/* mermaid builds a temporary div in <body> while rendering; keep it out of the layout so the page never jumps */
+body>div[id^="dmmd"],body>div[id^="mmd"]{position:fixed!important;left:-99999px!important;top:0!important;width:1200px;visibility:hidden;pointer-events:none}
