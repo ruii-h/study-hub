@@ -17,10 +17,10 @@ export const Row = ({ children }: { children: ReactNode }) => (
 type BtnProps = ButtonHTMLAttributes<HTMLButtonElement> & { ghost?: boolean };
 export function Btn({ ghost, className = '', ...p }: BtnProps) {
   const base =
-    'min-h-11 min-w-11 cursor-pointer rounded-md px-4 font-sans text-xs font-bold transition duration-150 hover:brightness-110 active:animate-press-pop disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:brightness-100 aria-pressed:outline-2 aria-pressed:outline-accent';
+    'min-h-11 min-w-11 cursor-pointer rounded-lg px-4 font-sans text-[13px] font-bold tracking-[0.01em] transition duration-150 hover:-translate-y-px hover:brightness-110 active:translate-y-0 active:animate-press-pop disabled:cursor-not-allowed disabled:opacity-45 disabled:shadow-none disabled:hover:translate-y-0 disabled:hover:brightness-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent';
   const tone = ghost
-    ? 'border border-line bg-surface2 text-ink'
-    : 'border-0 bg-accent text-black in-data-[theme=light]:text-white';
+    ? 'border border-line bg-surface2 text-ink shadow-[inset_0_1px_0_rgba(255,255,255,.06)] hover:border-accent/60 aria-pressed:border-accent aria-pressed:bg-accent/20 aria-pressed:shadow-[0_0_0_1px_var(--accent)]'
+    : 'border-0 bg-linear-to-b from-accent to-[color-mix(in_srgb,var(--accent),black_24%)] text-black shadow-[0_2px_10px_-2px_color-mix(in_srgb,var(--accent)_60%,transparent),inset_0_1px_0_rgba(255,255,255,.3)] in-data-[theme=light]:text-white';
   return <button type="button" className={`${base} ${tone} ${className}`} {...p} />;
 }
 

@@ -1,0 +1,151 @@
+import { ex, section, ask, theory, step, p, check, slip, why, table, ul, code } from './lib.mjs';
+
+const chip = (n) => `TUTORIAL 6 · TIER 2 · Q${n}`;
+const ic = (n) => `IN-CLASS · Q${n}`;
+
+const inclass = [
+  ex({
+    chip: ic(1), title: 'Three insertion orders, three different trees',
+    q: 'Build a BST by inserting the numbers in each of these orders, then count how many comparisons are needed to search for the number 1 in each tree. BST1: 55, 4, 23, 21, 12, 7, 66, 1, 91, 44. BST2: 23, 7, 66, 55, 12, 91, 21, 1, 4, 44. BST3: 1, 91, 7, 55, 4, 44, 12, 23, 21, 66.',
+    ans: table([['Tree', 'Root', 'Height', 'Comparisons to find 1'], ['BST1', '55', '6', '3 (55, 4, 1)'], ['BST2', '23', '4', '3 (23, 7, 1)'], ['BST3', '1', '8', '1 (1)']]),
+    work: [
+      ask('All three trees contain the <b>same ten numbers</b>, only the insertion order differs. The question shows that a BST’s shape (and so its speed) depends on the order in which data arrives, and that a long search path does not always mean a slow search for <i>every</i> key.'),
+      theory('Binary search tree insertion: start at the root, go left if the new value is smaller and right if it is larger, and attach the new node where the path ends. The first value inserted always becomes the root.'),
+      p('<b>BST1</b> (root 55). Insert 4 (left of 55). 23 goes 55 → left 4 → right of 4. 21 goes left of 23, 12 left of 21, 7 left of 12. 66 goes right of 55. 1 goes left of 4. 91 goes right of 66. 44 goes 55 → 4 → 23 → right of 23.'),
+      code('55\n├─ L: 4\n│    ├─ L: 1\n│    └─ R: 23\n│         ├─ L: 21\n│         │    └─ L: 12\n│         │         └─ L: 7\n│         └─ R: 44\n└─ R: 66\n     └─ R: 91', 'BST1 (height 6)'),
+      p('<b>BST2</b> (root 23). 7 left of 23, 66 right of 23, 55 left of 66, 12 right of 7, 91 right of 66, 21 right of 12, 1 left of 7, 4 right of 1, 44 left of 55.'),
+      code('23\n├─ L: 7\n│    ├─ L: 1\n│    │    └─ R: 4\n│    └─ R: 12\n│         └─ R: 21\n└─ R: 66\n     ├─ L: 55\n     │    └─ L: 44\n     └─ R: 91', 'BST2 (height 4)'),
+      p('<b>BST3</b> (root 1). Every other number is bigger than 1, so everything hangs to the right of 1. 91 is right of 1. 7 goes 1 → 91 → left of 91. 55 goes right of 7, and 4 goes left of 7. 44 goes left of 55, 12 left of 44, 23 right of 12, 21 left of 23, and 66 right of 55. The tree leans heavily to one side.'),
+      code('1\n└─ R: 91\n     └─ L: 7\n          ├─ L: 4\n          └─ R: 55\n               ├─ L: 44\n               │    └─ L: 12\n               │         └─ R: 23\n               │              └─ L: 21\n               └─ R: 66', 'BST3 (height 8)'),
+      step('b', 'Count comparisons as nodes visited, including the node that matches. BST1: 55 → 4 → 1 = <b>3</b>. BST2: 23 → 7 → 1 = <b>3</b>. BST3: 1 is the root = <b>1</b>.'),
+      check('Now search for 21 instead. BST1: 55, 4, 23, 21 = 4. BST2: 23, 7, 12, 21 = 4. BST3: 1, 91, 7, 55, 44, 12, 23, 21 = 8. The skewed BST3 is far worse for most keys even though it was best for key 1.'),
+      why('The worst-case cost of search is the <b>height</b>. BST2 is the shortest (height 4) and BST3 the tallest (8). Inserting keys in sorted or nearly sorted order, as BST3 nearly does, is what produces tall, thin trees.'),
+      slip('A single lucky search (key 1 in BST3) says nothing about the shape. Judge a tree by its height, which is the worst case.'),
+    ],
+  }),
+  ex({
+    chip: ic(2), title: 'Is this binary tree a BST?',
+    q: 'Give an algorithm that takes a binary tree as input and returns True if it is a binary search tree and False otherwise.',
+    ans: code('def is_bst(node, low=None, high=None):\n    if node is None:\n        return True                          # an empty tree is a BST\n    if low is not None and node.value <= low:\n        return False                         # too small for this position\n    if high is not None and node.value >= high:\n        return False                         # too large for this position\n    return (is_bst(node.left,  low, node.value) and\n            is_bst(node.right, node.value, high))') + '<p>Time <code>O(n)</code>: every node is visited once.</p>',
+    work: [
+      ask('A BST is not just “each node is bigger than its left child and smaller than its right child”. The rule has to hold against <b>every ancestor</b>: everything in a node’s left subtree is smaller than it, and everything in its right subtree is larger.'),
+      theory('BST property + inorder traversal: the inorder traversal of a BST visits keys in increasing order. A recursive check can carry down the allowed range (low, high).'),
+      step(1, '<b>Wrong idea (local check only).</b> Compare each node only with its two children. This tree passes that test but is <i>not</i> a BST:'),
+      code('10\n├─ L: 5\n│    └─ R: 15      # 15 > 5 is fine locally,\n└─ R: 20           # but 15 is in the LEFT subtree of 10 and 15 > 10', 'tree'),
+      step(2, '<b>Right idea: pass a range downwards.</b> Start with no limits. Going left through a node with value v means all values below must be &lt; v, so the new upper limit is v. Going right means all values must be &gt; v, so the new lower limit is v. A node outside its range makes the answer False.'),
+      p('<b>Trace on the bad tree above.</b> is_bst(10) allows any value. Left child 5 is within (None, 10): fine. 5’s right child 15 must lie in (5, 10), but 15 ≥ 10 → <b>False</b>.'),
+      p('<b>Alternative (inorder).</b> Do an inorder traversal collecting the keys, then check the list is strictly increasing. For the bad tree the inorder is 5, 15, 10, 20, and 15 &gt; 10 breaks the order.'),
+      check('Both methods visit each node once, so they take O(n). The range-passing method needs no extra list, only the recursion stack (O(height)).'),
+      slip('Using <code>&lt;=</code> and <code>&gt;=</code> here assumes all keys are distinct. If duplicates were allowed you would have to decide which side they go on and adjust the strictness of the comparisons accordingly.'),
+    ],
+  }),
+];
+
+const items = [
+  ex({
+    chip: chip(7), title: 'Build a tree with set operations, then traverse it',
+    q: 'The operations are applied by hand: <code>t.setRoot(Node("A"))</code>, <code>t.root.setLeft(Node("B"))</code>, <code>t.root.setRight(Node("C"))</code>, <code>t.root.left.setLeft(Node("D"))</code>, <code>t.root.right.setRight(Node("E"))</code>, <code>t.root.right.right.setLeft(Node("F"))</code>, <code>t.root.left.setRight(Node("G"))</code>. (a) What is <code>t.root.right</code>? (b) <code>t.root.left.right</code>? (c) What is the height? (d) The parent of "E"? (e) The preorder, (f) inorder and (g) postorder traversals?',
+    ans: table([['Part', 'Answer'], ['(a)', 'the node C (with its subtree)'], ['(b)', 'the node G'], ['(c)', '4 levels (3 edges)'], ['(d)', 'C'], ['(e) preorder', 'A, B, D, G, C, E, F'], ['(f) inorder', 'D, B, G, A, C, F, E'], ['(g) postorder', 'D, G, B, F, E, C, A']]),
+    work: [
+      ask('Step one is to <b>draw the tree</b>. Read each dotted path from the left: <code>t.root.right.right</code> means “from the root go right, then right again”.'),
+      step(1, 'Build the tree line by line. A is the root. B is its left child, C its right child. D is the left child of B. E is the right child of C. F is the left child of E (<code>t.root.right.right</code> is E). G is the right child of B.'),
+      code('        A\n       / \\\n      B   C\n     / \\   \\\n    D   G   E\n           /\n          F', 'tree'),
+      step('a', '<code>t.root.right</code> goes from the root to its right child: the node <b>C</b>. Printing it shows C, and it carries its whole subtree (E and F).'),
+      step('b', '<code>t.root.left.right</code>: root → left child B → B’s right child: the node <b>G</b>.'),
+      step('c', 'Longest path: A → C → E → F. That is 4 nodes, so the tree has <b>4 levels</b> (the course counts height as the number of levels; counted in edges it is 3).'),
+      step('d', 'E hangs under C, so its parent is <b>C</b>.'),
+      p('<b>Traversal recipes.</b> Preorder = <i>parent, left, right</i>. Inorder = <i>left, parent, right</i>. Postorder = <i>left, right, parent</i>. Apply the recipe at every node, starting at A.'),
+      step('e', 'Preorder: visit A; then the whole left subtree of A in preorder (B, then D, then G); then the right subtree (C, then C’s right subtree E, F). Result: <b>A, B, D, G, C, E, F</b>.'),
+      step('f', 'Inorder: left subtree of A first. Within it: D, B, G. Then A. Then the right subtree: C has no left child, so C, then E’s subtree: F, E. Result: <b>D, B, G, A, C, F, E</b>.'),
+      step('g', 'Postorder: left subtree first: D, G, B. Right subtree: F, E, C. Then A last. Result: <b>D, G, B, F, E, C, A</b>.'),
+      check('Each traversal must list all 7 nodes exactly once. Also, in preorder the root is always first, and in postorder it is always last: A, ..., A.'),
+      slip('For inorder, a node with only a right child (like C) is visited <i>before</i> its right subtree. “Left, parent, right” still holds when the left part is empty.'),
+    ],
+  }),
+  ex({
+    chip: chip(8), title: 'Worst-case search in a BST that is not full',
+    q: 'If a BST with n nodes is not full, (a) what is the worst-case complexity of <code>searchbst</code> in terms of n? (b) What shape does the tree have in this worst case?',
+    ans: `<p>(a) <code>O(n)</code>. (b) A completely skewed tree, a chain where every node has only one child (a linked list in disguise), so the height is n.</p>`,
+    work: [
+      ask('Searching a BST makes one comparison per level, so the cost is at most the <b>height</b>. So the question is: how tall can a BST with n nodes get?'),
+      theory('BST efficiency: the maximum number of comparisons for search, insert or remove equals the height. A balanced tree of n nodes has height about ⌊log₂ n⌋ + 1 and costs O(log n); a skewed tree has height n and costs O(n).'),
+      step(1, '“Not full” means we cannot count on every node having 0 or 2 children, so nothing forces the tree to be bushy.'),
+      step(2, 'The tallest possible shape puts one node on each level: every node has a single child. The height is n.'),
+      code('1\n└─ R: 2\n     └─ R: 3\n          └─ R: 4\n               └─ R: 5', 'inserting 1, 2, 3, 4, 5 in order'),
+      step(3, 'Searching for the last key (5) visits all n nodes: 5 comparisons. So the worst case is <b>O(n)</b>.'),
+      why('Inserting keys that arrive already sorted (or in reverse order) produces this shape, which is why balanced trees (AVL, red–black) or shuffled insertion orders matter.'),
+      slip('Saying O(log n) because “it is a BST” is the most common error. O(log n) holds only when the tree is balanced.'),
+    ],
+  }),
+  ex({
+    chip: chip(9), title: 'Bob’s contact list: best and worst insertion order',
+    q: 'Bob wants to organise his contacts into an alphabetical BST. (a) In what sequence should he insert the names to get the best tree, and why? (b) What is the worst sequence, and why?',
+    ans: `<p>(a) Insert the <b>middle</b> name first, then the middle of each half, and so on, level by level. This gives a balanced tree of height ⌊log₂ n⌋ + 1.</p><p>(b) Insert the names in <b>alphabetical order</b> (or reverse alphabetical): the tree becomes a chain of height n.</p>`,
+    work: [
+      ask('Both parts are about the <b>height</b> of the tree, which sets the search cost. The first name inserted becomes the root, so the order decides the shape.'),
+      theory('The root splits the remaining names into “before” and “after” groups. To keep the tree short, each split should divide the names as evenly as possible.'),
+      step('a', 'Take the sorted list. Insert its <b>median</b> first so that half the names go left and half go right. Then repeat on each half. For seven names A–G, the best order is D, B, F, A, C, E, G.'),
+      code('        D\n      /   \\\n     B     F\n    / \\   / \\\n   A   C E   G', 'best case: height 3 = ⌊log₂ 7⌋ + 1'),
+      p('With n names the height is ⌊log₂ n⌋ + 1. Finding any contact takes at most that many comparisons: about 10 for 1,000 contacts.'),
+      step('b', 'Insert A, B, C, D, E, F, G in order. A is the root, every later name is bigger than everything so far, so each goes right. The result is a chain.'),
+      code('A\n└─ R: B\n     └─ R: C\n          └─ R: D\n               └─ …', 'worst case: height n'),
+      p('Searching for G takes 7 comparisons, and for 1,000 contacts it takes up to 1,000, no better than flipping through the notebook. Reverse alphabetical order is just as bad (a chain going left).'),
+      check('For n = 1,000: best height 10, worst height 1,000. That is a factor of 100 in the worst-case number of comparisons.'),
+      slip('Alphabetical order feels the most natural way to enter a sorted contact list, but it is exactly the worst case for a BST.'),
+    ],
+  }),
+  ex({
+    chip: chip(10), title: 'Chain email: tallest and shortest tree',
+    q: 'Andy sends an email to two friends, each of whom either forwards it to two new friends or does not forward it at all. The forwarding forms a binary tree. If 100 other people (besides Andy) end up sending emails, what are (a) the maximum and (b) the minimum possible height of the tree?',
+    ans: `<p>(a) <b>102</b> levels. (b) <b>8</b> levels.</p>`,
+    work: [
+      ask('Count the senders. Andy plus 100 others = <b>101 senders</b>. Each sender sends to exactly two people, so each sender is a node with exactly 2 children. The people who receive but do not forward are the leaves.'),
+      theory('Height of a binary tree with n nodes: at most n levels (a chain) and at least ⌊log₂ n⌋ + 1 levels (a complete tree).'),
+      step('a', '<b>Tallest tree.</b> Make the senders form a chain: Andy → sender 2 → … → sender 101. Every sender has two children but only one of them forwards again. Counting levels: 101 sender levels, plus one more level for the people who receive from the last sender, gives <b>102</b>.'),
+      step('b', '<b>Shortest tree.</b> The 101 senders should fill the upper levels as completely as possible. Levels 1–6 hold 1 + 2 + 4 + 8 + 16 + 32 = 63 senders, which is not enough. Levels 1–7 hold up to 127 ≥ 101, so the senders need <b>7 levels</b> (⌊log₂ 101⌋ + 1 = 7).'),
+      step('b', 'The people receiving emails from the last level of senders sit one level lower, so the whole tree has <b>7 + 1 = 8</b> levels.'),
+      check('Total number of people in the tree: each sender has two children, so 101 senders have 202 children and the tree has 1 + 202 = 203 nodes.'),
+      slip('Using log₂ 203 gives the same 8 here, but the reasoning should come from the senders (internal nodes) forming a complete tree, then adding one level of leaves.'),
+    ],
+  }),
+  ex({
+    chip: chip(11), title: 'The mirror of a binary tree',
+    q: '(a) Design a recursive algorithm that turns a binary tree into its mirror, swapping the left and right child of every node. (b) What is its Big O complexity?',
+    ans: code('def mirror(root):\n    if root is not None:\n        root.left, root.right = root.right, root.left    # swap the two children\n        mirror(root.left)                                # then mirror both subtrees\n        mirror(root.right)') + '<p><code>O(n)</code>: each node is visited once and does a constant amount of work.</p>',
+    work: [
+      ask('The mirror of a tree is the original with left and right children swapped <b>at every node</b>, not just at the root. So: swap here, then repeat in both subtrees.'),
+      theory('Recursion on trees follows the shape of the tree: handle the current node, then call the same function on the left and right subtrees. The base case is an empty tree (None).'),
+      step(1, '<b>Base case.</b> If the node is None, there is nothing to do.'),
+      step(2, '<b>Swap.</b> Exchange the two child links of this node.'),
+      step(3, '<b>Recurse.</b> Call mirror on both children. It does not matter which one you call first, since they are separate subtrees.'),
+      code('before:      A            after:       A\n            / \\                       / \\\n           B   C                     C   B\n          / \\   \\                   /   / \\\n         D   E   F                 F   E   D', 'tree'),
+      p('<b>Trace.</b> mirror(A) swaps B and C. mirror(C): C’s children were (None, F) and become (F, None). mirror(B): children (D, E) become (E, D). The recursion then reaches None everywhere below and stops.'),
+      step(4, '<b>Complexity.</b> The function is called once for every node and once for every missing child (None). That is n + (n + 1) calls in total for a binary tree with n nodes, each doing O(1) work, so <b>O(n)</b>. The structure is the same as a preorder traversal.'),
+      slip('If you only swap at the root, the result is not the mirror: the subtrees below would still have their original left/right order. The recursive calls are what make every level swap.'),
+    ],
+  }),
+  ex({
+    chip: chip(12), title: 'Height, and checking a tree is balanced',
+    q: '<code>depth(root)</code> returns 0 for None and otherwise <code>1 + max(depth(root.left), depth(root.right))</code>. (a) What is its worst-case complexity for a tree of N nodes? (b) Write a recursive <code>is_balanced(root)</code> that uses <code>depth</code>, returning True if for every node the depths of its left and right subtrees differ by at most 1. Give its complexity and show the working.',
+    ans: `<p>(a) <code>O(N)</code>: depth visits every node of the subtree it is called on.</p>` + code('def is_balanced(root):\n    if root is None:\n        return True\n    if abs(depth(root.left) - depth(root.right)) > 1:\n        return False\n    return is_balanced(root.left) and is_balanced(root.right)') + '<p>(b) <code>O(N log N)</code> for a balanced tree (the answer expected in the tutorial); up to <code>O(N²)</code> as a general upper bound.</p>',
+    work: [
+      ask('Two things: (a) how much work one call to <code>depth</code> costs; (b) how many times <code>is_balanced</code> calls it and on how big a subtree each time.'),
+      step('a', '<code>depth</code> makes one call per node of the tree and one per empty child. Calling it on a node visits that node’s entire subtree: it is <b>O(number of nodes in that subtree)</b>, so O(N) for the whole tree.'),
+      step('b', '<b>Design.</b> A tree is balanced if (1) the root’s two subtrees differ in depth by at most 1 <i>and</i> (2) both subtrees are themselves balanced. Check the root with <code>depth</code>, then recurse.'),
+      p('<b>Trace on a small unbalanced tree:</b> root a has a left subtree with depth 3 (nodes b, …) and a right subtree with depth 1 (node c). |3 − 1| = 2 &gt; 1, so is_balanced(a) returns False straight away.'),
+      step('b', '<b>Counting the work.</b> At each node, is_balanced calls depth on the left and right subtrees. Together those two calls visit all the nodes below that node. So the work done at one node is proportional to the size of its subtree.'),
+      p('Look at the tree level by level. At level 0 the root does work proportional to N. At level 1 the two children do work proportional to N/2 each, so about N together. In general <b>each level of the tree costs about N in total</b>, because the subtrees on a level do not overlap.'),
+      step('b', 'A balanced tree has about log₂ N levels. So the total is N per level × log N levels = <b>O(N log N)</b>.'),
+      why('The reason for the extra log N factor is that every node’s height is recomputed from scratch by each of its ancestors, so a node near the bottom is visited once for every level above it.'),
+      p('<b>Faster idea (extra).</b> Compute the height and the balance check in one pass. Return −1 if a subtree is unbalanced, else its height:'),
+      code('def height_or_fail(root):\n    if root is None:\n        return 0\n    l = height_or_fail(root.left)\n    r = height_or_fail(root.right)\n    if l == -1 or r == -1 or abs(l - r) > 1:\n        return -1               # unbalanced somewhere below\n    return 1 + max(l, r)\n\ndef is_balanced_fast(root):\n    return height_or_fail(root) != -1      # O(N): each node visited once'),
+      slip('Do not stop after checking only the root. A tree whose root looks balanced can still contain an unbalanced subtree further down, and the recursive calls are there to catch that.'),
+    ],
+  }),
+];
+
+export default {
+  week: 6,
+  inclassNew: section({ id: 'ic-new', heading: '📝 In-class exercises', sub: 'The lecture exercises on BST shape and BST checking. Attempt each one first, then open the answer.', items: inclass }),
+  tier2: section({ id: 'tut-t2', heading: '📚 Tutorial questions: Tier 2', sub: 'The harder questions from the same tutorial. Try each on paper, then open the answer, then the full working.', items }),
+};

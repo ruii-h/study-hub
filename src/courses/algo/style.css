@@ -1749,3 +1749,29 @@ html[data-theme=light] .nb>b:first-child{color:#1a7f37}
 /* full-width placement inside the multi-column .t-section grid */
 .t-section>.nb,.t-section>.film,.t-section>.film-key,.t-section>.film-tree,.t-section>.film-pair,.t-section>figure.film-tree{grid-column:1/-1}
 .t-section>.film-tree{width:100%}
+
+/* exercise cards: chip tag + title like the worked examples */
+.exr-head{display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin-bottom:8px}
+.exr-head h4{margin:0;font-size:17px;line-height:1.35;color:var(--ink)}
+.exr-head .cf-tag{display:inline-flex}
+.exr .ma p{margin:0 0 10px}
+.exr .ma .slip,.exr .ma .chk{color:var(--muted);font-style:italic}
+.exr .ma .t-table-wrap{margin:8px 0 10px}
+.exr .ma pre.code{margin:8px 0 12px}
+
+/* Tutorials tab: exercise list nested under the chapter in the side nav */
+.tut-sub{margin:2px 0 8px 14px;padding-left:8px;border-left:1px solid var(--border)}
+.tut-sub-h{font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding:8px 8px 2px}
+button.tut-sub-i{width:100%;text-align:left;background:none;border:0;border-radius:6px;display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:6px 8px;cursor:pointer;font:inherit;color:var(--muted)}
+button.tut-sub-i .chip{font-size:9.5px;font-weight:700;letter-spacing:.04em;color:var(--green)}
+button.tut-sub-i .ttl{font-size:12.5px;line-height:1.35;color:var(--text)}
+@media (hover:hover){button.tut-sub-i:hover{background:var(--surface2)}}
+.tut-actions{margin:0 0 14px;display:flex;flex-wrap:wrap;gap:8px}
+.exr.flash{animation:exflash 1.2s ease-out}
+@keyframes exflash{0%{box-shadow:0 0 0 3px var(--accent)}100%{box-shadow:0 0 0 0 transparent}}
+
+/* Mock Exams tab */
+.exr-sub{margin:14px 0 6px;font-size:15px;line-height:1.35;color:var(--ink)}
+.exr .ma pre.mermaid,.exr-q pre.mermaid{margin:10px 0}
+.exr-q>div,.exr .ma{min-width:0;max-width:100%}
+.exr-q .t-table-wrap,.exr .ma .t-table-wrap{max-width:100%;overflow-x:auto}

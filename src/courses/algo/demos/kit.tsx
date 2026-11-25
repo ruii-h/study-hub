@@ -31,8 +31,8 @@ export function Transport({ s, label }: { s: ReturnType<typeof useSteps>; label?
       <Btn disabled={s.k >= s.last || s.playing} onClick={s.next}>Step</Btn>
       <Btn ghost aria-pressed={s.playing} onClick={s.toggle}>{s.playing ? 'Pause' : 'Play'}</Btn>
       <Btn ghost disabled={s.k === 0 && !s.playing} onClick={s.reset}>Reset</Btn>
-      <span className="text-[12.5px] text-muted">{label ?? 'Step'} {s.k} / {s.last}</span>
-      <Btn ghost aria-label="Playback speed" onClick={() => s.setSpeed(s.speed === 1 ? 2 : s.speed === 2 ? 0.5 : 1)}>{s.speed === 1 ? 'Speed 1×' : s.speed === 2 ? 'Speed 2×' : 'Speed 0.5×'}</Btn>
+      <span className="rounded-md bg-surface2 px-2.5 py-1 text-[12.5px] tabular-nums text-muted">{label ?? 'Step'} <b className="text-ink">{s.k}</b> / {s.last}</span>
+      <Btn ghost aria-label="Playback speed" className="px-3" onClick={() => s.setSpeed(s.speed === 1 ? 2 : s.speed === 2 ? 0.5 : 1)}>{s.speed === 1 ? 'Speed 1×' : s.speed === 2 ? 'Speed 2×' : 'Speed 0.5×'}</Btn>
     </Row>
   );
 }

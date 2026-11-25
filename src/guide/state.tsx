@@ -10,6 +10,10 @@ export interface Data {
   quiz: Record<string, any[]>; hard: Record<string, any[]>; fill?: Record<string, any[]>; exam: { mcq: any[]; wr: any[] };
   selfq?: string; selfn?: number; ice?: string; pqg?: [string, number[]][]; secs?: Record<string, [number, number, string, string?]>;
   pastNote?: string; cmock?: any[]; pastSingle?: boolean; tabs?: TabDef[]; play?: any[];
+  /** tutorial + in-class exercises, one entry per chapter (shown in the Tutorials tab, not in the theory chapters) */
+  tuts?: { n: number; count: number; html: string }[];
+  /** full mock exams (shown in the Mock Exams tab) */
+  mocks?: { n: number; count: number; html: string }[];
 }
 export type Back = { tab: string; sel: string | number; y: number; label: string; up: Back | null; sec?: string; q?: number } | null;
 type Json = Record<string, any>;
@@ -25,6 +29,8 @@ export interface Ctx {
   openChapter: (n: number, o?: { back?: Back; sec?: string; y?: number }) => void;
   pendingScroll: React.MutableRefObject<{ sec?: string; y?: number } | null>;
   pqSel: string | number; setPqSel: (s: string | number) => void; pqMode: string; setPqMode: (m: string) => void;
+  tutSel: number; setTutSel: (n: number) => void; openTut: (n: number) => void;
+  mockSel: number; setMockSel: (n: number) => void;
   pastSec: string; setPastSec: (s: string) => void; cch: number; setCch: (n: number) => void;
   goQuiz: (n: number, mode?: string) => void; goBack: () => void; navOpen: boolean; setNavOpen: (b: boolean) => void;
 }
@@ -56,6 +62,8 @@ export function GuideProvider({ meta, D, api, children }: { meta: CourseMeta; D:
   const [back, setBack] = useState<Back>(null);
   const [pqSel, setPqSelRaw] = useState<string | number>(ST.pq !== undefined && (ST.pq === 'mx' || ST.pq === 'sc' || D.lessons.find((l) => l.n === ST.pq)) ? ST.pq : D.lessons[0].n);
   const [pqMode, setPqMode] = useState<string>(ST.pqm === 'warm' ? 'warm' : 'hard');
+  const [tutSel, setTutSelRaw] = useState<number>(() => (D.tuts?.some((t) => t.n === ST.tut) ? (ST.tut as number) : D.tuts?.[0]?.n ?? 0));
+  const [mockSel, setMockSelRaw] = useState<number>(() => (D.mocks?.some((t) => t.n === ST.mock) ? (ST.mock as number) : D.mocks?.[0]?.n ?? 0));
   const [pastSec, setPastSecRaw] = useState<string>(ST.psec && D.secs?.[ST.psec] ? ST.psec : Object.keys(D.secs || {})[0] || '');
   const [cch, setCchRaw] = useState<number>(ST.cch || 0);
   const [navOpen, setNavOpen] = useState(false);
@@ -80,22 +88,26 @@ export function GuideProvider({ meta, D, api, children }: { meta: CourseMeta; D:
     patch('V', (v) => ({ ...v, [n]: 1 })); patch('ST', (s) => ({ ...s, last: n, tab: t, ['last_' + t]: n }));
   }, [patch, tabOf]);
   const setPqSel = useCallback((s: string | number) => { setPqSelRaw(s); patch('ST', (o) => ({ ...o, pq: s })); setNavOpen(false); }, [patch]);
+  const setTutSel = useCallback((n: number) => { setTutSelRaw(n); patch('ST', (o) => ({ ...o, tut: n })); setNavOpen(false); }, [patch]);
+  const openTut = useCallback((n: number) => { setTutSelRaw(n); setTabRaw('tut'); setNavOpen(false); patch('ST', (o) => ({ ...o, tut: n, tab: 'tut' })); }, [patch]);
+  const setMockSel = useCallback((n: number) => { setMockSelRaw(n); patch('ST', (o) => ({ ...o, mock: n })); setNavOpen(false); }, [patch]);
   const setPastSec = useCallback((s: string) => { setPastSecRaw(s); patch('ST', (o) => ({ ...o, psec: s })); setNavOpen(false); }, [patch]);
   const setCch = useCallback((n: number) => { setCchRaw(n); patch('ST', (o) => ({ ...o, cch: n })); setNavOpen(false); }, [patch]);
   const goQuiz = useCallback((n: number, mode = 'hard') => { setPqMode(mode); setPqSelRaw(n); setTabRaw('practice'); setNavOpen(false); }, []);
   const goBack = useCallback(() => {
     const b = back; if (!b) return;
     if (b.tab === 'cheat' || b.tab === 'cards') { setBack(null); setTab(b.tab); return; }
+    if (b.tab === 'tut') { setBack(null); openTut(+b.sel); setTimeout(() => document.getElementById('theory-content')?.scrollTo({ top: b.y }), 80); return; }
     if (b.tab === 'theory') { if (+b.sel === cur) { setBack(b.up); pendingScroll.current = { y: b.y }; setCur((c) => c); document.getElementById('theory-content')?.scrollTo({ top: b.y, behavior: 'smooth' }); } else openChapter(+b.sel, { back: b.up ?? undefined, y: b.y }); return; }
     setBack(null);
     if (b.tab === 'practice') { setPqSelRaw(b.sel === 'mx' ? 'mx' : b.sel); setTabRaw('practice'); }
     else if (b.tab === 'past') { if (b.sec) setPastSecRaw(b.sec); setTabRaw('past'); setTimeout(() => document.getElementById('pq' + b.q)?.scrollIntoView({ block: 'start' }), 80); }
-  }, [back, cur, openChapter, setTab]);
+  }, [back, cur, openChapter, setTab, openTut]);
   const resetAll = useCallback(() => {
     setSt((s) => { const next = { S: {}, V: {}, K: {}, P: {}, M: {}, QP: {}, PS: {}, PW: {}, ST: { theme: s.ST.theme, fs: s.ST.fs } }; stRef.current = next; persist(next); return next; });
   }, [persist]);
 
-  const value: Ctx = { D, meta, wiki, api, ...(st as any), patch, resetAll, tab, setTab, tabOf, cur, back, setBack, openChapter, pendingScroll, pqSel, setPqSel, pqMode, setPqMode, pastSec, setPastSec, cch, setCch, goQuiz, goBack, navOpen, setNavOpen };
+  const value: Ctx = { D, meta, wiki, api, ...(st as any), patch, resetAll, tab, setTab, tabOf, cur, back, setBack, openChapter, pendingScroll, pqSel, setPqSel, pqMode, setPqMode, tutSel, setTutSel, openTut, mockSel, setMockSel, pastSec, setPastSec, cch, setCch, goQuiz, goBack, navOpen, setNavOpen };
   return <C.Provider value={value}>{children}</C.Provider>;
 }
 

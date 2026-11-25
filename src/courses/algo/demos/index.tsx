@@ -1,8 +1,6 @@
 import { createRoot, type Root } from 'react-dom/client';
 import BinarySearch from './BinarySearch';
 import SortCompare from './SortCompare';
-import GraphSearch from './GraphSearch';
-import UniformCost from './UniformCost';
 import IterationLab from './IterationLab';
 import RecursionLab from './RecursionLab';
 import StackQueueLab from './StackQueueLab';
@@ -23,8 +21,8 @@ initDiagramZoom();
 const DEMOS: Record<string, () => React.JSX.Element> = {
   bsearch: BinarySearch,
   sort: SortCompare,
-  graph: GraphSearch,
-  ucs: UniformCost,
+  graph: () => <GraphTracer ids={['run']} simple />,
+  ucs: () => <GraphTracer ids={['uc']} simple />,
   iter: IterationLab,
   recur: RecursionLab,
   stackq: StackQueueLab,

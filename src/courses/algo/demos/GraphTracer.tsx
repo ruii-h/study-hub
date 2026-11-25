@@ -24,6 +24,12 @@ const GRAPHS: Record<string, G> = {
   },
 };
 
+GRAPHS.uc = {
+  name: 'Uniform cost search from A to F (edge = cost)', directed: true, weighted: true, start: 'A', goal: 'F', algos: ['ucs'],
+  pos: GRAPHS.run.pos,
+  edges: [['A', 'B', 0.9], ['A', 'C', 0.1], ['B', 'C', 0.3], ['B', 'D', 0.2], ['B', 'E', 0.5], ['C', 'A', 0.9], ['C', 'D', 0.1], ['D', 'B', 0.2], ['D', 'F', 0.8], ['E', 'D', 1]],
+};
+
 const MRT_NAMES: Record<string, string> = { JE: 'Jurong East', CL: 'Clementi', BV: 'Buona Vista', QT: 'Queenstown', TB: 'Tiong Bahru', OP: 'Outram Park', RP: 'Raffles Place', CH: 'City Hall', BG: 'Bugis', PL: 'Paya Lebar', TM: 'Tanah Merah', NT: 'Newton', OR: 'Orchard', DG: 'Dhoby Ghaut' };
 GRAPHS.mrt = {
   name: 'Simplified Singapore MRT (minutes)', directed: false, weighted: true, pick: true, start: 'JE', goal: 'PL', algos: ['bfs', 'ucs'], names: MRT_NAMES, vb: '0 0 420 230',
@@ -35,7 +41,7 @@ const CODE: Record<Algo, string[]> = {
   dfs: ['stack = [start]', 'while stack:', '    u = stack.pop()', '    if u in visited: continue      # discard', '    visit(u)', '    for v in reversed(neighbours(u)):', '        if v not in visited: stack.append(v)'],
   bfs: ['queue = [start]; seen = {start}', 'while queue:', '    u = queue.pop(0)', '    visit(u)', '    for v in neighbours(u):', '        if v not in seen:', '            seen.add(v); queue.append(v)'],
   topo: ['def dfs(u):', '    seen.add(u)', '    for v in neighbours(u):', '        if v not in seen: dfs(v)', '    finish.append(u)           # after all outgoing', '', 'order = reversed(finish)'],
-  ucs: ['pq = [(0, start)]', 'while pq:', '    cost, u = heappop(pq)', '    if u in done: continue', '    done[u] = cost; if u == goal: stop', '    for v, w in neighbours(u):', '        heappush(pq, (cost + w, v))'],
+  ucs: ['pq = [(0, start)]', 'while pq:', '    cost, u = heappop(pq)', '    if u in done: continue', '    done[u] = cost; if u == goal: stop', '    for v, w in neighbours(u):', '        enqueue_or_update(pq, v, cost + w)   # keep the cheaper'],
 };
 
 type Mark = 'new' | 'fr' | 'cur' | 'done';
@@ -111,8 +117,14 @@ function run(g: G, algo: Algo): Step[] {
         return out;
       }
       const add: string[] = [];
-      for (const [v, w] of nbrs(g, u)) if (!(v in done)) { pq.push([c + w, v, u]); add.push(`${v}:${c + w}`); if (mark[v] === 'new') mark[v] = 'fr'; }
-      snap({ cur: u, line: 4, front: `[${fmt()}]`, frontLabel: 'Priority queue (cheapest first)', note: `Dequeue ${u} at cost ${c}, finalise it. ${add.length ? `Enqueue ${add.join(', ')} (cost so far + edge).` : 'Nothing new to enqueue.'}`, row: [`${u}:${c}`, Object.entries(done).map(([k, v]) => `${k}=${v}`).join(' '), fmt()] });
+      for (const [v, w] of nbrs(g, u)) if (!(v in done)) {
+        const nc = +(c + w).toFixed(1); const ex = pq.find((x) => x[1] === v);
+        if (!ex) { pq.push([nc, v, u]); add.push(`enqueue ${v}:${nc}`); }
+        else if (nc < ex[0]) { add.push(`update ${v}: ${ex[0]} → ${nc}`); ex[0] = nc; ex[2] = u; }
+        else add.push(`keep ${v}:${ex[0]} (${nc} is not cheaper)`);
+        if (mark[v] === 'new') mark[v] = 'fr';
+      }
+      snap({ cur: u, line: 4, front: `[${fmt()}]`, frontLabel: 'Priority queue (cheapest first)', note: `Dequeue ${u} at cost ${c}, finalise it. ${add.length ? `Neighbours (cost so far + edge): ${add.join('; ')}.` : 'Nothing new to enqueue.'}`, row: [`${u}:${c}`, Object.entries(done).map(([k, v]) => `${k}=${v}`).join(' '), fmt()] });
       mark[u] = 'done';
     }
   }
@@ -121,7 +133,7 @@ function run(g: G, algo: Algo): Step[] {
 
 const FILL: Record<Mark, string> = { new: COL.s2, fr: 'rgba(210,153,34,.35)', cur: COL.accent, done: 'rgba(63,185,80,.45)' };
 
-export default function GraphTracer({ ids }: { ids: string[] }) {
+export default function GraphTracer({ ids, simple }: { ids: string[]; simple?: boolean }) {
   const [gid, setGid] = useState(ids[0]);
   const g0 = GRAPHS[gid];
   const [from, setFrom] = useState(g0.start);
@@ -191,13 +203,13 @@ export default function GraphTracer({ ids }: { ids: string[] }) {
           return a === 'dfs' || a === 'topo' ? <StackTower compact min={3} label={a === 'topo' ? 'finish stack' : 'stack'} items={items} /> : <QueuePipe items={items} priority={a === 'ucs'} label={a === 'ucs' ? 'priority queue' : 'queue'} />;
         })()}
       </div>
-      <Pseudo lines={CODE[a]} active={cur.line} />
-      <div className="my-2 max-h-48 overflow-auto rounded-lg border border-line">
+      {!simple && <Pseudo lines={CODE[a]} active={cur.line} />}
+      {!simple && <div className="my-2 max-h-48 overflow-auto rounded-lg border border-line">
         <table className="w-full border-collapse text-left text-[12.5px]">
           <thead><tr className="bg-surface2 text-muted"><th className="px-2 py-1">Step</th><th className="px-2 py-1">{a === 'topo' ? 'Event' : 'Took'}</th><th className="px-2 py-1">{a === 'topo' ? 'Call path' : a === 'ucs' ? 'Finalised' : 'Visited'}</th><th className="px-2 py-1">{a === 'topo' ? 'Finish stack' : 'Container after'}</th></tr></thead>
           <tbody>{steps.slice(0, s.k + 1).map((st, i) => <tr key={i} className={i === s.k ? 'bg-accent/15 font-semibold' : ''}><td className="px-2 py-1">{i}</td>{st.row.map((c, j) => <td key={j} className="px-2 py-1 font-mono">{c}</td>)}</tr>)}</tbody>
         </table>
-      </div>
+      </div>}
       <Msg live>{cur.note}</Msg>
     </DemoCard>
   );

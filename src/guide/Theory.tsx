@@ -35,7 +35,8 @@ export function WikiLayer() {
       e.preventDefault(); hide();
       const G = ref.current; const n = +a.dataset.n!, id = a.dataset.id || ''; const c = document.getElementById('theory-content');
       const l = G.D.lessons.find((x) => x.n === G.cur);
-      const back = !(G.tab === 'theory' || G.D.tabs?.some((x) => x.key === G.tab && x.ns))
+      const back = G.tab === 'tut' ? { tab: 'tut', sel: G.tutSel, y: c?.scrollTop || 0, label: 'Back to the tutorial', up: null }
+        : !(G.tab === 'theory' || G.D.tabs?.some((x) => x.key === G.tab && x.ns))
         ? { tab: G.tab, sel: G.cur, y: 0, label: 'Back to the ' + (G.tab === 'cheat' ? 'cheat-sheet' : 'flashcards'), up: null }
         : { tab: 'theory', sel: G.cur, y: c?.scrollTop || 0, label: 'Back to ' + (l ? G.wiki.wlChap(l) : 'the previous page'), up: G.back };
       if (n === G.cur && G.tab === G.tabOf(n)) { G.setBack(back); if (id) scrollToId(id); else c?.scrollTo({ top: 0, behavior: 'smooth' }); }
@@ -144,7 +145,8 @@ export default function Theory() {
           {!finished && <ChapterLoader />}
           <div ref={body} className={finished ? '' : 'defer-hl'} onClick={onBodyClick} dangerouslySetInnerHTML={{ __html: ready ? htmlStr : '' }} />
           {slot && D.cmock ? createPortal(<MockExam qs={D.cmock} />, slot) : null}
-          {meta.tabs.includes('Practice') && (D.hard[cur]?.length || D.quiz[cur]?.length) ? <div className="endrow"><div className="endmsg">You have reached the end of Chapter {lesson.dn ?? cur}. <b>Next step:</b> test yourself while it is fresh.</div><button className="btn" onClick={() => g.goQuiz(cur)}>🧠 Take the Chapter {cur} quiz</button></div> : null}
+          {meta.tabs.includes('Practice') && (D.hard[cur]?.length || D.quiz[cur]?.length) ? <div className="endrow"><div className="endmsg">You have reached the end of Chapter {lesson.dn ?? cur}. <b>Next step:</b> test yourself while it is fresh.</div><div className="row"><button className="btn" onClick={() => g.goQuiz(cur)}>🧠 Take the Chapter {cur} quiz</button>{D.tuts?.some((t) => t.n === cur) ? <button className="btn ghost" onClick={() => g.openTut(cur)}>✏️ Tutorials &amp; exercises</button> : null}</div></div> : null}
+          {!(meta.tabs.includes('Practice') && (D.hard[cur]?.length || D.quiz[cur]?.length)) && D.tuts?.some((t) => t.n === cur) ? <div className="endrow"><div className="endmsg">Ready to apply it? Work through the tutorial and in-class exercises for this chapter.</div><button className="btn" onClick={() => g.openTut(cur)}>✏️ Tutorials &amp; exercises</button></div> : null}
           <div className="t-nav-footer">
             {pv ? <button className="t-nav-btn" onClick={() => g.openChapter(pv.n)}><small>Previous</small>← {pv.title}</button> : <div />}
             {nx ? <button className="t-nav-btn next" onClick={() => g.openChapter(nx.n)}><small>Next chapter</small>{nx.title} →</button> : meta.tabs.includes('Practice') && g.tabOf(cur) === 'theory' ? <button className="t-nav-btn next" onClick={() => g.setTab('practice')}><small>You finished the course notes</small>Go to the practice questions →</button> : <div />}

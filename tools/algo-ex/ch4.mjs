@@ -1,0 +1,132 @@
+import { ex, section, ask, theory, step, p, check, slip, why, table, ul, code } from './lib.mjs';
+
+const chip = (n) => `TUTORIAL 4 · TIER 2 · Q${n}`;
+
+const items = [
+  ex({
+    chip: chip(7), title: 'Subtraction GCD, written recursively',
+    q: 'Rewrite this iterative GCD algorithm (repeated subtraction) using recursion. Hint: the base case is a == b.<br>' + code('def dijkstra(a, b):\n    while a != b:\n        if a > b:\n            a = a - b\n        else:\n            b = b - a\n    return a'),
+    ans: code('def dij_rec(a, b):\n    if a == b:\n        return a                 # base case\n    if a > b:\n        return dij_rec(a - b, b)\n    return dij_rec(a, b - a)'),
+    work: [
+      ask('Turn a <code>while</code> loop into recursion. The loop condition says when to <i>keep going</i>; the recursive version needs the opposite: when to <i>stop</i>.'),
+      theory('Recursion needs a base case, a smaller call, and a reason the calls get closer to the base case. Every loop iteration becomes one call, and the variables that change (a, b) become the arguments.'),
+      step(1, '<b>Base case.</b> The loop runs while a != b, so it stops when a == b, and the answer is that common value. Return a.'),
+      step(2, '<b>Reduction.</b> Inside the loop, if a &gt; b the new values are (a − b, b); otherwise they are (a, b − a). Make those the arguments of the next call.'),
+      step(3, '<b>Why it ends.</b> Each call makes one number smaller, and both stay positive, so the pair shrinks until the two numbers are equal.'),
+      p('<b>Trace of dij_rec(48, 18):</b>'),
+      table([['Call', 'a vs b', 'Next call'], ['dij_rec(48, 18)', 'a &gt; b', 'dij_rec(30, 18)'], ['dij_rec(30, 18)', 'a &gt; b', 'dij_rec(12, 18)'], ['dij_rec(12, 18)', 'a &lt; b', 'dij_rec(12, 6)'], ['dij_rec(12, 6)', 'a &gt; b', 'dij_rec(6, 6)'], ['dij_rec(6, 6)', 'a == b', 'returns 6 (base case)']]),
+      p('The return value 6 passes straight back up through every call, because each call just returns what the next call returns. This is called <b>tail recursion</b>: nothing remains to be done after the recursive call.'),
+      slip('Writing the base case as <code>a != b</code> is the opposite of what is needed. A base case is the situation where you stop calling.'),
+    ],
+  }),
+  ex({
+    chip: chip(8), title: 'Euclid’s GCD, written recursively',
+    q: 'Rewrite Euclid’s algorithm using recursion.<br>' + code('def euclid(a, b):\n    while b != 0:\n        a, b = b, a % b\n    return a'),
+    ans: code('def euclid(a, b):\n    if b == 0:\n        return a                 # base case\n    return euclid(b, a % b)'),
+    work: [
+      ask('Same translation as Q7: the loop stops when b == 0, so that is the base case. The loop body <code>a, b = b, a % b</code> becomes the arguments of the next call.'),
+      step(1, '<b>Base case:</b> if b == 0, then gcd(a, 0) = a.'),
+      step(2, '<b>Reduction:</b> gcd(a, b) = gcd(b, a % b). The remainder a % b is always smaller than b, so the second argument strictly decreases.'),
+      p('<b>Trace of euclid(48, 18):</b>'),
+      table([['Call', 'a % b', 'Next call'], ['euclid(48, 18)', '48 % 18 = 12', 'euclid(18, 12)'], ['euclid(18, 12)', '18 % 12 = 6', 'euclid(12, 6)'], ['euclid(12, 6)', '12 % 6 = 0', 'euclid(6, 0)'], ['euclid(6, 0)', '', 'returns 6 (base case)']]),
+      why('The two algorithms (Q7 and Q8) give the same answer, but Euclid is much faster. For gcd(1,000,000, 1) subtraction needs 999,999 steps, while Euclid needs only 1 step: 1,000,000 % 1 = 0.'),
+      slip('If you call euclid(18, 48), the first call swaps the arguments (18 % 48 = 18, so it calls euclid(48, 18)), so the order of arguments does not need to be checked.'),
+    ],
+  }),
+  ex({
+    chip: chip(9), title: 'repeat_string(s, n)',
+    q: 'Write a recursive <code>repeat_string(s, n)</code> that returns n copies of the string s joined together. For example <code>repeat_string("apple", 3)</code> returns <code>"appleappleapple"</code>.',
+    ans: code('def repeat_string(s, n):\n    if n == 0:\n        return ""                       # base case: zero copies\n    return s + repeat_string(s, n - 1)  # one copy + (n-1) copies'),
+    work: [
+      ask('Describe the answer for n copies in terms of the answer for n − 1 copies: n copies = <b>one copy</b> followed by <b>n − 1 copies</b>.'),
+      theory('Recursive definition: base case plus reduction. Here the problem size is n, and the reduction is n → n − 1.'),
+      step(1, '<b>Base case.</b> Zero copies of any string is the empty string <code>""</code>. (You could also use n == 1 returning s, but then n = 0 would never stop, so n == 0 is safer.)'),
+      step(2, '<b>Reduction.</b> <code>s + repeat_string(s, n − 1)</code>.'),
+      p('<b>Trace of repeat_string("ab", 3):</b>'),
+      code('repeat_string("ab", 3)\n= "ab" + repeat_string("ab", 2)\n= "ab" + ("ab" + repeat_string("ab", 1))\n= "ab" + ("ab" + ("ab" + repeat_string("ab", 0)))\n= "ab" + ("ab" + ("ab" + ""))\n= "ababab"', 'trace'),
+      p('The calls go <b>down</b> to n = 0 first, then the strings are glued together on the way <b>back up</b>. That is why you see “winding” and “unwinding”.'),
+      slip('If you forget the base case (or start from n == 1 and pass n = 0), the function calls itself forever until Python raises <code>RecursionError</code>.'),
+    ],
+  }),
+  ex({
+    chip: chip(10), title: 'Sum of the first n positive integers',
+    q: 'Write a recursive <code>sum(n)</code> that returns 1 + 2 + … + n. For example, sum(3) returns 1 + 2 + 3.',
+    ans: code('def sum(n):\n    if n == 0:\n        return 0                 # base case: empty sum\n    return n + sum(n - 1)        # n plus the sum of the rest'),
+    work: [
+      ask('The sum up to n is the last term n plus the sum up to n − 1.'),
+      step(1, '<b>Base case:</b> the sum of no numbers is 0. (n == 1 returning 1 also works.)'),
+      step(2, '<b>Reduction:</b> <code>sum(n) = n + sum(n − 1)</code>.'),
+      code('sum(3) = 3 + sum(2)\n       = 3 + (2 + sum(1))\n       = 3 + (2 + (1 + sum(0)))\n       = 3 + (2 + (1 + 0))\n       = 6', 'trace'),
+      p('The call stack holds sum(3), sum(2), sum(1), sum(0) at its deepest, then each call returns and adds its n.'),
+      check('Compare with the closed form n(n + 1)/2 = 3 · 4 / 2 = 6. ✔ The closed form takes O(1), while the recursion takes O(n) calls and uses O(n) stack space. Recursion here is a teaching example, not the best way to compute this sum.'),
+      slip('Naming a function <code>sum</code> hides Python’s built-in <code>sum</code>. It is fine for the exercise, but avoid it in real code.'),
+    ],
+  }),
+  ex({
+    chip: chip(11), title: 'Reverse an array recursively',
+    q: 'Write a recursive <code>reverse(a)</code> that returns a new array with the same elements as a in reverse order.',
+    ans: code('def reverse(a):\n    if len(a) == 0:\n        return []                      # base case: nothing to reverse\n    return reverse(a[1:]) + a[0:1]     # reverse the rest, then add the first item at the end\n\n# or peel both ends at once\ndef reverse2(a):\n    if len(a) <= 1:\n        return a\n    return a[-1:] + reverse2(a[1:len(a)-1]) + a[0:1]'),
+    work: [
+      ask('Reversing [1, 2, 3, 4] = reverse the tail [2, 3, 4], then put 1 at the very end. That uses a smaller problem (shorter list) and one extra step.'),
+      step(1, '<b>Base case.</b> An empty list reversed is an empty list.'),
+      step(2, '<b>Reduction.</b> <code>reverse(a) = reverse(a[1:]) + [a[0]]</code>. Note <code>a[0:1]</code> is a one-item list, so + joins two lists. (<code>a[0]</code> alone would be a number and cannot be added to a list.)'),
+      code('reverse([1, 2, 3])\n= reverse([2, 3]) + [1]\n= (reverse([3]) + [2]) + [1]\n= ((reverse([]) + [3]) + [2]) + [1]\n= (([] + [3]) + [2]) + [1]\n= [3, 2, 1]', 'trace'),
+      p('<b>Second version.</b> Peel off both ends at once: the last item goes first, the first item goes last, and the middle is reversed recursively. This needs two base cases’ worth of thinking: length 0 and length 1 are both already reversed, so <code>len(a) &lt;= 1</code> returns a. It makes about n/2 calls instead of n.'),
+      why('Each slice <code>a[1:]</code> copies the list, so the first version really costs O(n) per call and O(n²) overall. If the question asks for “numbers of steps”, count the calls (n + 1) and mention the slices.'),
+      slip('<code>reverse(a[1:]) + a[0]</code> fails with a <code>TypeError</code> (list + int). Use <code>[a[0]]</code> or <code>a[0:1]</code>.'),
+    ],
+  }),
+  ex({
+    chip: chip(12), title: 'Sum of 1/x + 1/x² + … + 1/xⁿ',
+    q: 'f12(x, n) = 1/x¹ + 1/x² + 1/x³ + … + 1/xⁿ. For example f12(2, 4) = 1/2 + 1/4 + 1/8 + 1/16 = 0.9375. You may use this function that returns xⁿ:<br>' + code('def power(x, n):\n    if n == 0:\n        return 1\n    if n == 1:\n        return x\n    return x * power(x, n - 1)') + 'Write <code>f12_rec(x, n)</code> using recursion.',
+    ans: code('def f12_rec(x, n):\n    if n == 1:\n        return 1 / x                         # base case\n    return f12_rec(x, n - 1) + 1 / power(x, n)') + '<p>Complexity: <code>O(n²)</code>, because the call for term k runs <code>power(x, k)</code> in O(k). A faster form (below) is <code>O(n)</code>.</p>',
+    work: [
+      ask('The series up to n is the series up to n − 1, plus the new last term 1/xⁿ.'),
+      step(1, '<b>Base case:</b> with a single term, f12(x, 1) = 1/x.'),
+      step(2, '<b>Reduction:</b> f12(x, n) = f12(x, n − 1) + 1/xⁿ, and xⁿ comes from the supplied <code>power</code> function.'),
+      p('<b>Trace of f12_rec(2, 3):</b> f12(2, 3) = f12(2, 2) + 1/power(2, 3) = (f12(2, 1) + 1/power(2, 2)) + 1/8 = ((1/2) + 1/4) + 1/8 = 0.875.'),
+      p('<b>Complexity.</b> There are n calls. The call that adds term k runs <code>power(x, k)</code>, which makes k recursive calls. Adding them up: 1 + 2 + … + n = n(n + 1)/2, which is <b>O(n²)</b>.'),
+      p('<b>Faster version, O(n).</b> Factor out 1/x: S(n) = 1/x + 1/x² + … + 1/xⁿ = (1/x) · (1 + S(n − 1)), with S(0) = 0. No <code>power</code> call is needed:'),
+      code('def f12_fast(x, n):\n    if n == 0:\n        return 0\n    return (1 + f12_fast(x, n - 1)) / x'),
+      check('f12_fast(2, 4): S1 = (1 + 0)/2 = 0.5, S2 = (1 + 0.5)/2 = 0.75, S3 = (1 + 0.75)/2 = 0.875, S4 = (1 + 0.875)/2 = 0.9375. ✔ Matches the example.'),
+      slip('Calling <code>power(x, n)</code> inside every recursive step looks harmless but hides an inner loop. Always add up the cost of helper functions called from inside a recursion.'),
+    ],
+  }),
+  ex({
+    chip: chip(13), title: 'Alternating series 1·x + 2·y + 3·x + 4·y + …',
+    q: 'f13(x, y, n) = 1·x + 2·y + 3·x + 4·y + 5·x + … with n terms: odd-numbered terms use x, even-numbered terms use y. For example f13(4, 3, 5) = 1·4 + 2·3 + 3·4 + 4·3 + 5·4 = 54. Write <code>f13_rec(x, y, n)</code> using recursion.',
+    ans: code('def f13_rec(x, y, n):\n    if n == 1:\n        return x                      # the first term is 1 * x\n    if n % 2 == 0:\n        return n * y + f13_rec(x, y, n - 1)\n    return n * x + f13_rec(x, y, n - 1)'),
+    work: [
+      ask('The n-th term is <code>n·x</code> if n is odd and <code>n·y</code> if n is even. The sum of n terms is the n-th term plus the sum of the first n − 1 terms.'),
+      step(1, '<b>Base case:</b> f13(x, y, 1) = 1·x = x.'),
+      step(2, '<b>Reduction:</b> look at n % 2. Even n: the last term is n·y. Odd n: the last term is n·x. Then add f13(x, y, n − 1).'),
+      p('<b>Trace of f13_rec(4, 3, 5):</b>'),
+      table([['Call', 'Last term', 'Rest'], ['n = 5 (odd)', '5·4 = 20', 'f13(…, 4)'], ['n = 4 (even)', '4·3 = 12', 'f13(…, 3)'], ['n = 3 (odd)', '3·4 = 12', 'f13(…, 2)'], ['n = 2 (even)', '2·3 = 6', 'f13(…, 1)'], ['n = 1 (base)', '1·4 = 4', '']]),
+      p('Adding on the way back up: 4 + 6 + 12 + 12 + 20 = <b>54</b>. ✔'),
+      slip('Only the <i>parity</i> of the term number picks x or y, not the size of n. Test <code>n % 2</code>, not <code>n &gt; 2</code>.'),
+    ],
+  }),
+  ex({
+    chip: chip(14), title: 'Approximating eˣ: iterative cost and better recursion',
+    q: 'The series eˣ ≈ 1 + x/1! + x²/2! + x³/3! + … + xⁿ/n! is computed by:<br>' + code('def f14(x, n):\n    sum = 1\n    for j in range(1, n + 1):\n        sum += power(x, j) / factorial(j)\n    return sum') + '(a) What is the complexity of this iterative version, where power and factorial are the recursive functions that make j calls each? (b) Rewrite f14 using recursion, with a better complexity if you can. For example f14(2, 4) = 1 + 2 + 2 + 4/3 + 2/3 = 7.0.',
+    ans: `<p>(a) <code>O(n²)</code>.</p><p>(b) A direct recursive rewrite is also O(n²). A better version nests the terms (Horner form) and costs <code>O(n)</code>:</p>` + code('def f14_rec(x, n, j=1):\n    if j > n:\n        return 1\n    return 1 + x / j * f14_rec(x, n, j + 1)'),
+    work: [
+      ask('Part (a) asks you to add up the cost of the loop <i>and</i> of the two helpers inside it. Part (b) asks you to avoid recomputing xʲ and j! from scratch for every term.'),
+      step('a', 'The loop runs j = 1, 2, …, n. In iteration j, <code>power(x, j)</code> makes j calls and <code>factorial(j)</code> makes j calls, so about 2j steps. Total: 2 · (1 + 2 + … + n) = n(n + 1), which is <b>O(n²)</b>.'),
+      step('b', '<b>Direct version.</b> f14(x, n) = f14(x, n − 1) + xⁿ/n!. It has n levels, and each level recomputes power and factorial in O(n), so it is also O(n²).'),
+      p('<b>Improvement, idea 1: precompute.</b> Fill an array of powers (pw[i] = pw[i−1]·x) and an array of factorials (fac[i] = fac[i−1]·i) once, each in O(n). Then every term is pw[n]/fac[n], an O(1) lookup, and the whole recursion is O(n).'),
+      p('<b>Improvement, idea 2: factor the series.</b> Each term is the previous term times x/j. Pull the common factors out:'),
+      code('e^x ≈ 1 + x/1 * (1 + x/2 * (1 + x/3 * (1 + x/4)))', 'idea'),
+      p('Read the nested brackets from the inside: the call at position j returns 1 + (x/j) × (result of position j + 1). The base case is j &gt; n, which returns 1.'),
+      table([['Call', 'Value'], ['j = 5 (j &gt; n)', '1'], ['j = 4', '1 + 2/4 · 1 = 1.5'], ['j = 3', '1 + 2/3 · 1.5 = 2'], ['j = 2', '1 + 2/2 · 2 = 3'], ['j = 1', '1 + 2/1 · 3 = <b>7</b>']]),
+      p('n + 1 calls, each doing O(1) work: <b>O(n)</b>. Same answer 7.0 as the example.'),
+      why('The speed-up comes from reusing work. The term for j is the term for j − 1 times x/j, so each step needs only one multiplication and one division instead of rebuilding xʲ and j! from the start.'),
+      slip('The tutorial’s power and factorial functions are recursive, so their cost is j, not 1. If you treat them as O(1), you wrongly get O(n) for the iterative version.'),
+    ],
+  }),
+];
+
+export default {
+  week: 4,
+  tier2: section({ id: 'tut-t2', heading: '📚 Tutorial questions: Tier 2', sub: 'The harder recursion questions from the same tutorial. Write your own function first, then open the answer, then the full working.', items }),
+};

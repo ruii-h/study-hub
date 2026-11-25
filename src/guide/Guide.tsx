@@ -7,12 +7,14 @@ import Theory, { WikiLayer } from './Theory';
 import Practice from './Practice';
 import { Cards, Cheat } from './Cards';
 import Past from './Past';
+import Tutorials, { TutNav } from './Tutorials';
+import Mocks, { MockNav } from './Mocks';
 import { tabSwap } from './motion';
 import { watchHighlight } from '../course/highlight';
 
 const TAB_DEF: Record<string, [string, string, string]> = {
   theory: ['📖', 'Theory', ''], practice: ['🧠', 'Practice', ' Questions'], cards: ['🃏', 'Flashcards', ''],
-  cheat: ['📌', 'Cheat', '-sheet'], ice: ['✏️', 'ICE', ' Exercises'], past: ['📝', 'Past', ' Exam'],
+  cheat: ['📌', 'Cheat', '-sheet'], tut: ['✏️', 'Tutorials', ' & Exercises'], mock: ['🎯', 'Mock', ' Exams'], ice: ['✏️', 'ICE', ' Exercises'], past: ['📝', 'Past', ' Exam'],
 };
 
 const tabDef = (D: Data, t: string): [string, string, string] => { const x = D.tabs?.find((y) => y.key === t); return x ? [x.ico, x.label, x.x] : TAB_DEF[t]; };
@@ -46,6 +48,8 @@ export function SideList() {
         {D.play!.map((p: any, i: number) => p.g === gname ? navItem('▶', i + 1, p.title, (ST.play || D.play![0].id) === p.id, () => { g.patch('ST', (o) => ({ ...o, play: p.id })); g.setNavOpen(false); }) : null)}</div>))}
     </>);
   }
+  if (tab === 'tut') return <TutNav />;
+  if (tab === 'mock') return <MockNav />;
   if (sc && sc.groups) return (<>
     <div className="theory-nav-header">{sc.label}{sc.x}</div>
     {grp(sc.groups, (n) => { const l = L(n); return navItem(l.icon, l.dn ?? n, l.title, cur === n, () => g.openChapter(n), V[n] ? <span className="rd" title="Read" aria-label="read">●</span> : null); })}
@@ -129,6 +133,8 @@ function useTabs() {
   return useMemo(() => {
     const t = ['theory'];
     if (meta.tabs.includes('Practice')) t.push('practice');
+    if (D.tuts?.length) t.push('tut');
+    if (D.mocks?.length) t.push('mock');
     if (meta.tabs.includes('Flashcards')) t.push('cards');
     if (meta.tabs.includes('Cheat-sheet')) t.push('cheat');
     D.tabs?.forEach((x) => { if (!t.includes(x.key)) t.push(x.key); });
@@ -193,6 +199,8 @@ function Shell({ meta }: { meta: CourseMeta }) {
           {(tab === 'theory' || !!D.tabs?.some((x) => x.key === tab && x.ns)) && <Theory />}
           {tab === 'play' && g.api?.Playground && <g.api.Playground />}
           {tab === 'practice' && <Practice />}
+          {tab === 'tut' && <Tutorials />}
+          {tab === 'mock' && <Mocks />}
           {tab === 'cards' && <Cards />}
           {tab === 'cheat' && !D.tabs?.some((x) => x.key === 'cheat') && <Cheat />}
           {tab === 'ice' && <div className="pane" id="icem" tabIndex={0}><h1 className="t-h1" style={{ fontSize: 26 }}>In-class exercises (ICE)</h1><div className="sub">Exercises from the weekly in-class sessions, grouped by chapter. Attempt each one first, then open the answer. Lab exercises are not included: they are meant to be run against test cases.</div><div dangerouslySetInnerHTML={{ __html: D.ice || '' }} /></div>}
