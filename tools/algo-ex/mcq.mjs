@@ -43,8 +43,11 @@ export function mcqify(html, log = []) {
     for (const r of rightTxt) { let i = on.indexOf(r); if (i < 0) i = on.findIndex((o) => o && (r.startsWith(o) || o.startsWith(r))); if (i >= 0 && !ci.includes(i)) ci.push(i); }
     if (!ci.length || ci.length !== rightTxt.length) { log.push('NO MATCH ' + key + ' ' + JSON.stringify(rightTxt)); return all; }
     ci.sort((x, y) => x - y);
-    const stem = q.slice(0, u.index);
-    lis.forEach((x, i) => { lis[i] = x.replace(/s*((cannot be|possible))/gi, ''); }); // the answer hints are shown only after checking
+    // statement lists in the stem (the options refer to them by number): keep them, but make the numbers visible
+    const stem = q.slice(0, u.index).replace('<p>Options:</p>', '')
+      .replace(/<ol>([\s\S]*?)<\/ol>/g, (m, inner) => { let items = [...inner.matchAll(/<li>([\s\S]*?)<\/li>/g)].map((x) => x[1]); if (items.length === 1) items = items[0].split(/\s+(?=\d\. )/).map((x) => x.replace(/^\d\. /, '')); return '<div class="mcq-sth">Statements</div><ol class="mcq-st">' + items.map((x) => '<li>' + x + '</li>').join('') + '</ol>'; })
+      .replace(/<ul>/g, '<ul class="mcq-st">');
+    lis.forEach((x, i) => { lis[i] = x.replace(/\s*\((cannot be|possible)\)/gi, ''); }); // the answer hints are shown only after checking
     const multi = ci.length > 1 || /select all|choose (1 or more|2|two|3|three)|select \d|\(select/i.test(text(stem + ' ' + title));
     let why = WHY[key] || autoBigO(lis, ci);
     if (WHY[key] && WHY[key].length !== lis.length) { log.push(`WHY LENGTH ${key}: ${WHY[key].length} vs ${lis.length}`); why = null; }

@@ -1797,3 +1797,8 @@ button.tut-sub-i .ttl{font-size:12.5px;line-height:1.35;color:var(--text)}
 .mcq .mcq-expl{min-width:0;max-width:100%}
 .mcq .mcq-expl .t-table-wrap{max-width:100%;overflow-x:auto}
 .mcq .mcq-expl>p:first-child{margin-top:6px}
+.mcq .mcq-sth{margin:10px 0 2px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ye)}
+.mcq .mcq-st{margin:2px 0 12px;padding-left:28px}
+.mcq ol.mcq-st{list-style:decimal!important}
+.mcq ul.mcq-st{list-style:disc!important}
+.mcq .mcq-st li{display:list-item!important;margin:4px 0;padding:0;border:0;background:none}
