@@ -3,6 +3,12 @@ const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&l
 
 export function stackTables(c: HTMLElement) {
   if (innerWidth > 600) return;
+  // tables outside a wrapper (e.g. inside "At a glance" cards) get one, so they stack instead of spilling out of the card
+  c.querySelectorAll<HTMLElement>('table').forEach((t) => {
+    if (t.closest('.t-table-wrap')) return;
+    const w = document.createElement('div'); w.className = 't-table-wrap in-card';
+    t.replaceWith(w); w.appendChild(t);
+  });
   c.querySelectorAll<HTMLElement>('.t-table-wrap').forEach((w) => {
     if (w.scrollWidth <= w.clientWidth + 1) return;
     const tb = w.querySelector('table'); if (!tb || (tb.tHead == null && !tb.querySelector('th'))) return;

@@ -11,27 +11,34 @@ npm run build     # outputs dist/
 
 ## Layout
 - `src/hub/` – course picker (React + Tailwind).
-- `src/course/CourseApp.tsx` – loads one course lazily, injects its CSS, mounts its engine, and removes everything when you leave.
+- `src/course/CourseApp.tsx` – loads one course lazily, injects its CSS, mounts the shared guide, and removes everything when you leave.
 - `src/guide/` – the React + Framer Motion guide app shared by all five courses (theory, practice, flashcards, ICE, past exams, search, wiki-links).
 - `src/courses/<id>/` – `data.json` (lessons, quizzes, cards, exams) and `style.css`.
-- `src/courses/algo/demos/` – the four ALGO demos as React + Tailwind components (mounted into each `.demo-slot` by the engine).
+- `src/courses/algo/demos/` – the four ALGO demos as React + Tailwind components (mounted into each `.demo-slot` by the guide).
 - `src/styles/animations.css` – the 19 original keyframes, exposed to Tailwind as `animate-*` in `src/index.css`.
 - Mermaid is loaded on demand when a chapter contains a diagram; BPAS gets KaTeX CSS/fonts from the `katex` package.
 - `tools/` – the one-off scripts used to split the original HTML files (`tools/extract/*` then `tools/gen-courses.mjs`).
 
 ## Deploy
-Static site, hash routing, relative base: works on GitHub Pages (`.github/workflows/deploy.yml`), Netlify (`netlify.toml`) or any static host. Nothing has been published.
+Static site, hash routing, relative base. Live at https://ruii-h.github.io/study-hub/, deployed from `main` of `ruii-h/study-hub` by `.github/workflows/deploy.yml` (also works on Netlify via `netlify.toml` or any static host). Pushing to `main` redeploys.
 
 ## Styling notes
 Legacy course CSS is injected inside `@layer legacy`, below Tailwind's utilities, so new React components can use Tailwind freely. Lesson, quiz and flashcard markup is stored in the JSON with the original class names, so that CSS stays as plain CSS.
 
-`engine.js` files started as generated output and have been hand-edited since (quizzes, wiki links, back pill, flashcards). Treat them as source; `tools/gen-courses.mjs` is stale. Content fixes are applied with small one-off scripts in `tools/` that assert every replacement matched.
+Behaviour lives in the shared React guide (`src/guide/*`), not per-course engines; the old `engine.js` files and `tools/gen-courses.mjs` are gone or stale, so never regenerate course files. Content fixes are applied with small one-off scripts in `tools/` that assert every replacement matched.
 
 ---
 
 # House rules (how this site should look and behave)
 
 These are the owner's standing preferences. Follow them for every change, in all three courses, unless told otherwise.
+
+## Readability and containment (most important)
+- **Nothing may spill out of its container on a phone.** No horizontal page scroll, no text, table, image, diagram or code running past a card edge. Check at 360, 390 and 412px. Wide tables **stack** into one card per row with the column name above each value (done by `stackTables` in `src/guide/enhance.ts`, which also wraps tables inside "At a glance" cards); code blocks and diagrams scroll inside their own box. Lesson columns and flex children carry `min-width: 0` so one wide child can never stretch the page.
+- **Readability beats density.** Break text into short paragraphs and lists with a blank line between ideas; one idea per paragraph, about three sentences at most. Never pack many facts into a single block or a single table cell.
+- **Group related things.** Related points sit together under one clear label; unrelated points are visibly separated (spacing, a sub-heading or a new card).
+- **Highlight keywords, not whole sentences.** Key terms are bold and coloured (cyan for names and keywords, yellow for table headers, muted italics for caveats) so the eye finds them. Body text stays the normal colour. Do not colour or bold more than a few words per sentence, or nothing stands out.
+- Every new or edited section is checked at phone width for all three: no spill, enough air, keywords visible.
 
 ## Targets
 - **Phone first, desktop too.** Priority device: Samsung S24 Ultra in Chrome (about 412 × 915 CSS px; also check 360 × 780). No horizontal scrolling, nothing hidden under the bottom tab bar, tap targets at least 44px on touch.
@@ -50,7 +57,8 @@ These are the owner's standing preferences. Follow them for every change, in all
 - Page changes fade in smoothly. Never combine CSS smooth-scroll on the lesson container with a page transition (it makes the jump stutter): the container uses `scroll-behavior: auto`, and smooth scrolling is requested explicitly only for same-page moves.
 - Jumping to another chapter: render, jump to the target instantly, fade in. Jumping inside the same chapter: scroll smoothly and keep the page.
 - Press feedback is subtle and must never spill onto a neighbouring control. No bouncing.
-- Respect `prefers-reduced-motion`.
+- Animations must always run: never add `prefers-reduced-motion` kill switches. Flips and reveals use Framer Motion.
+- Animations come only from `src/guide/motion.ts` (no inline motion props).
 
 ## Hover versus click
 - Hover is only a mouse nicety and never the only way to do something. Every hover rule sits in `@media (hover: hover)`, so touch screens never get sticky hover states.
@@ -65,7 +73,7 @@ These are the owner's standing preferences. Follow them for every change, in all
 
 ## Cards and containers
 - Flashcards: tap to flip, the front says "Tap to reveal the definition…", "Mark as known" updates in place and does not flip the card again. Badge shows the section title, never a section number.
-- If a grid row would leave an empty cell beside a card, stretch that card across the row (done by `fillRows` in each engine).
+- If a grid row would leave an empty cell beside a card, stretch that card across the row (done by `fillRows` in `src/guide/wiki.ts`).
 - Cards must not leave blank gaps beside them on wide screens and must stack to one column on phones.
 - Link text must never be injected into flex or grid containers (it breaks the layout with gaps).
 
@@ -79,6 +87,7 @@ These are the owner's standing preferences. Follow them for every change, in all
 - The A− / A+ size control stays working and the layout must survive it.
 
 ## Content groupings
+- Every quiz chapter appears under a section header in the Practice nav. There is no separate "Exam sections" list, because it only repeated the chapters below it. Chapters with few questions are grouped, not left as lone 1/2, 2/3 entries.
 - Practice-tab chapter quizzes are grouped under the exam sections (IDP):
   - **A**: chapters 1–5 (introduction, empathy, requirements, ideate, prototype).
   - **B**: chapters 6–11 and 16 (models, memory, input, mobile, information design, visual design including Gestalt, UI tools).
@@ -123,16 +132,21 @@ These are the owner's standing preferences. Follow them for every change, in all
 
 **Unfinished:** IS1704 labs (Lab 1-8, mock labs, past lab tests) are not included on purpose: they are meant to be run against test cases. See `tools/newcourse/ctp/LABS-TODO.md`.
 
-## How I want things done (house rules — read before changing anything)
+## Code blocks, structure and module formats
 - **Code blocks always use the Obsidian colour scheme**: black `#000000` background, `#F8F8F2` text, keywords `#FFA4D8`, operators and `and/or/not/in/is` `#FF5555`, `True/False/None` `#FF79C6`, strings `#50FA7B`, numbers `#BD93F9`, comments `#6272A4`, function names `#F1FA8C`, built-ins and variables `#00FFFF`, parameters `#F8F8F2`. The palette lives in `src/course/course-extra.css` (`.tk-*`) and is applied at runtime by `src/course/highlight.ts`, started from `src/guide/Guide.tsx`. If code ever looks uncoloured, the highlighter is not mounted.
 - IS1704 code uses a Python editor font; IS114 shows commands in a terminal-style block labelled `powershell`.
-- **One place for everything shared.** Animations come only from `src/guide/motion.ts` (no inline motion props). Shared UI behaviour lives in `src/guide/*`; shared look and utility classes live in `src/course/course-extra.css`. Build reusable pieces ("our own bootstrap") instead of repeating markup or CSS.
-- Animations must always run: never add `prefers-reduced-motion` kill switches. Flips and reveals use Framer Motion.
+- **One place for everything shared.** Shared UI behaviour lives in `src/guide/*`; shared look and utility classes live in `src/course/course-extra.css`. Build reusable pieces ("our own bootstrap") instead of repeating markup or CSS.
 - Side lists never rebuild on click (stable React nodes); only highlights change.
 - Each module has its own teaching format; do not copy IS211's "why it matters / memory hook" template onto other modules. IS1704 teaches like the author's Python notes: explanation first, then code.
-- Tabs: no Final Exam tab anywhere; no cheat-sheet for IS1704. Type-the-answer questions belong inside the Exam-style quiz.
-- Check desktop and mobile (375px) after UI changes; no empty containers, no content landing in the wrong grid column, rounded corners everywhere.
+- Tabs: no Final Exam tab for IS114, IS1704 or IS216; no cheat-sheet for IS1704. Type-the-answer questions belong inside the Exam-style quiz. (The IS115, IS210 and IS211 guides keep their Final Exam.)
+- No empty containers, no content landing in the wrong grid column, rounded corners everywhere.
+
+## How to work on this repo
+- Do not ask questions when the README already answers them; pick the sensible default, do it and say what was chosen.
+- Check desktop and phone width (375–412px) after every UI change, and look at it in the browser before calling it done.
+- Shared behaviour goes in `src/guide/*` so every course gets it; course-specific content goes in `src/courses/<id>/data.json` and `style.css`.
 - Commit and push after each finished change. Keep replies short and do not elaborate unless asked.
+- `CLAUDE.md` points new sessions at this file; keep the two consistent.
 
 ## IS216 WAD2 (generated)
 `node tools/wad2/build.mjs` rebuilds `src/courses/wad2` from `tools/wad2/data.json`, which `tools/wad2/extract.mjs` pulled out of the standalone offline WAD2 page (theory, cheat sheets, live-playground lessons; Bootstrap 5.3 is bundled in `src/courses/wad2/bs.*`). The 104 theory topics are grouped into chapters by track, the 17 cheat sheets and 7 code-archive chapters get their own tabs (`D.tabs`, rendered by the Theory reader scoped to those chapters), and the 14 exercises feed the Live playground tab (`src/courses/wad2/Playground.tsx`). Chapters 1-3 are the start and exam-toolkit topics. Practice questions, past papers and the exam-question index are left out on purpose for now.

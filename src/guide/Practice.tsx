@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { breakAny } from './paragraphs';
 import { EXTRA } from './config';
 import { scoreClass, shuffle, useG } from './state';
 import { fade, pop, rise, slideX } from './motion';
@@ -79,7 +80,7 @@ function MultiBody({ title, qs, qkey, pills, ch }: MQ) {
         return (
           <motion.div className="exq" key={q.rec.id} id={'mq' + i} {...rise(i)}>
             <div className="qh"><h2 className="qn">Question {i + 1}</h2><span className="ms">SELECT ALL THAT APPLY</span></div>
-            <div className="qt" dangerouslySetInnerHTML={{ __html: q.src.q }} />
+            <div className="qt" dangerouslySetInnerHTML={{ __html: breakAny(q.src.q) }} />
             <div role="group" aria-label={`Options for question ${i + 1}`}>
               {q.o.map((x: string, j: number) => {
                 const isA = q.a.includes(j), isS = sel.includes(j);
@@ -93,7 +94,7 @@ function MultiBody({ title, qs, qkey, pills, ch }: MQ) {
             <div className="row"><button className="btn" disabled={chk || !sel.length} onClick={() => check(q)}>Check answer</button></div>
             <AnimatePresence>{chk && (
               <motion.div className="vd" aria-live="polite" {...fade}>
-                <div className={`verdict ${ok ? 'ok' : 'no'}`}><b>{ok ? '✅ Fully correct.' : '❌ Not quite.'}</b> Correct: <b>{q.a.map((x: number) => L5[x]).join(', ')}</b>. <span dangerouslySetInnerHTML={{ __html: q.src.e }} />
+                <div className={`verdict ${ok ? 'ok' : 'no'}`}><b>{ok ? '✅ Fully correct.' : '❌ Not quite.'}</b> Correct: <b>{q.a.map((x: number) => L5[x]).join(', ')}</b>. <span dangerouslySetInnerHTML={{ __html: breakAny(q.src.e) }} />
                   {!ok && q.src.ch ? <div className="row"><JumpBtn ch={q.src.ch} text={q.src.q + ' ' + q.src.e + ' ' + q.o.filter((_: any, j: number) => q.a.includes(j) !== sel.includes(j)).join(' ')} back={{ tab: 'practice', sel: qkey === 'mx' ? 'mx' : g.pqSel, y: 0, label: 'Back to your quiz', up: null }} /></div> : null}
                 </div>
               </motion.div>)}</AnimatePresence>
@@ -143,13 +144,13 @@ function SingleBody({ title, qs, n, pills }: SQ) {
     <div className="qprog" role="status" aria-live="polite"><span>Answered {done} of {N} · {score} correct</span><i><b style={{ width: `${(done / N) * 100}%` }} /></i><button className="btn ghost sm" onClick={restart}>↺ Start over</button></div>
     {prep.map((q: any, i: number) => (
       <motion.div className="qq" key={q.rec.id} {...rise(i)}>
-        <div className="t"><span>{i + 1}. </span><span dangerouslySetInnerHTML={{ __html: q.q }} /></div>
+        <div className="t"><span>{i + 1}. </span><span dangerouslySetInnerHTML={{ __html: breakAny(q.q) }} /></div>
         {q.o.map((o: string, j: number) => <button key={j} className={`opt ${q.rec.chk ? (j === q.c ? 'ok' : j === q.rec.sel ? 'bad' : '') : ''}`} disabled={!!q.rec.chk} onClick={() => pick(q.rec.id, j)} dangerouslySetInnerHTML={{ __html: o }} />)}
         <AnimatePresence>{q.rec.chk ? (
           <motion.div className="exp" role="status" {...fade}>
-            {q.rec.sel === q.c ? <>✅ <b>Correct.</b> <span dangerouslySetInnerHTML={{ __html: q.e }} /></> : <>❌ <b>Not quite.</b>
-              {q.w[q.rec.sel] ? <div className="wh"><b>Why “{q.o[q.rec.sel].replace(/<[^>]+>/g, '').slice(0, 58)}” is wrong:</b> <span dangerouslySetInnerHTML={{ __html: q.w[q.rec.sel] }} /></div> : null}
-              <div className="wh"><b>Correct: <span dangerouslySetInnerHTML={{ __html: q.o[q.c] }} />.</b> <span dangerouslySetInnerHTML={{ __html: q.e }} /></div>
+            {q.rec.sel === q.c ? <>✅ <b>Correct.</b> <span dangerouslySetInnerHTML={{ __html: breakAny(q.e) }} /></> : <>❌ <b>Not quite.</b>
+              {q.w[q.rec.sel] ? <div className="wh"><b>Why “{q.o[q.rec.sel].replace(/<[^>]+>/g, '').slice(0, 58)}” is wrong:</b> <span dangerouslySetInnerHTML={{ __html: breakAny(q.w[q.rec.sel]) }} /></div> : null}
+              <div className="wh"><b>Correct: <span dangerouslySetInnerHTML={{ __html: q.o[q.c] }} />.</b> <span dangerouslySetInnerHTML={{ __html: breakAny(q.e) }} /></div>
               <div className="row"><JumpBtn ch={n} text={q.q + ' ' + q.o[q.c] + ' ' + q.e} back={{ tab: 'practice', sel: n, y: 0, label: 'Back to your quiz', up: null }} /></div></>}
           </motion.div>) : null}</AnimatePresence>
       </motion.div>))}
@@ -186,11 +187,11 @@ function FillQuiz({ qs, qkey, title }: { qs: any[]; qkey: string; title: string 
       return (
         <div className="exq" key={i}>
           <div className="qh"><h2 className="qn">Question {i + 1}</h2><span className="ms">TYPE THE ANSWER</span></div>
-          <div className="qt" dangerouslySetInnerHTML={{ __html: q.q }} />
+          <div className="qt" dangerouslySetInnerHTML={{ __html: breakAny(q.q) }} />
           {multi ? <textarea rows={4} {...inputProps} onChange={(e) => set(i, { ...rec, v: e.target.value })} /> : <input type="text" {...inputProps} className={rec.ok ? 'ok' : ''} onChange={(e) => set(i, { ...rec, v: e.target.value })} onKeyDown={(e) => { if (e.key === 'Enter') set(i, { v: rec.v, done: 1, ok: fillOK(q, rec.v || '') ? 1 : 0 }); }} />}
           <div className="row"><button className="btn" onClick={() => set(i, { v: rec.v, done: 1, ok: fillOK(q, rec.v || '') ? 1 : 0 })}>Check answer</button><button className="btn ghost" onClick={() => set(i, { v: rec.v, done: 1, ok: 0, shown: 1 })}>Show answer</button></div>
           <AnimatePresence>{rec.done ? (
-            <motion.div className="vd" aria-live="polite" {...fade}><div className={`verdict ${rec.ok ? 'ok' : 'no'}`}><b>{rec.ok ? '✅ Correct.' : rec.shown ? 'Answer revealed.' : '❌ Not quite.'}</b> <span dangerouslySetInnerHTML={{ __html: q.e || '' }} />
+            <motion.div className="vd" aria-live="polite" {...fade}><div className={`verdict ${rec.ok ? 'ok' : 'no'}`}><b>{rec.ok ? '✅ Correct.' : rec.shown ? 'Answer revealed.' : '❌ Not quite.'}</b> <span dangerouslySetInnerHTML={{ __html: breakAny(q.e || '') }} />
               {rec.ok ? null : <div className="why wy"><b>Accepted answer:</b> {shown.map((a: string, k: number) => <span key={k}>{k ? ' or ' : ''}<code>{a}</code></span>)}</div>}</div></motion.div>) : null}</AnimatePresence>
         </div>);
     })}
@@ -217,7 +218,7 @@ export default function Practice() {
   if (pqSel !== 'mx') mxKey.current = 0;
   const l = typeof pqSel === 'number' ? D.lessons.find((x) => x.n === pqSel) : null;
   let pane: React.ReactNode = null;
-  if (pqSel === 'sc') pane = <><h1 className="t-h1" style={{ fontSize: 26, marginBottom: 6 }}>Self-check Q&amp;A</h1><div className="sub">Think first, then open the answer.</div><div className="t-section" dangerouslySetInnerHTML={{ __html: D.selfq || '' }} /></>;
+  if (pqSel === 'sc') pane = <><h1 className="t-h1" style={{ fontSize: 26, marginBottom: 6 }}>Self-check Q&amp;A</h1><div className="sub">Think first, then open the answer.</div><div className="t-section" dangerouslySetInnerHTML={{ __html: breakAny(D.selfq || '') }} /></>;
   else if (pqSel === 'mx') pane = !mxSnap.current.length
     ? <><h1 className="t-h1" style={{ fontSize: 26 }}>Review my mistakes</h1><div className="exq"><div className="qt">🎉 No mistakes saved.</div><div className="sub">Questions you get wrong in the exam-style quizzes or the past-year questions are collected here and stay until you answer them correctly. This is spaced practice: retrieving what you missed is what moves it into long-term memory.</div></div></>
     : <MultiQuiz key={'mx' + mxSnap.current.length} title={`Review my mistakes (${mxSnap.current.length})`} qs={mxSnap.current} qkey="mx" />;

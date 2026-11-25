@@ -2,6 +2,7 @@ import { useEffect, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { shuffle, useG } from './state';
 import { JumpBtn, Ring, WhyRow, fillOK } from './Practice';
+import { breakAny } from './paragraphs';
 import { fade, pop, rise } from './motion';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -66,7 +67,7 @@ function Body({ n, title, qs, k }: { n: number; title: string; qs: any[]; k: str
         return (
           <motion.div className="exq" key={rec.id} id={'mq' + i} {...rise(i)}>
             <div className="qh"><h2 className="qn">Question {i + 1}</h2><span className="ms">{TAG[t]}</span></div>
-            <div className="qt" dangerouslySetInnerHTML={{ __html: q.src.q }} />
+            <div className="qt" dangerouslySetInnerHTML={{ __html: breakAny(q.src.q) }} />
             {t === 'f' || t === 'w' ? (
               long ? <textarea rows={4} id={'fa' + i} spellCheck={false} disabled={chk} value={rec.v || ''} aria-label={`Your answer to question ${i + 1}`} style={{ width: '100%', font: '14px/1.5 ui-monospace,Consolas,monospace' }} onChange={(e) => setRec(rec.id, (r) => ({ ...r, v: e.target.value }))} />
                 : <input type="text" id={'fa' + i} spellCheck={false} autoComplete="off" autoCapitalize="off" disabled={chk} className={chk && ok ? 'ok' : ''} value={rec.v || ''} aria-label={`Your answer to question ${i + 1}`} style={{ width: '100%', font: '14px/1.5 ui-monospace,Consolas,monospace' }} onChange={(e) => setRec(rec.id, (r) => ({ ...r, v: e.target.value }))} onKeyDown={(e) => { if (e.key === 'Enter' && !chk && (rec.v || '').trim()) check(); }} />
@@ -96,7 +97,7 @@ function Body({ n, title, qs, k }: { n: number; title: string; qs: any[]; k: str
               <motion.div className="vd" aria-live="polite" {...fade}>
                 <div className={`verdict ${ok ? 'ok' : 'no'}`}>
                   <b>{ok ? (t === 'w' ? '✅ Marked as known.' : '✅ Correct.') : rec.shown ? 'Answer revealed.' : t === 'w' ? '↺ Marked to review.' : '❌ Not quite.'}</b>{' '}
-                  {t !== 'f' && t !== 'w' ? <>Correct: <b>{q.a.map((x: number) => L5[x]).join(', ')}</b>. </> : null}<span dangerouslySetInnerHTML={{ __html: q.src.e || '' }} />
+                  {t !== 'f' && t !== 'w' ? <>Correct: <b>{q.a.map((x: number) => L5[x]).join(', ')}</b>. </> : null}<span dangerouslySetInnerHTML={{ __html: breakAny(q.src.e || '') }} />
                   {t === 'f' && !ok ? <div className="why wy"><b>Accepted answer:</b> {fillShown.map((a: string, m: number) => <span key={m}>{m ? ' or ' : ''}<code>{a}</code></span>)}</div> : null}
                   {!ok ? <div className="row"><JumpBtn ch={n} text={q.src.q + ' ' + (q.src.e || '')} back={back} /></div> : null}
                 </div>

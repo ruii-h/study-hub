@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { cardChap, shuffle, useG } from './state';
 import { flipTiming } from './motion';
+import { breakAny } from './paragraphs';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function ChapterSelect() {
@@ -29,7 +30,7 @@ function Card({ c, i }: { c: { t: string; d: string; f: string }; i: number }) {
       onAnimationComplete={() => { if (phase === 'close') { setBack((b) => !b); setPhase('open'); } else if (phase === 'open') setPhase('idle'); }}>
       {back ? (<>
         <div className="bp-card-header bp-card-back"><div className="bp-card-header-title" dangerouslySetInnerHTML={{ __html: c.t }} /><span className="bp-flip-badge">Definition</span></div>
-        <div className="fc-b" dangerouslySetInnerHTML={{ __html: c.d }} />
+        <div className="fc-b" dangerouslySetInnerHTML={{ __html: breakAny(c.d) }} />
         <div style={{ padding: '0 16px 12px' }}><button className="btn ghost" onClick={(e) => { e.stopPropagation(); g.patch('K', (k) => ({ ...k, [i]: k[i] ? 0 : 1 })); }}>{known ? '✓ Known (undo)' : 'Mark as known'}</button></div>
       </>) : (<>
         <div className="bp-card-header"><div className="bp-card-header-title" dangerouslySetInnerHTML={{ __html: c.t }} /><span className="bp-flip-badge">Term · {g.wiki.wlRefLabel(c.f)}</span></div>

@@ -163,3 +163,13 @@ td .pb+.pb,li .pb+.pb{margin-top:.45em}
   .t-table-wrap:not(.stack) table:has(tr>*:nth-child(4)){min-width:540px}
   .t-table-wrap{-webkit-overflow-scrolling:touch}
 }
+
+/* Tables wrapped inside a card ("At a glance"): the card already has the border, so the wrapper is invisible */
+.t-table-wrap.in-card{border:0!important;background:none!important;box-shadow:none!important;border-radius:0!important;margin:8px 0;max-width:100%;overflow-x:auto}
+.t-table-wrap.in-card.stack table{border:0!important}
+.t-table-wrap.stack tr{border-top:1px solid var(--border)}
+/* Safety net: nothing may poke out of a lesson container on phones */
+@media(max-width:640px){.theory-content{overflow-x:clip}.theory-content img,.theory-content svg,.theory-content pre{max-width:100%}.theory-content pre{overflow-x:auto}}
+/* The lesson column is a flex child: without min-width:0 a wide table stretches the whole page past the screen */
+.tab-view>*,.theory-content,.theory-content>*{min-width:0}
+.theory-content{max-width:100%}
