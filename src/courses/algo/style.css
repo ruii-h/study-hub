@@ -1775,3 +1775,22 @@ button.tut-sub-i .ttl{font-size:12.5px;line-height:1.35;color:var(--text)}
 .exr .ma pre.mermaid,.exr-q pre.mermaid{margin:10px 0}
 .exr-q>div,.exr .ma{min-width:0;max-width:100%}
 .exr-q .t-table-wrap,.exr .ma .t-table-wrap{max-width:100%;overflow-x:auto}
+
+/* sub-headings inside a theory section (BFS / DFS, Method 1-3, Plan A / B ...) */
+.t-h3x{margin:26px 0 10px;padding:6px 0 6px 12px;border-left:4px solid var(--accent);font-size:17px;font-weight:800;line-height:1.35!important;color:var(--accent);text-wrap:balance}
+.t-h3x:first-child{margin-top:8px}
+
+/* slow walk-through that sits at the top of the section it explains */
+.t-slow{margin:12px 0 6px;padding:12px 14px 4px;border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);border-left:4px solid var(--accent);border-radius:12px;background:color-mix(in srgb,var(--accent) 6%,transparent);min-width:0;max-width:100%}
+.t-slow-tag{display:inline-block;margin:0 0 6px;padding:3px 10px;border-radius:999px;background:var(--accent);color:#fff;font-size:12px;font-weight:800;letter-spacing:.03em;text-transform:uppercase}
+.t-slow .t-h3x{margin-top:18px}
+.t-slow-tag + .t-h3x{margin-top:8px}
+
+/* multiple-choice options in Exam Practice: look like tappable answer cards */
+.exr-q ul{list-style:none;margin:12px 0 4px;padding:0;display:grid;gap:8px;counter-reset:opt}
+.exr-q ul>li{counter-increment:opt;position:relative;display:flex;align-items:flex-start;gap:10px;min-width:0;margin:0;padding:10px 12px;border:1.5px solid color-mix(in srgb,var(--accent) 35%,transparent);border-radius:12px;background:color-mix(in srgb,var(--accent) 5%,transparent);cursor:pointer;line-height:1.5;overflow-wrap:anywhere;-webkit-tap-highlight-color:transparent;transition:background .12s,border-color .12s}
+.exr-q ul>li::before{content:counter(opt,upper-alpha);flex:none;width:26px;height:26px;border-radius:50%;border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--accent);line-height:1}
+.exr-q ul>li.sel{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 18%,transparent)}
+.exr-q ul>li.sel::before{background:var(--accent);color:#fff}
+@media (hover:hover){.exr-q ul>li:hover{border-color:var(--accent)}}
+.exr-q .opt-hint{margin:10px 0 -2px;font-size:12.5px;opacity:.75}

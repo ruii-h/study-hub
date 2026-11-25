@@ -84,7 +84,7 @@ export default function Mocks() {
             <div className="meta">🎯 {mock.count} questions · chips show the question number and its marks</div></div>
           {outl.length > 1 && (
             <nav className="toc" aria-label="Sections in this mock exam"><div className="tocs">{outl.map((s) => <a key={s.id} href={'#' + s.id} className={active === s.id ? 'on' : ''} onClick={(e) => { e.preventDefault(); const c = document.getElementById('theory-content'), t = document.getElementById(s.id); if (c && t) { t.classList.add('in'); c.scrollTo({ top: t.offsetTop - 70, behavior: 'smooth' }); } }}>{s.title}</a>)}</div></nav>)}
-          <div ref={body} dangerouslySetInnerHTML={{ __html: htmlStr }} />
+          <div ref={body} onClick={(e) => { const li = (e.target as HTMLElement).closest('.exr-q ul > li'); if (li) li.classList.toggle('sel'); }} dangerouslySetInnerHTML={{ __html: htmlStr }} />
           <div className="t-nav-footer">
             {pv ? <button className="t-nav-btn" onClick={() => g.setMockSel(pv.n)}><small>Previous</small>← {(pv as any).title}</button> : <div />}
             {nx ? <button className="t-nav-btn next" onClick={() => g.setMockSel(nx.n)}><small>Next</small>{(nx as any).title} →</button> : <div />}
