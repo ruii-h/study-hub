@@ -3,6 +3,7 @@ import { SideList } from './Guide';
 import { useG } from './state';
 import { breakText } from './paragraphs';
 import { mergeCells, reveal, runMermaid, stackTables, transposeTables } from './enhance';
+import { paintAll, wireMcq } from './mcq';
 import SolToggle, { useSolutions } from './SolToggle';
 
 type Item = { i: number; chip: string; title: string };
@@ -56,6 +57,9 @@ export default function Mocks() {
   const outl = useMemo(() => outline(mock.html), [mock]);
   const [active, setActive] = useState('');
   useSolutions(body, mock.n);
+  const sol = !!ST.tsol; const solRef = useRef(sol); solRef.current = sol;
+  useLayoutEffect(() => { const b = body.current; if (!b) return; return wireMcq(b, () => solRef.current); }, [mock.n]);
+  useLayoutEffect(() => { if (body.current) paintAll(body.current, sol); }, [sol, mock.n]);
   const dir = useRef(0); const prev = useRef(mock.n);
   if (prev.current !== mock.n) { dir.current = mock.n > prev.current ? 1 : -1; prev.current = mock.n; }
   const theme: string = ST.theme || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
@@ -84,7 +88,7 @@ export default function Mocks() {
             <div className="meta">🎯 {mock.count} questions · chips show the question number and its marks</div></div>
           {outl.length > 1 && (
             <nav className="toc" aria-label="Sections in this mock exam"><div className="tocs">{outl.map((s) => <a key={s.id} href={'#' + s.id} className={active === s.id ? 'on' : ''} onClick={(e) => { e.preventDefault(); const c = document.getElementById('theory-content'), t = document.getElementById(s.id); if (c && t) { t.classList.add('in'); c.scrollTo({ top: t.offsetTop - 70, behavior: 'smooth' }); } }}>{s.title}</a>)}</div></nav>)}
-          <div ref={body} onClick={(e) => { const li = (e.target as HTMLElement).closest('.exr-q ul > li'); if (li) li.classList.toggle('sel'); }} dangerouslySetInnerHTML={{ __html: htmlStr }} />
+          <div ref={body} dangerouslySetInnerHTML={{ __html: htmlStr }} />
           <div className="t-nav-footer">
             {pv ? <button className="t-nav-btn" onClick={() => g.setMockSel(pv.n)}><small>Previous</small>← {(pv as any).title}</button> : <div />}
             {nx ? <button className="t-nav-btn next" onClick={() => g.setMockSel(nx.n)}><small>Next</small>{(nx as any).title} →</button> : <div />}

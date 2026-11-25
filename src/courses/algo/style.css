@@ -1255,7 +1255,7 @@ dialog#help[open]::backdrop{animation:fadeIn .24s ease-out}
 /* section = grid, so wide screens use the width without endless line lengths */
 .t-section{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,480px),1fr));gap:14px 28px;align-items:stretch}
 .t-section>*{min-width:0}
-.t-section>.t-h2,.t-section>.sub,.t-section>.t-table-wrap,.t-section>table,.t-section>.t-callout,.t-section>.demo,.t-section>pre,.t-section>.mermaid,.t-section>.fcards,.t-section>.checks,.t-section>p,.t-section>ul,.t-section>ol,.t-section>.t-mini-table,.t-section>div[class*=case-file],.t-section>.t-unit.case,.t-section>h3,.t-section>details{grid-column:1/-1}
+.t-section>.t-h2,.t-section>.sub,.t-section>.t-table-wrap,.t-section>table,.t-section>.t-callout,.t-section>.demo,.t-section>pre,.t-section>.mermaid,.t-section>.fcards,.t-section>.checks,.t-section>p,.t-section>ul,.t-section>ol,.t-section>.t-mini-table,.t-section>div[class*=case-file],.t-section>.t-unit.case,.t-section>h3,.t-section>.t-h3x,.t-section>details{grid-column:1/-1}
 .t-section>p,.t-section>ul{max-width:150ch}
 .t-unit{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin:0}
 .t-unit>.t-h3{margin-top:0}
@@ -1786,11 +1786,14 @@ button.tut-sub-i .ttl{font-size:12.5px;line-height:1.35;color:var(--text)}
 .t-slow .t-h3x{margin-top:18px}
 .t-slow-tag + .t-h3x{margin-top:8px}
 
-/* multiple-choice options in Exam Practice: look like tappable answer cards */
-.exr-q ul{list-style:none;margin:12px 0 4px;padding:0;display:grid;gap:8px;counter-reset:opt}
-.exr-q ul>li{counter-increment:opt;position:relative;display:flex;align-items:flex-start;gap:10px;min-width:0;margin:0;padding:10px 12px;border:1.5px solid color-mix(in srgb,var(--accent) 35%,transparent);border-radius:12px;background:color-mix(in srgb,var(--accent) 5%,transparent);cursor:pointer;line-height:1.5;overflow-wrap:anywhere;-webkit-tap-highlight-color:transparent;transition:background .12s,border-color .12s}
-.exr-q ul>li::before{content:counter(opt,upper-alpha);flex:none;width:26px;height:26px;border-radius:50%;border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--accent);line-height:1}
-.exr-q ul>li.sel{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 18%,transparent)}
-.exr-q ul>li.sel::before{background:var(--accent);color:#fff}
-@media (hover:hover){.exr-q ul>li:hover{border-color:var(--accent)}}
-.exr-q .opt-hint{margin:10px 0 -2px;font-size:12.5px;opacity:.75}
+/* Exam Practice multiple choice (same look as the IS211 quiz): options, per-option reasons, verdict */
+.mcq [hidden]{display:none!important}
+.mcq .qh{margin:12px 0 6px}
+.mcq .mcq-o{min-width:0}
+.mcq .eo{min-width:0;overflow-wrap:anywhere}
+.mcq .eo span{min-width:0}
+.mcq .why{margin-left:8px}
+.mcq .mcq-verdict{min-width:0;max-width:100%}
+.mcq .mcq-expl{min-width:0;max-width:100%}
+.mcq .mcq-expl .t-table-wrap{max-width:100%;overflow-x:auto}
+.mcq .mcq-expl>p:first-child{margin-top:6px}

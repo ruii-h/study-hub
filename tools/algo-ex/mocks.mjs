@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { esc, code } from './lib.mjs';
+import { mcqify } from './mcq.mjs';
 import { curveFig, ringsFig, vennFig, topoFig } from './mock-figs.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -201,6 +202,7 @@ const mocks = [...parseMocks(md, /^# (?=Mock 2|Mock 3)/m, 1, false), ...parseMoc
 
 const strip = (s) => s.replace(/[*`✅]/g, '').replace(/\s+/g, ' ').trim();
 const outMocks = [];
+const MCQLOG = [];
 const dump = process.argv.includes('--dump');
 for (const mock of mocks) {
   let count = 0; const secHtml = [];
@@ -235,11 +237,12 @@ for (const mock of mocks) {
     });
     secHtml.push(`<div class="t-section" id="msec${mock.n}-${si}" data-gen="1"><div role="heading" aria-level="2" class="t-h2">${inline(sec.title)}</div>${cards.join('')}</div>`);
   });
-  outMocks.push({ n: mock.n, title: NAMES[mock.n], count, html: secHtml.join('') });
+  outMocks.push({ n: mock.n, title: NAMES[mock.n], count, html: mcqify(secHtml.join(''), MCQLOG) });
 }
 if (dump) process.exit(0);
 const D = JSON.parse(fs.readFileSync(F, 'utf8'));
 D.mocks = outMocks;
 D.exam = { mcq: [], wr: [] }; // the old Past Exam tab is scrapped (replaced by Exam Practice)
 fs.writeFileSync(F, JSON.stringify(D));
+if (MCQLOG.length) console.log(MCQLOG.join('\n'));
 console.log('mocks:', outMocks.map((m) => `${m.title}: ${m.count}`).join(', '));
