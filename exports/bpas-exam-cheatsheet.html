@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>IS210 BPAS exam cheat sheet (A4 landscape, 2 pages)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+@page{size:A4 landscape;margin:0}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#e8e8e8;color:#111;font-family:"Segoe UI",Arial,Helvetica,sans-serif}
+.page{width:297mm;height:210mm;margin:0 auto 6mm;background:#fff;padding:4.5mm 5mm 4mm;overflow:hidden;position:relative;page-break-after:always;break-after:page}
+.page:last-child{page-break-after:auto;break-after:auto;margin-bottom:0}
+@media print{html,body{background:#fff}.page{margin:0}}
+.hd{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1.4px solid #222;padding-bottom:1px;margin-bottom:2mm}
+.hd h1{font-size:10.5pt;margin:0;letter-spacing:.2px}
+.hd span{font-size:6.6pt;color:#333}
+.cols{column-count:4;column-gap:3mm;column-fill:balance;height:calc(210mm - 4.5mm - 4mm - 8.4mm)}
+.box{break-inside:avoid;border:.7px solid #444;border-radius:2px;margin:0 0 1.6mm;padding:0 0 1px;background:#fff}
+.box>h2{margin:0;padding:1px 3px;font-size:7.2pt;letter-spacing:.2px;color:#fff;line-height:1.25}
+.box .b{padding:1px 3px 0;font-size:7pt;line-height:1.26}
+.box.loose{break-inside:auto}
+.b p{margin:0 0 1px}
+.b ul{margin:0 0 1px;padding-left:8px}
+.b li{margin:0 0 .5px}
+.b b,.b strong{font-weight:700}
+.b table{border-collapse:collapse;width:100%;margin:1px 0 1.5px;font-size:6.7pt;line-height:1.2}
+.b th,.b td{border:.5px solid #777;padding:.4px 1.6px;vertical-align:top;text-align:left}
+.b th{background:#eee;font-weight:700}
+.warn{color:#b00020;font-weight:700}
+.ok{color:#0a6b2d;font-weight:700}
+.k{font-weight:700;color:#0b3d91}
+.c1>h2{background:#1f4e79}.c2>h2{background:#6a1b9a}.c3>h2{background:#00695c}.c4>h2{background:#b34700}.c5>h2{background:#8a1c1c}.c6>h2{background:#37474f}.c7>h2{background:#2e7d32}
+.fmt{display:grid;grid-template-columns:repeat(3,1fr);gap:2mm;margin-bottom:2mm;font-size:6.2pt;line-height:1.25}
+.fmt div{border:.7px solid #444;border-radius:2px;padding:1px 4px}
+.fmt b{font-size:6.6pt}
+.mono{font-family:Consolas,"Courier New",monospace;font-size:5.8pt}
+.tag{display:inline-block;background:#222;color:#fff;border-radius:2px;padding:0 2px;font-size:5.4pt;margin-right:1px;vertical-align:1px}
+</style>
+</head>
+<body>
+
+<!-- ============================== PAGE 1 ============================== -->
+<section class="page">
+<div class="hd"><h1>IS210 BPAS · Exam cheat sheet · Page 1: drawing, RCI, alignment</h1><span>90 marks: 3 design Qs 35 · SAQ 25 · 15 MCQ 30 (M12 = MCQ only) · double-sided A4</span></div>
+<div class="cols">
+
+<div class="box c1"><h2>PROCESS WORKFLOW MODEL (design Q) · draw checklist</h2><div class="b">
+<ul>
+<li><b>Lane = who PERFORMS the activity</b> (role, department or system), not the tool touched. A participant gets a lane only if it performs ≥1 activity. A change of lane = hand-off.</li>
+<li><b>Activity types:</b> <span class="k">Manual</span> (human, no system) → human lane · <span class="k">Interactive</span> (human uses a system) → <b>HUMAN lane</b>, system attached by a dotted association · <span class="k">Automated</span> (system only) → <b>system lane</b>.</li>
+<li><b>Events:</b> circles. Start = trigger (e.g. customer walk-in). <b>Every path must reach an end event</b>; one end event per distinct outcome (rejected / approved / paid).</li>
+<li><b>Activity</b> = rounded rectangle, short verb–noun, one per step of the scenario; keep the scenario's order.</li>
+<li><b>XOR gateway</b> = diamond with ✖: one flow in, several out. <span class="warn">Label EVERY exit</span> (Yes/No, Approved/Rejected) and add % if given (75/25, then 90/10). <b>Merge</b> = several in, one out. <b>AND</b> = diamond with + (parallel). Count flows to tell decision from merge.</li>
+<li><b>Solid arrow</b> = sequence flow. <b>Dotted line</b> = association to a system / document name. Sub-process = + box. Timer = clock. Loop = arrow back.</li>
+<li>Annotate when given: <b>execution time</b> (min), <b>probability</b> on branches, <b>systems used</b>, <b>work products</b> (or say you left them out).</li>
+<li><b>State assumptions</b> (email = hand-off channel, not a system/lane; work products omitted; separate process only triggered; which branch is the default).</li>
+<li>Walk-through: read the scenario once and underline each actor, each system, each "if". Draw lanes first, then steps, then gateways, then ends.</li>
+</ul></div></div>
+
+<div class="box c1"><h2>RESOURCE MODEL (design Q)</h2><div class="b">
+<table><tr><th></th><th>Internal (you manage / control / operate)</th><th>External (you do not)</th></tr>
+<tr><th>Human</th><td>Own staff and roles: Employee, Manager, Office Administrator, CSO, MO, LM, Bread Artist</td><td>Customers, couriers, partners, bank</td></tr>
+<tr><th>Technology</th><td>Own systems: IMS, RAS, Billing System, BAS</td><td>Workday Cloud System, Bank System, Gov UEN website, Outlook</td></tr></table>
+<ul><li><span class="warn">Internal/external = who controls or operates it, NOT who uses or pays</span> (Workday is external although the company pays).</li>
+<li>List only resources that <b>participate in the process in scope</b>. Email is a channel, not a resource.</li>
+<li>Resource ≠ organisation chart: Resource = who/what is used.</li></ul></div></div>
+
+<div class="box c1"><h2>WHICH MODEL ANSWERS IT?</h2><div class="b">
+<table><tr><td><b>Organisation</b></td><td>Who reports to whom / who is the boss (“people politics”). Functional role (title on org chart) vs Process role (exists only because of the process). Group vs individual role.</td></tr>
+<tr><td><b>Location</b></td><td>Where offices/people are → deployment, language, time zones.</td></tr>
+<tr><td><b>Resource</b></td><td>Which humans and systems are used; customers/suppliers; internal vs external.</td></tr>
+<tr><td><b>Workflow</b></td><td>Order of steps, hand-offs, system-to-system interaction, what happens on rejection (most common answer).</td></tr>
+<tr><td><b>Business rules</b></td><td>IF…THEN… decision logic in plain English; they attach to <b>activities, not gateways</b>. Answer “When?”, not “Why?”.</td></tr></table></div></div>
+
+<div class="box c2"><h2>RCI MODEL (design Q) · root cause, NO impact level</h2><div class="b">
+<p><b>Columns:</b> Issue # · Issue Description · Cause Description · <b>Root Cause</b> · <b>Issue Category</b> · Business Performance Metrics <span class="mono">(+ Impact Level: not needed)</span>. Template may swap a column (e.g. Stakeholder).</p>
+<ul><li><b>Issue</b> = the effect, written “X happens, which leads to Y”. <b>Cause</b> = why. <b>Root cause</b> = the deeper/common cause (5-Why or fishbone). <span class="warn">Never restate the issue as its root cause.</span></li>
+<li>One issue can have <b>several causes → several rows</b>, each with its own root cause and category.</li>
+<li><b>Issue categories (5):</b> <b>Process</b> (manual steps, redundancy, paper, wrong order) · <b>System</b> (slow/missing functionality, no automation in a system) · <b>People</b> (skills, workload, training, resistance) · <b>Policy</b> (rules, approvals, access rights) · <b>Others</b>.</li>
+<li>Typical root causes: lack of automation (Process) · paper-based process (Process) · lack of system functionality (System) · department/company policy (Policy) · late exception check (Process).</li>
+<li><b>Metrics:</b> total process time, waiting time, cost per case, cost of rejection, # errors, # complaints, # missing forms, % on-time.</li>
+<li>Example: AO emails each request → slow = <b>lack of automation / Process</b>; BAS slow, hard to search = <b>lack of system functionality / System</b>; AO cannot use the BAS = <b>department policy / Policy</b>.</li></ul>
+<p><b>RCR</b> (next step): Root Cause → Recommendation → <b>Impact score 5 = Very High … 1 = Very Low</b> → <b>Complexity 5 = Very Easy … 1 = Very Complex</b> (higher = better on both). Do high-impact + easy first. Sources: domain, technology, best practice, experience.</p></div></div>
+
+<div class="box c4"><h2>BUSINESS &amp; IT ALIGNMENT (SAQ)</h2><div class="b">
+<ul><li><b>Misalignment symptoms (5 questions):</b> goals driving technology decisions? · IT enables business innovation? · shared accountability? · effective communication between teams? · technology strategy integrated with business strategy?</li>
+<li><b>Root causes:</b> IT does not appreciate business processes · business does not appreciate IT value · no common language · growing business / changing environment.</li>
+<li><b>Steps:</b> treat IT as transformative, not a cost centre · target customers internally and externally · IT and business “talk” in a common language · clear goals for IT · demand measurable ROI · write IT + business strategy in one document.</li>
+<li><b>Enterprise alignment</b> = whole organisation, via Enterprise Architecture. <b>Project alignment</b> = one IT solution, via Business Process Engineering Methodology.</li>
+<li><b>Carr “IT doesn’t matter”:</b> IT alone becomes a commodity; advantage comes from combining IT with strategy, processes and capability.</li>
+<li><b>Four dimensions:</b> Purpose = Why (mission, vision, goals) · Participants = Who · Process = How · Product = What. (“Project” is not a 4th P.)</li>
+<li><b>BPM cycle:</b> Discover → Model &amp; Analyse → Design solution → Implement → Monitor &amp; Optimise (never ends). Course: Model → Analyse → Solve → Innovate.</li></ul></div></div>
+
+<div class="box c4"><h2>CLASSIFY: MISSION · VISION · OBJECTIVE · STRATEGY (SAQ)</h2><div class="b">
+<table><tr><th>Statement</th><th>Tell-tale</th><th>Example</th></tr>
+<tr><td><b>Mission</b></td><td>Present, what we do now and for whom; concrete; guides day-to-day; descriptive words (<i>provide, deliver, serve</i>)</td><td>“Provide affordable and reliable auto insurance.”</td></tr>
+<tr><td><b>Vision</b></td><td>Future aspiration; abstract, inspirational, long term (<i>be the leading / most trusted</i>)</td><td>“Lead claims processing for auto insurance.”</td></tr>
+<tr><td><b>Business objective</b></td><td>Concrete, <b>measurable, time-bound</b> (numbers, dates)</td><td>“Cut claims fraud by 80% within two years.”</td></tr>
+<tr><td><b>Strategy</b></td><td><b>Actions / plans</b> to achieve the objectives (<i>deploy, expand, launch, partner, automate</i>)</td><td>“Expand into new markets and launch a campaign.”</td></tr></table>
+<p>Cascade: Mission &amp; Vision → Business objectives → Strategies → Process performance goals → metrics. A number + deadline = objective; a verb of action = strategy; “where we aspire to be” = vision.</p></div></div>
+
+<div class="box c3"><h2>USE CASE DIAGRAM (design Q)</h2><div class="b">
+<ul><li><b>Actor</b> = generic role noun (Patient, not “Max”); stick figure; can be a human, a device or an <b>external system</b>. <b>Use case</b> = verb–noun oval (Book Appointment). <b>Association</b> = solid line actor–use case. <b>System boundary</b> = rectangle, one per system.</li>
+<li><b>Derive from the To-Be workflow:</b></li></ul>
+<table><tr><th>Activity</th><th>Becomes</th></tr>
+<tr><td>Manual</td><td><b>No use case</b></td></tr>
+<tr><td>Interactive</td><td>1 use case, linked to the <b>human</b> who does it</td></tr>
+<tr><td>Automated, 1 system</td><td>1 use case of that system (actor = who is served/notified)</td></tr>
+<tr><td>Automated, 2 systems</td><td><b>2 use cases</b>: sender (client) in its boundary and receiver (server) in the other; each system is the <b>actor</b> of the other’s</td></tr></table>
+<ul><li><span class="warn">Do NOT combine automated use cases</span> (email + SMS = 2). Add extras: CRUD “view”, login, search.</li>
+<li>Systems used but without a lane (annotated) are still actors. Notified person (e.g. LM) = actor.</li>
+<li>Packages: group related use cases of <b>one</b> system, name by function; <b>never across systems</b>.</li></ul></div></div>
+
+<div class="box c3"><h2>FUNCTION MODEL · SPOT THE ERROR (SAQ/design)</h2><div class="b">
+<p>Columns: System · Function · Use case · <b>Change type</b> · Technical notes. Change type describes the <b>SYSTEM</b>, not the business practice.</p>
+<table><tr><th>Change type</th><th>Meaning / matching note</th></tr>
+<tr><td><b>New</b></td><td>System does not have it; “currently manual”; “was done in another system”; “system integration” (New integration)</td></tr>
+<tr><td><b>To be modified</b></td><td>Partly supported; “needs modification / currently interactive”; enhance existing module</td></tr>
+<tr><td><b>Unchanged</b></td><td>Fully supported by an existing system (“fully supported”, feature already exists)</td></tr></table>
+<ul><li><b>Check each row:</b> (1) note “manual / does not exist” but type Unchanged → <b>New</b> · (2) note “fully supported / exists” but type New → <b>Unchanged</b> · (3) note “partially supported” → <b>To be modified</b> · (4) moved from another system → <b>New (Migrate)</b> · (5) system-to-system → New + integration note (e.g. HTTPS/REST) · (6) use case under the wrong system or function.</li>
+<li>Trap: “done manually today” yet Outlook already has the feature → <b>Unchanged</b>.</li></ul></div></div>
+
+<div class="box c3"><h2>C4 CONTEXT DIAGRAM (design Q: “only draw the context diagram”)</h2><div class="b">
+<ul><li>Your system = <b>one box</b> (software system in scope). Around it: <b>People</b> (human actors/roles) and <b>external systems</b> you do not own (IMS, Gov website, Outlook, Bank).</li>
+<li><b>Label every arrow</b> with what flows (use case / data / protocol, e.g. “Sends notifications [email]”, HTTPS/RESTful API) and direction.</li>
+<li><b>Two systems:</b> draw both as boxes, give each its own users, join them with a labelled integration arrow (client → server).</li>
+<li>No internals: no databases, applications, components. <b>No Docker/containers here.</b> Audience: everybody.</li>
+<li>Map from Solve: human use-case actor → Person · system you build → system in scope · systems you don’t own → external system · integration use cases → labelled arrow. Add a short key.</li></ul></div></div>
+
+</div></section>
+
+<!-- ============================== PAGE 2 ============================== -->
+<section class="page">
+<div class="hd"><h1>IS210 BPAS · Exam cheat sheet · Page 2: analysis, solutioning, innovation, MCQ facts</h1><span>M12 = multiple choice / select only · static report formulas · dynamic techniques</span></div>
+<div class="cols">
+
+<div class="box c5"><h2>DYNAMIC ANALYSIS · 8 TECHNIQUES (match the keyword!)</h2><div class="b">
+<table><tr><th>Technique</th><th>Use when / keyword · example</th></tr>
+<tr><td><b>1 Capacity</b></td><td><b>Maximum</b> the process or resource can handle (supply) vs demand. “200 orders/day but can only make 100”; “2 counters register max 96/h”.</td></tr>
+<tr><td><b>2 Process cycle time/cost</b></td><td>Time and cost of the <b>whole workflow per instance/customer</b>: “each customer takes 15 min on average, $x”.</td></tr>
+<tr><td><b>3 Resource utilisation</b></td><td>Is a resource over- or under-used? Utilisation = workload ÷ capacity. &gt;100% overloaded (127%); very low = idle → lower hours or reassign. Target e.g. 70–85%.</td></tr>
+<tr><td><b>4 Activities time/cost</b></td><td>Duration and cost of <b>each activity</b> (mean, s.d.).</td></tr>
+<tr><td><b>5 Bottleneck</b></td><td>Process + resource + activity combined: <b>long waiting time, long queue length, over-utilised resource</b>. Not “the longest task”.</td></tr>
+<tr><td><b>6 Path analysis</b></td><td>Paths come from <b>decision points</b>. Check <b>rejection cases</b>; vary the probability (1–100%) and watch the path. Rank by <b>expected contribution = share × cost (or time)</b>, not by frequency or per-case cost.</td></tr>
+<tr><td><b>7 Unusual event</b></td><td>Rare, high-impact events (flood, outage, strike).</td></tr>
+<tr><td><b>8 What-if</b></td><td>Change <b>one thing at a time</b> (cashiers 2 → 3: cycle time 20 → 10 min). Find the <b>smallest option that meets the goal</b>, then check cost; lowest waiting time is not automatically best.</td></tr></table>
+<ul><li><b>4 phases:</b> 1 Establish performance goals → 2 Model &amp; simulate (As-Is, then each To-Be) → 3 Impact analysis (who is affected: <b>hard/soft × internal/external</b>) → 4 Final selection (goals + simulation + impact + management).</li>
+<li><b>Simulation data:</b> <b>process-wide</b> = arrivals, frequency, opening hours · <b>activity</b> = task time, cost, resource, queue rule · <b>resource</b> = cost/h, headcount, work hours, max utilisation · <b>decision points</b> = branch probabilities.</li>
+<li>Random inputs → runs differ → <b>run many times</b>. Matching one average is not enough to call a model valid. Utilisation &lt;100% does not rule out queues. Static report cannot show waiting.</li></ul></div></div>
+
+<div class="box c5"><h2>STATIC REPORT FORMULAS</h2><div class="b">
+<p><b>Input factor</b> f = probability a task runs; nested branches <b>multiply</b> (80% × 60% = 48%).</p>
+<table><tr><td><b>Cycle time</b></td><td>CT = Σ t·f (min)</td></tr>
+<tr><td><b>Cost / instance</b></td><td>Σ (t·f ÷ 60) × cost per hour of the role</td></tr>
+<tr><td><b>Annual workload</b></td><td>W = Σ (t·f ÷ 60) × instances per year</td></tr>
+<tr><td><b>Required resources</b></td><td>R = W ÷ annual hours per resource</td></tr>
+<tr><td><b>Utilisation</b></td><td>U = R ÷ number available (&gt;100% = overloaded)</td></tr>
+<tr><td><b>Path contribution</b></td><td>share × value; Σ = weighted average</td></tr>
+<tr><td><b>% improvement</b></td><td>(As-Is − To-Be) ÷ As-Is × 100</td></tr></table>
+<p>Which activity contributes most to cycle time? Compare t·f, not t alone (18 min × 10% = 1.8 &lt; 6 min × 100% = 6).</p></div></div>
+
+<div class="box c3"><h2>SOLVE · FUNCTIONAL vs NON-FUNCTIONAL</h2><div class="b">
+<p><b>Functional</b> = what the system <b>does</b> (features, data handling, user interaction) → drives use cases. <b>Non-functional</b> = how well / how it should be (performance “loads in 2 s”, security, usability, reliability “99.9% uptime”).</p>
+<p><b>Solve method:</b> Use case model → Use case packages → Function model → Architecture (C4) → Risk model → Cost model.</p></div></div>
+
+<div class="box c6"><h2>BLUEPRINT · C4 · RISK · COST (MCQ)</h2><div class="b">
+<p><b>Concept Solution Blueprint</b> = Architecture + Risk + Cost modelling; <b>high-level</b>, no vendor/OS/technical commitment yet.</p>
+<table><tr><th>C4</th><th>Shows</th><th>Audience</th></tr>
+<tr><td><b>Context</b></td><td>System as ONE box + users + external systems</td><td>Everyone · recommended</td></tr>
+<tr><td><b>Container</b></td><td>Applications and data stores inside the system (not Docker)</td><td>Technical · recommended</td></tr>
+<tr><td><b>Component</b></td><td>Building blocks inside one container (= function-model functions)</td><td>Architects/devs · only if it adds value</td></tr>
+<tr><td><b>Code</b></td><td>Classes of one component</td><td>Rare; auto-generated</td></tr></table>
+<p><b>Abstractions:</b> Person · Software system · Container · Component. Each level zooms into one box of the level above.</p>
+<p><b>Risk types:</b> <b>Goal</b> (market/policy change) · <b>Process flow</b> (unexpected events, delays) · <b>Data</b> (new/partly available) · <b>Technology</b> (new tech, lack of expertise, security incident) · <b>Organisational</b> (lack of resources, roles/departments change).</p>
+<p><b>Mitigation:</b> <b>Reduction</b> = lower probability (defence) or impact (mitigation) · <b>Transfer</b> = shift to others (insurance) · <b>Acceptance</b> = do nothing · <b>Elimination</b> = avoid the risky activity.</p>
+<table><tr><th>Impact \ Likelihood</th><th>Low</th><th>Med</th><th>High</th></tr>
+<tr><th>High</th><td>B</td><td>A</td><td>A</td></tr><tr><th>Medium</th><td>C</td><td>B</td><td>A</td></tr><tr><th>Low</th><td>C</td><td>C</td><td>B</td></tr></table>
+<p><b>A = highest rating.</b> Risk model columns: description, impact, likelihood, rating, type, mitigation, impact of strategy.</p>
+<p><b>Cost model:</b> <b>qualitative Low/Med/High, not dollars</b>; columns Item · Fixed · Maintenance · Total rating (+ justification); total rating of a group reflects its items.</p></div></div>
+
+<div class="box c7"><h2>INNOVATION · GASSMANN MAGIC TRIANGLE (SAQ)</h2><div class="b">
+<table><tr><th>Corner</th><th>Asks</th><th>Is</th><th>BMC blocks</th></tr>
+<tr><td><b>Who?</b> (centre)</td><td>Target customer</td><td>Customer segment</td><td>Segments, Channels, Relationships</td></tr>
+<tr><td><b>What?</b></td><td>What do you offer</td><td>Value proposition = <b>product</b></td><td>Value proposition</td></tr>
+<tr><td><b>How?</b></td><td>How is it created</td><td>Value chain = <b>process</b></td><td>Key activities, resources, partners</td></tr>
+<tr><td><b>Value?</b></td><td>How is revenue made</td><td>Revenue model</td><td>Revenue streams, Cost structure</td></tr></table>
+<ul><li><b>Count the changed corners:</b> only <b>What?</b> → <b>product</b> innovation · only <b>How?</b> → <b>process</b> innovation · <span class="warn">two or more corners → BUSINESS MODEL innovation</span> (e.g. new customers + new revenue model; new product + new value chain).</li>
+<li>For a business model answer, name each changed corner, what it was and what it became (e.g. Uber: What? ride on demand, How? drivers’ own cars via app, Value? commission per ride).</li>
+<li>Innovation = commercialisation of an invention; creativity (ideas) → invention (new, scientific) → innovation (adds value). <b>Incremental</b> = small, less risk; <b>radical</b> = value +50–100%+, riskier, more culture change (reengineering).</li></ul></div></div>
+
+<div class="box c6"><h2>M11 · AUTOMATION &amp; IoT (MCQ only)</h2><div class="b">
+<table><tr><th></th><th>Traditional</th><th>RPA</th><th>Intelligent</th><th>Agentic</th></tr>
+<tr><td>Data</td><td>structured</td><td>mostly structured</td><td>+ unstructured</td><td>multiple, unstructured</td></tr>
+<tr><td>Logic</td><td>explicit rules</td><td>explicit rules</td><td>rules + predictive models</td><td>goals, policies, constraints</td></tr>
+<tr><td>Path</td><td>predefined</td><td>predefined</td><td>mostly predefined</td><td><b>dynamic</b></td></tr>
+<tr><td>Interacts via</td><td>system integration</td><td><b>user interface</b></td><td>AI in workflow</td><td>dynamically picked tools</td></tr>
+<tr><td>Human</td><td>exceptions</td><td>exceptions</td><td>validates uncertain</td><td>approves / supervises</td></tr></table>
+<ul><li><b>5 criteria for a technology:</b> agility &amp; flexibility · automation &amp; AI · collaboration &amp; communication · interoperability &amp; integration · data-driven decisions. Gartner trend themes: Architect, Synthesist, Vanguard.</li>
+<li><b>Digital twin</b> = dynamic digital representation of a physical asset/process/system, updated with real-world data (IoT).</li>
+<li><b>IoT use levels (low→high):</b> Monitor (human watches) · Alert · Predict · Control (actuator acts) · Optimise. <b>Layers (bottom→top):</b> device/sensor · network · service/app support · application. <b>Challenges:</b> security, privacy, connectivity, compatibility.</li>
+<li><b>BPMN IoT:</b> device = technology participant with own lane. <b>User task</b> human + app · <b>Script task</b> device’s own hardware function · <b>Service task</b> control system calls a device/service · <b>Send task</b> message to another pool · message event · timer start / intermediate.</li></ul></div></div>
+
+<div class="box c7"><h2>M12 · PROCESS ARCHITECTURE &amp; VALUE CHAINS (MCQ only)</h2><div class="b">
+<ul><li><b>Core</b> (value chain/primary): critical expertise, output goes to external customers · <b>Supporting</b>: outputs are inputs to core · <b>Management</b>: direction, rules, plans, controls (“regulations”).</li>
+<li><b>Porter primary:</b> inbound logistics · operations · outbound logistics · marketing &amp; sales · service. <b>Support:</b> firm infrastructure, HRM, technology development, procurement. Value = total revenue buyers will pay. Organisations have ~3–15 value chains.</li>
+<li><b>Process Executive Model:</b> functional units = columns, processes = rows, <b>levels 1–3, stops at level 3</b>; a bar spanning columns = several units involved. <b>Process Hierarchy Model:</b> tree under one level-3 process, <b>goes beyond level 3</b>.</li>
+<li>Frameworks: <b>eTOM</b> telecom · <b>SCOR</b> supply chain · <b>APQC PCF</b> cross-industry. Notations: Porter value chain, SAP Business Map. Faculty management = core, faculty services = support.</li></ul></div></div>
+
+<div class="box c6"><h2>MCQ TRAPS · QUICK CHECK</h2><div class="b">
+<ul><li>Interactive activity = <b>human’s</b> lane. Manual = no use case. Business rules ≠ gateway. Complexity 5 = Very <b>Easy</b>.</li>
+<li>Bottleneck ≠ longest task; path priority ≠ most frequent path. Cost model ≠ dollars. Container ≠ Docker. Context diagram = no internals.</li>
+<li>Static = no execution (cheap, no waiting/queues); dynamic = simulation. Impact analysis = who is affected, not speed/cost.</li>
+<li>Roles/reporting → Organisation; geography → Location; sequence → Workflow; IF-THEN → Business rules.</li></ul></div></div>
+
+</div></section>
+</body>
+</html>
