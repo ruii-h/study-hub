@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { SideList } from './Guide';
 import { useG } from './state';
 import { breakText } from './paragraphs';
@@ -34,13 +34,16 @@ export function MockNav() {
   const g = useG();
   const { D, mockSel } = g;
   const mocks = D.mocks || [];
+  let last: string | undefined;
   return (<>
-    <div className="theory-nav-header">Exam practice</div>
+    {!mocks.some((m) => m.grp) && <div className="theory-nav-header">Exam practice</div>}
     {mocks.map((m, i) => {
       const on = m.n === mockSel;
-      return (<button key={m.n} className={`theory-item ${on ? 'active' : ''}`} aria-current={on ? 'true' : undefined} onClick={() => g.setMockSel(m.n)}>
-        <span className="theory-item-icon" aria-hidden="true">{i < 3 ? '🎯' : i < 6 ? '📝' : '🏁'}</span><span className="tn">{i + 1}</span><span className="tt">{m.title}</span><span className="tq sc mid">{m.count}</span>
-      </button>);
+      /* a course can group its mocks under sub-headers (BPAS: 2018 sample exam, past quizzes, predicted questions) */
+      const head = m.grp && m.grp !== last ? <div className="theory-nav-header">{m.grp}</div> : null; last = m.grp ?? last;
+      return (<Fragment key={m.n}>{head}<button className={`theory-item ${on ? 'active' : ''}`} aria-current={on ? 'true' : undefined} onClick={() => g.setMockSel(m.n)}>
+        <span className="theory-item-icon" aria-hidden="true">{m.ico || (i < 3 ? '🎯' : i < 6 ? '📝' : '🏁')}</span><span className="tn">{m.grp ? '' : i + 1}</span><span className="tt">{m.title}</span><span className="tq sc mid">{m.count}</span>
+      </button></Fragment>);
     })}
   </>);
 }
@@ -84,7 +87,7 @@ export default function Mocks() {
       <div ref={scroller} id="theory-content" className="theory-content" tabIndex={0} aria-label="Mock exam content">
         <div key={mock.n}>
           <SolToggle /><div className="t-hero"><div className="t-tag">{pts} · {idx + 1} of {mocks.length}</div><h1 className="t-h1" tabIndex={-1}>{(mock as any).title || `Mock exam ${mock.n}`}</h1>
-            <div className="t-subtitle">Try each question under exam conditions first, then open the answer. Every answer carries its reasoning, so use it to find out why a wrong option is wrong.</div>
+            <div className="t-subtitle">{mock.sub || 'Try each question under exam conditions first, then open the answer. Every answer carries its reasoning, so use it to find out why a wrong option is wrong.'}</div>
             <div className="meta">🎯 {mock.count} questions · chips show the question number and its marks</div></div>
           {outl.length > 1 && (
             <nav className="toc" aria-label="Sections in this mock exam"><div className="tocs">{outl.map((s) => <a key={s.id} href={'#' + s.id} className={active === s.id ? 'on' : ''} onClick={(e) => { e.preventDefault(); const c = document.getElementById('theory-content'), t = document.getElementById(s.id); if (c && t) { t.classList.add('in'); c.scrollTo({ top: t.offsetTop - 70, behavior: 'smooth' }); } }}>{s.title}</a>)}</div></nav>)}

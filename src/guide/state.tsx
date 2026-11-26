@@ -17,7 +17,7 @@ export interface Data {
   /** tutorial + in-class exercises, one entry per chapter (shown in the Tutorials tab, not in the theory chapters) */
   tuts?: { n: number; count: number; html: string }[];
   /** full mock exams (shown in the Mock Exams tab) */
-  mocks?: { n: number; title?: string; count: number; html: string }[];
+  mocks?: { n: number; title?: string; count: number; html: string; grp?: string; ico?: string; sub?: string }[];
 }
 export type Back = { tab: string; sel: string | number; y: number; label: string; up: Back | null; sec?: string; q?: number } | null;
 type Json = Record<string, any>;
