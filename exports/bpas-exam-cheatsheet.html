@@ -16,12 +16,12 @@ html,body{margin:0;padding:0;background:#e8e8e8;color:#111;font-family:"Segoe UI
 .hd span{font-size:6.6pt;color:#333}
 .cols{column-count:4;column-gap:3mm;column-fill:balance;height:calc(210mm - 4.5mm - 4mm - 8.4mm)}
 .box{break-inside:auto;border:.7px solid #444;border-radius:2px;margin:0 0 1.6mm;padding:0 0 1px;background:#fff}
-.box>h2{margin:0;padding:1px 3px;font-size:7.2pt;letter-spacing:.2px;color:#fff;line-height:1.25}
+.box>h2{break-after:avoid;margin:0;padding:1px 3px;font-size:7.2pt;letter-spacing:.2px;color:#fff;line-height:1.25}
 .box .b{padding:1px 3px 0;font-size:6.6pt;line-height:1.24}
 .box.loose{break-inside:auto}
 .b p{margin:0 0 1px}
-.p1 .box .b{font-size:7.3pt}.p1 .b table{font-size:7pt}
-.p2 .box .b{font-size:6.6pt}.p2 .b table{font-size:6.3pt}
+.p1 .box .b{font-size:6.5pt}.p1 .b table{font-size:6.25pt}
+.p2 .box .b{font-size:6.8pt}.p2 .b table{font-size:6.5pt}
 .b tr,.dg,.cap{break-inside:avoid}
 .b ul{margin:0 0 1px;padding-left:8px}
 .b li{margin:0 0 .5px}
@@ -47,18 +47,15 @@ html,body{margin:0;padding:0;background:#e8e8e8;color:#111;font-family:"Segoe UI
 
 <!-- ============================== PAGE 1 ============================== -->
 <section class="page p1">
-<div class="hd"><h1>IS210 BPAS · Exam cheat sheet · M1–M7: alignment, modelling, RCI, analysis</h1></div>
+<div class="hd"><h1>IS210 BPAS · Exam cheat sheet · M1–M8: alignment, modelling, RCI, analysis, use cases</h1></div>
 <div class="cols">
 
 <div class="box c4"><h2>M1 · BUSINESS &amp; IT ALIGNMENT (SAQ)</h2><div class="b">
-<ul><li><b>Misalignment symptoms (5 questions):</b> goals driving technology decisions? · IT enables business innovation? · shared accountability? · effective communication between teams? · technology strategy integrated with business strategy?</li>
-<li><b>Root causes:</b> IT does not appreciate business processes · business does not appreciate IT value · no common language · growing business / changing environment.</li>
-<li><b>Steps:</b> treat IT as transformative, not a cost centre · target customers internally and externally · IT and business “talk” in a common language · clear goals for IT · demand measurable ROI · write IT + business strategy in one document.</li>
-<li><b>Enterprise alignment</b> = whole organisation, via Enterprise Architecture. <b>Project alignment</b> = one IT solution, via Business Process Engineering Methodology.</li>
-<li><b>Business Analyst (BPE team):</b> understands the business and the process studied and <b>translates business requirements into IT solution requirements</b>; does not need deep technology expertise or to implement the solution.</li>
-<li><b>Carr “IT doesn’t matter”:</b> IT alone becomes a commodity; advantage comes from combining IT with strategy, processes and capability.</li>
-<li><b>Four dimensions:</b> Purpose = Why (mission, vision, goals) · Participants = Who · Process = How · Product = What. (“Project” is not a 4th P.)</li>
-</ul></div></div>
+<ul><li><b>5 misalignment questions:</b> goals drive technology decisions? · IT enables innovation? · shared accountability? · good cross-team communication? · technology strategy part of business strategy?</li>
+<li><b>Root causes:</b> IT does not appreciate business processes · business does not appreciate IT value · no common language · growing / changing business.</li>
+<li><b>Steps:</b> IT as transformative, not a cost centre · serve internal + external customers · common language · clear IT goals · measurable ROI · one combined strategy document.</li>
+<li><b>Enterprise alignment</b> = whole organisation (Enterprise Architecture) · <b>Project alignment</b> = one IT solution (BPE methodology). <b>4 Ps:</b> Purpose = Why · Participants = Who · Process = How · Product = What.</li>
+<li><b>Business Analyst (BPE team):</b> understands the business and the process studied, <b>translates business requirements into IT solution requirements</b>; no deep technology expertise needed. <b>Carr:</b> IT alone is a commodity; advantage comes from IT + strategy + processes.</li></ul></div></div>
 
 <div class="box c4"><h2>M1 · CLASSIFY: MISSION · VISION · OBJECTIVE · STRATEGY (SAQ)</h2><div class="b">
 <table><tr><th>Statement</th><th>Tell-tale</th><th>Example</th></tr>
@@ -70,10 +67,9 @@ html,body{margin:0;padding:0;background:#e8e8e8;color:#111;font-family:"Segoe UI
 
 <div class="box c1"><h2>M2–M4 · PROCESSES &amp; MODELLING (MCQ)</h2><div class="b">
 <ul><li><b>BPM cycle:</b> Discover → Model &amp; Analyse → Design solution → Implement → Monitor &amp; Optimise (never ends). Course: Model → Analyse → Solve → Innovate.</li>
-<li><b>Activity types:</b> <span class="k">Manual</span> = human, no system (stacks shelves, signs a paper form) · <span class="k">Interactive</span> = human uses a system (enters details into the Shipping system, approves through the Purchase Portal) · <span class="k">Automated</span> = system only (SAP sends an IDOC to the Accounting system).</li>
 <li><b>Business rules:</b> constraints on an <b>activity</b> (IF…THEN, “manager approval above $1,000”), answer “When?”, never on a gateway.</li>
-<li><b>Roles:</b> functional role = title on the org chart · process role = exists only because of the process. <b>Internal/external resource</b> = who controls/operates it, not who pays (Workday = external).</li>
-<li><b>Models:</b> reporting → Organisation · geography → Location · who/what is used → Resource · order of steps → Workflow · IF…THEN → Business rules.</li></ul></div></div>
+<li><b>Roles:</b> functional role = title on the org chart · process role = exists only because of the process.</li>
+</ul></div></div>
 
 <div class="box c2"><h2>M5 · RCI: ISSUE → CAUSE → ROOT CAUSE (design Q3a / SAQ)</h2><div class="b">
 <p><b>Fill exactly the columns the template gives.</b> Usual: Issue · Cause · <b>Root cause</b> · Issue category · Metric · <b>Recommendation</b>. There is <b>no impact level</b>; a template may swap a column (e.g. Stakeholder).</p>
@@ -85,7 +81,16 @@ html,body{margin:0;padding:0;background:#e8e8e8;color:#111;font-family:"Segoe UI
 <tr><td>Approver re-types applicant details into email</td><td>Details sent by email by hand</td><td>Lack of automation / integration · <b>Process</b></td><td>Portal passes the data to Payroll automatically</td></tr>
 <tr><td>Hours of delay at Payroll admin and Telecom coordinator</td><td>Email is missed (busy, rarely checked)</td><td>No automatic notification; independent tasks done in sequence · <b>Process</b></td><td>Auto-notify; run the two tasks in <b>parallel</b></td></tr>
 <tr><td>Bed request waits (AO → BM)</td><td>AO cannot access the BAS</td><td>Department policy · <b>Policy</b></td><td>Review policy so AO can use the BAS</td></tr></table>
-<p><b>Metrics:</b> total process time, waiting time, cost per case, cost of rejection, # errors, # complaints, % on time. <b>RCR scoring:</b> impact 5 = very high · complexity 5 = very <b>easy</b> (higher = better on both) → do high-impact + easy first. Typical fixes: paper → online portal · late exception check → check first · lack of automation → auto-notify · policy → review access.</p></div></div>
+<p><b>Metrics:</b> total process time, waiting time, cost per case, cost of rejection, # errors, # complaints, % on time.</p>
+<p><b>RCR (Root Cause → Recommendation):</b> one recommendation per <b>root cause</b> (fix the root, not the symptom), written as <b>what + where</b> (“auto-send the approval email from the portal”, not “improve communication”). Then score it: <b>impact</b> 5 = very high … 1 = very low · <b>complexity</b> 5 = very <b>easy</b> … 1 = very complex. Higher = better on both → do high-impact + easy first. Sources of ideas: domain knowledge, technology, best practice, experience.</p>
+<table><tr><th>Root cause</th><th>Recommendation</th><th>Imp</th><th>Cx</th></tr>
+<tr><td>Paper-based process</td><td>Online portal captures the form</td><td>5</td><td>3</td></tr>
+<tr><td>Late exception check</td><td>Check eligibility before gathering requirements</td><td>4</td><td>4</td></tr>
+<tr><td>Lack of automation</td><td>System auto-sends the email / notification</td><td>4</td><td>4</td></tr>
+<tr><td>Independent tasks in sequence</td><td>Run them in parallel</td><td>3</td><td>5</td></tr>
+<tr><td>System lacks function</td><td>Add the feature (e.g. auto-notify) or integrate systems</td><td>5</td><td>2</td></tr>
+<tr><td>Policy blocks access</td><td>Review the policy / delegate rights</td><td>3</td><td>2</td></tr></table>
+<p class="cap">Priority = high impact + high complexity score (easy). People causes → training / rebalance workload.</p></div></div>
 
 <div class="box c5"><h2>M5 · STATIC REPORT IN PLAIN ENGLISH</h2><div class="b">
 <p>Static = worked out on paper from the average times, costs and probabilities (no waiting or queues). <b>Input factor</b> = the chance a step actually runs; along a branch you <b>multiply</b> the chances (80% then 60% → 48%).</p>
@@ -114,23 +119,17 @@ html,body{margin:0;padding:0;background:#e8e8e8;color:#111;font-family:"Segoe UI
 <li>Random inputs → runs differ → <b>run many times</b>. Matching one average is not enough to call a model valid. Utilisation &lt;100% does not rule out queues. Static report cannot show waiting.</li></ul></div></div>
 
 <div class="box c5"><h2>M5–M7 · WORKED NUMBERS (copy the pattern)</h2><div class="b">
-<p><b>Workload (SUBWAY):</b> tasks 0.5 + 1 + 0.5 = 2 min · W = 2 ÷ 60 × 43,800 = <b>1,460 h</b> · R = 1,460 ÷ 720 = <b>2.03</b> · U = 2.03 ÷ 3 = <b>68%</b> (3 available).</p>
-<p><b>Path analysis:</b> 70% × $20 = 14 · 25% × $100 = 25 · 5% × $800 = 40 → average <b>$79</b>. Improve the <b>$40 path first</b> though only 5% take it.</p>
-<p><b>What-if:</b> 2 tellers 14.0 min/$30 ✗ · 3 tellers 9.5 min/$36 ✓ · 4 tellers 8.9 min/$44 ✓ (little gain) · 5 tellers $55 ✗. Goals ≤10 min, ≤$50 → <b>choose 3</b> (smallest that meets all goals).</p>
-<p><b>Bottleneck rank (bed process):</b> rank by <b>average delay</b> (search 55 min, email request 45 min …), not by execution time. A re-try ends the instance and triggers a <b>new</b> instance (counts in frequency).</p></div></div>
+<p><b>Input factor:</b> 80% of cases reach step A and 60% of those go on to step B → 0.8 × 0.6 = <b>48%</b> of cases run step B.</p>
+<p><b>Workload (SUBWAY):</b> 3 tasks take 0.5 + 1 + 0.5 = <b>2 min per sandwich</b> → workload = 2 ÷ 60 h × 43,800 sandwiches = <b>1,460 hours a year</b> → Veggie Artists needed = 1,460 h ÷ 720 h per person = <b>2.03</b> → utilisation = 2.03 needed ÷ 3 available = <b>68%</b>.</p>
+<p><b>Path analysis (insurance claims):</b> automatic 70% of claims × $20 = <b>$14</b> · manual 25% × $100 = <b>$25</b> · fraud 5% × $800 = <b>$40</b> → average cost per claim $79. Fix the fraud path first (largest contribution) although only 5% of claims use it.</p>
+<p><b>Highest wastage (MobileHub path report):</b> “Reject with validation” = 14 of 50 cases (28%), <b>26 h 55 min elapsed but only 42 min of work</b>, $13.43 spent on cases that end in rejection → the most time and cost wasted. Fix: validate/reject earlier, automate, parallelise.</p>
+<p><b>Bottleneck rank (bed process):</b> rank by <b>average delay</b> (search bed availability 55 min, email bed request 45 min …), not by execution time. A retry ends the instance and triggers a <b>new</b> instance.</p></div></div>
 
 <div class="box c5"><h2>M7 · IMPACT ANALYSIS (phase 3)</h2><div class="b">
 <table><tr><th></th><th>Hard (quantifiable)</th><th>Soft</th></tr>
 <tr><td><b>Internal</b></td><td>staff hours, training cost, job displacement</td><td>loss of control, resistance, learning curve, policy change</td></tr>
 <tr><td><b>External</b></td><td>partner/customer cost, data-sharing</td><td>image, trust, partner reliance</td></tr></table>
 <p>e.g. “Let AO access the BAS” = <b>internal only</b> (policy, training). “Cloud system shared with partner hospitals” = <b>external + internal</b>. Best To-Be may be rejected if impact on people/partners is too high.</p></div></div>
-
-</div></section>
-
-<!-- ============================== PAGE 2 ============================== -->
-<section class="page p2">
-<div class="hd"><h1>IS210 BPAS · Exam cheat sheet · M8–M12: requirements, architecture, innovation, technology</h1></div>
-<div class="cols">
 
 <div class="box c3"><h2>M8 · USE CASE DIAGRAM (design Q1)</h2><div class="b">
 <ul><li><b>Actor</b> = generic role noun (Patient, not “Max”); stick figure; can be a human, a device or an <b>external system</b>. <b>Use case</b> = verb–noun oval (Book Appointment). <b>Association</b> = solid line actor–use case. <b>System boundary</b> = rectangle, one per system. <span class="warn">State the relationships:</span> draw a line for every actor ↔ use case pair (each actor linked to <b>every</b> use case it takes part in) and label the system.</li>
@@ -144,9 +143,26 @@ html,body{margin:0;padding:0;background:#e8e8e8;color:#111;font-family:"Segoe UI
 <li>Sample (HDB resale): buyer and seller are human actors (Submit registration, Select flat, Accept/Reject offer); HDB-RP calls SingPass and STS web services → those are <b>external-system actors</b>.</li>
 <li>Systems used but without a lane (annotated) are still actors. Notified person (e.g. LM) = actor.</li>
 <li>Packages: group related use cases of <b>one</b> system, name by function; <b>never across systems</b>.</li></ul></div></div>
+<div class="box c3"><h2>M8 · WORKED: HDB RESALE → USE CASES</h2><div class="b">
+<table><tr><th>To-Be step</th><th>Use case · actor</th></tr>
+<tr><td>Buyer submits registration with SingPass</td><td>Submit Registration · Buyer</td></tr>
+<tr><td>HDB-RP gets personal data / income from the web services</td><td>Retrieve Personal Data · SingPass system; Retrieve Income · STS (external-system actors)</td></tr>
+<tr><td>System validates eligibility, notifies buyer</td><td>Validate Eligibility; Notify Eligibility · Buyer</td></tr>
+<tr><td>Buyer updates form, selects a flat, submits</td><td>Review Application; Select Flat · Buyer</td></tr>
+<tr><td>Seller accepts / rejects the offer</td><td>Respond to Offer · Seller</td></tr>
+<tr><td>System notifies and gives an appointment</td><td>Notify Result; Give Appointment · Buyer, Seller</td></tr>
+<tr><td>Meet the HDB officer</td><td><b>Manual → no use case</b></td></tr></table>
+<p class="cap">One system boundary (HDB-RP) with the buyer and seller on the left and external systems on the right; group related use cases in a package.</p></div></div>
+
+</div></section>
+
+<!-- ============================== PAGE 2 ============================== -->
+<section class="page p2">
+<div class="hd"><h1>IS210 BPAS · Exam cheat sheet · M8–M12: function model, architecture, innovation, technology</h1></div>
+<div class="cols">
 
 <div class="box c3"><h2>M8 · USE CASE DIAGRAM · WORKED EXAMPLE</h2><div class="b">
-<svg class="dg" viewBox="0 0 260 128" font-size="7" stroke="#222" stroke-width=".8" fill="none">
+<svg class="dg" style="width:80%;margin:1px auto" viewBox="0 0 260 128" font-size="7" stroke="#222" stroke-width=".8" fill="none">
 <rect x="62" y="3" width="138" height="122" rx="3"/><text x="131" y="13" text-anchor="middle" font-weight="700">Booking System</text>
 <ellipse cx="131" cy="38" rx="48" ry="12"/><text x="131" y="40.5" text-anchor="middle">Book Appointment</text>
 <ellipse cx="131" cy="66" rx="48" ry="12"/><text x="131" y="68.5" text-anchor="middle">View Schedule</text>
@@ -157,6 +173,9 @@ html,body{margin:0;padding:0;background:#e8e8e8;color:#111;font-family:"Segoe UI
 <line x1="227" y1="90" x2="178" y2="97"/>
 </svg>
 <p class="cap">Actors outside the boundary (Patient = human; Email Server = <b>external system</b> actor of an automated use case). Verb–noun ovals inside one boundary per system. Manual steps (e.g. “Prepare room”) get no oval.</p></div></div>
+
+
+
 
 <div class="box c3"><h2>M8 · FUNCTION MODEL · SPOT THE ERROR (SAQ)</h2><div class="b">
 <p>Columns: System · Function · Use case · <b>Change type</b> · Technical notes. Change type describes the <b>SYSTEM</b>, not the business practice.</p>
@@ -186,6 +205,12 @@ html,body{margin:0;padding:0;background:#e8e8e8;color:#111;font-family:"Segoe UI
 <p><b>A = highest rating.</b> Risk model columns: description, impact, likelihood, rating, type, mitigation, impact of strategy.</p>
 <p><b>Cost model:</b> <b>qualitative Low/Med/High, not dollars</b>; columns Item · Fixed · Maintenance · Total rating (+ justification); total rating of a group reflects its items.</p></div></div>
 
+<div class="box c6"><h2>M9 · WORKED RISK ROW</h2><div class="b">
+<table><tr><th>Risk</th><th>Type</th><th>Impact</th><th>Likelihood</th><th>Rating</th><th>Mitigation</th></tr>
+<tr><td>Staff resist the new portal</td><td>Organisational</td><td>Low</td><td>High</td><td>B</td><td>Reduction: training and pilot</td></tr>
+<tr><td>Partner web service goes down</td><td>Technology</td><td>High</td><td>Low</td><td>B</td><td>Transfer: SLA with partner</td></tr>
+<tr><td>Law changes eligibility rules</td><td>Goal</td><td>High</td><td>Medium</td><td>A</td><td>Reduction: configurable rules</td></tr></table>
+<p class="cap">Rating from the matrix: A = act first. Match the risk type to the cause (people/roles → organisational, tools → technology, policy/market → goal, unexpected events → process flow, missing data → data).</p></div></div>
 <div class="box c3"><h2>M9 · C4 CONTEXT DIAGRAM (design Q2)</h2><div class="b">
 <ul><li><span class="warn">Label what each box is</span>: name + type + one-line description, e.g. <b>Online Store [Software System]</b>, <b>Customer [Person]</b>, <b>Bank [External system]</b>. Your system = <b>one box</b> (software system in scope). Around it: <b>People</b> (human actors/roles) and <b>external systems</b> you do not own (IMS, Gov website, Outlook, Bank).</li>
 <li><b>Label every arrow</b> with what flows (use case / data / protocol, e.g. “Sends notifications [email]”, HTTPS/RESTful API) and direction.</li>
@@ -214,7 +239,7 @@ html,body{margin:0;padding:0;background:#e8e8e8;color:#111;font-family:"Segoe UI
 <li>BMC link: Who = segments, channels, relationships · What = value proposition · How = key activities, resources, partners · Value = revenue streams, cost structure.</li>
 <li>Creativity (ideas) → invention (new, scientific) → <b>innovation</b> (commercialised, adds value). Incremental = small, low risk · radical = big value jump, risky, more culture change.</li></ul></div></div>
 
-<div class="box c6"><h2>M11 · AUTOMATION &amp; IoT (MCQ only)</h2><div class="b">
+<div class="box c6"><h2>M11 · AUTOMATION &amp; IoT</h2><div class="b">
 <table><tr><th></th><th>Traditional</th><th>RPA</th><th>Intelligent</th><th>Agentic</th></tr>
 <tr><td>Data</td><td>structured</td><td>mostly structured</td><td>+ unstructured</td><td>multiple, unstructured</td></tr>
 <tr><td>Logic</td><td>explicit rules</td><td>explicit rules</td><td>rules + predictive models</td><td>goals, policies, constraints</td></tr>
