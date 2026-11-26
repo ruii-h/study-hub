@@ -15,15 +15,18 @@ html,body{margin:0;padding:0;background:#e8e8e8;color:#111;font-family:"Segoe UI
 .hd h1{font-size:10.5pt;margin:0;letter-spacing:.2px}
 .hd span{font-size:6.6pt;color:#333}
 .cols{column-count:4;column-gap:3mm;column-fill:balance;height:calc(210mm - 4.5mm - 4mm - 8.4mm)}
-.box{break-inside:avoid;border:.7px solid #444;border-radius:2px;margin:0 0 1.6mm;padding:0 0 1px;background:#fff}
+.box{break-inside:auto;border:.7px solid #444;border-radius:2px;margin:0 0 1.6mm;padding:0 0 1px;background:#fff}
 .box>h2{margin:0;padding:1px 3px;font-size:7.2pt;letter-spacing:.2px;color:#fff;line-height:1.25}
-.box .b{padding:1px 3px 0;font-size:7pt;line-height:1.26}
+.box .b{padding:1px 3px 0;font-size:6.6pt;line-height:1.24}
 .box.loose{break-inside:auto}
 .b p{margin:0 0 1px}
+.p1 .box .b{font-size:6.4pt}.p1 .b table{font-size:6.15pt}
+.p2 .box .b{font-size:6.8pt}.p2 .b table{font-size:6.5pt}
+.b tr,.dg,.cap{break-inside:avoid}
 .b ul{margin:0 0 1px;padding-left:8px}
 .b li{margin:0 0 .5px}
 .b b,.b strong{font-weight:700}
-.b table{border-collapse:collapse;width:100%;margin:1px 0 1.5px;font-size:6.7pt;line-height:1.2}
+.b table{border-collapse:collapse;width:100%;margin:1px 0 1.5px;font-size:6.35pt;line-height:1.18}
 .b th,.b td{border:.5px solid #777;padding:.4px 1.6px;vertical-align:top;text-align:left}
 .b th{background:#eee;font-weight:700}
 .warn{color:#b00020;font-weight:700}
@@ -34,13 +37,16 @@ html,body{margin:0;padding:0;background:#e8e8e8;color:#111;font-family:"Segoe UI
 .fmt div{border:.7px solid #444;border-radius:2px;padding:1px 4px}
 .fmt b{font-size:6.6pt}
 .mono{font-family:Consolas,"Courier New",monospace;font-size:5.8pt}
+.dg{width:100%;height:auto;display:block;margin:1px 0 1px;font-family:"Segoe UI",Arial,Helvetica,sans-serif}
+.dg text{fill:#111;stroke:none}.dg text.w{fill:#fff}
+.cap{font-size:6.3pt;color:#333;margin:0 0 1px}
 .tag{display:inline-block;background:#222;color:#fff;border-radius:2px;padding:0 2px;font-size:5.4pt;margin-right:1px;vertical-align:1px}
 </style>
 </head>
 <body>
 
 <!-- ============================== PAGE 1 ============================== -->
-<section class="page">
+<section class="page p1">
 <div class="hd"><h1>IS210 BPAS · Exam cheat sheet · Page 1: drawing, RCI, alignment</h1><span>90 marks: 3 design Qs 35 · SAQ 25 · 15 MCQ 30 (M12 = MCQ only) · double-sided A4</span></div>
 <div class="cols">
 
@@ -57,13 +63,34 @@ html,body{margin:0;padding:0;background:#e8e8e8;color:#111;font-family:"Segoe UI
 <li>Walk-through: read the scenario once and underline each actor, each system, each "if". Draw lanes first, then steps, then gateways, then ends.</li>
 </ul></div></div>
 
+<div class="box c1"><h2>WORKFLOW · WORKED EXAMPLE (copy this layout)</h2><div class="b">
+<svg class="dg" viewBox="0 0 260 130" font-size="7" stroke="#222" stroke-width=".8" fill="none">
+<defs><marker id="ar" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L6 3L0 6z" fill="#222" stroke="none"/></marker></defs>
+<rect x=".5" y=".5" width="259" height="43"/><rect x=".5" y="43.5" width="259" height="43"/><rect x=".5" y="86.5" width="259" height="43"/>
+<rect x=".5" y=".5" width="34" height="43" fill="#e3ebf5"/><rect x=".5" y="43.5" width="34" height="43" fill="#e3ebf5"/><rect x=".5" y="86.5" width="34" height="43" fill="#e3ebf5"/>
+<text x="17" y="24" text-anchor="middle" font-size="6.5">Customer</text><text x="17" y="67" text-anchor="middle" font-size="6.5">Clerk</text><text x="17" y="110" text-anchor="middle" font-size="6.5">System</text>
+<circle cx="48" cy="21" r="6"/><line x1="54" y1="21" x2="62" y2="21" marker-end="url(#ar)"/>
+<rect x="62" y="11" width="50" height="20" rx="4"/><text x="87" y="23" text-anchor="middle">Submit form</text>
+<line x1="87" y1="31" x2="87" y2="54" marker-end="url(#ar)"/>
+<rect x="62" y="54" width="50" height="20" rx="4"/><text x="87" y="66" text-anchor="middle">Check form</text>
+<line x1="87" y1="74" x2="87" y2="77" stroke-dasharray="1.5 1.5"/><rect x="70" y="77" width="34" height="8" stroke-dasharray="1.5 1.5"/><text x="87" y="83.3" text-anchor="middle" font-size="6">IMS</text>
+<line x1="112" y1="64" x2="140" y2="64" marker-end="url(#ar)"/>
+<path d="M150 54L160 64L150 74L140 64Z"/><text x="150" y="67" text-anchor="middle" font-size="8">✖</text><text x="150" y="51" text-anchor="middle" font-size="6.5">Valid?</text>
+<line x1="150" y1="74" x2="150" y2="98" marker-end="url(#ar)"/><text x="154" y="84" font-size="6.5">Yes 75%</text>
+<rect x="125" y="98" width="50" height="20" rx="4"/><text x="150" y="110" text-anchor="middle">Send notice</text>
+<line x1="175" y1="108" x2="204" y2="108" marker-end="url(#ar)"/><circle cx="210" cy="108" r="6" stroke-width="2.4"/><text x="210" y="124" text-anchor="middle" font-size="6.5">Approved</text>
+<line x1="160" y1="64" x2="204" y2="64" marker-end="url(#ar)"/><text x="182" y="60" text-anchor="middle" font-size="6.5">No 25%</text><circle cx="210" cy="64" r="6" stroke-width="2.4"/><text x="210" y="80" text-anchor="middle" font-size="6.5">Rejected</text>
+</svg>
+<p class="cap">Manual “Submit form” = human lane · Interactive “Check form” = <b>human lane</b> + dotted line to IMS · Automated “Send notice” = <b>system lane</b>. Thin circle = start, thick circle = end, ✖ = XOR (every exit labelled).</p></div></div>
+
 <div class="box c1"><h2>RESOURCE MODEL (design Q)</h2><div class="b">
 <table><tr><th></th><th>Internal (you manage / control / operate)</th><th>External (you do not)</th></tr>
 <tr><th>Human</th><td>Own staff and roles: Employee, Manager, Office Administrator, CSO, MO, LM, Bread Artist</td><td>Customers, couriers, partners, bank</td></tr>
 <tr><th>Technology</th><td>Own systems: IMS, RAS, Billing System, BAS</td><td>Workday Cloud System, Bank System, Gov UEN website, Outlook</td></tr></table>
 <ul><li><span class="warn">Internal/external = who controls or operates it, NOT who uses or pays</span> (Workday is external although the company pays).</li>
 <li>List only resources that <b>participate in the process in scope</b>. Email is a channel, not a resource.</li>
-<li>Resource ≠ organisation chart: Resource = who/what is used.</li></ul></div></div>
+<li>Resource ≠ organisation chart: Resource = who/what is used.</li>
+<li><b>Draw:</b> 2×2 grid, one box per resource, grouped as Human (internal | external) and Technology (internal | external); title = the process in scope.</li></ul></div></div>
 
 <div class="box c1"><h2>WHICH MODEL ANSWERS IT?</h2><div class="b">
 <table><tr><td><b>Organisation</b></td><td>Who reports to whom / who is the boss (“people politics”). Functional role (title on org chart) vs Process role (exists only because of the process). Group vs individual role.</td></tr>
@@ -111,6 +138,19 @@ html,body{margin:0;padding:0;background:#e8e8e8;color:#111;font-family:"Segoe UI
 <li>Systems used but without a lane (annotated) are still actors. Notified person (e.g. LM) = actor.</li>
 <li>Packages: group related use cases of <b>one</b> system, name by function; <b>never across systems</b>.</li></ul></div></div>
 
+<div class="box c3"><h2>USE CASE DIAGRAM · WORKED EXAMPLE</h2><div class="b">
+<svg class="dg" viewBox="0 0 260 128" font-size="7" stroke="#222" stroke-width=".8" fill="none">
+<rect x="62" y="3" width="138" height="122" rx="3"/><text x="131" y="13" text-anchor="middle" font-weight="700">Booking System</text>
+<ellipse cx="131" cy="38" rx="48" ry="12"/><text x="131" y="40.5" text-anchor="middle">Book Appointment</text>
+<ellipse cx="131" cy="66" rx="48" ry="12"/><text x="131" y="68.5" text-anchor="middle">View Schedule</text>
+<ellipse cx="131" cy="98" rx="48" ry="12"/><text x="131" y="100.5" text-anchor="middle">Send Reminder</text>
+<circle cx="24" cy="42" r="5"/><line x1="24" y1="47" x2="24" y2="62"/><line x1="14" y1="53" x2="34" y2="53"/><line x1="24" y1="62" x2="16" y2="74"/><line x1="24" y1="62" x2="32" y2="74"/><text x="24" y="84" text-anchor="middle" font-size="6.5">Patient</text>
+<line x1="30" y1="52" x2="84" y2="40"/><line x1="30" y1="55" x2="84" y2="64"/>
+<circle cx="236" cy="78" r="5"/><line x1="236" y1="83" x2="236" y2="98"/><line x1="226" y1="89" x2="246" y2="89"/><line x1="236" y1="98" x2="228" y2="110"/><line x1="236" y1="98" x2="244" y2="110"/><text x="236" y="120" text-anchor="middle" font-size="6.5">Email Server</text>
+<line x1="227" y1="90" x2="178" y2="97"/>
+</svg>
+<p class="cap">Actors outside the boundary (Patient = human; Email Server = <b>external system</b> actor of an automated use case). Verb–noun ovals inside one boundary per system. Manual steps (e.g. “Prepare room”) get no oval.</p></div></div>
+
 <div class="box c3"><h2>FUNCTION MODEL · SPOT THE ERROR (SAQ/design)</h2><div class="b">
 <p>Columns: System · Function · Use case · <b>Change type</b> · Technical notes. Change type describes the <b>SYSTEM</b>, not the business practice.</p>
 <table><tr><th>Change type</th><th>Meaning / matching note</th></tr>
@@ -127,10 +167,23 @@ html,body{margin:0;padding:0;background:#e8e8e8;color:#111;font-family:"Segoe UI
 <li>No internals: no databases, applications, components. <b>No Docker/containers here.</b> Audience: everybody.</li>
 <li>Map from Solve: human use-case actor → Person · system you build → system in scope · systems you don’t own → external system · integration use cases → labelled arrow. Add a short key.</li></ul></div></div>
 
+<div class="box c3"><h2>C4 CONTEXT · WORKED EXAMPLE</h2><div class="b">
+<svg class="dg" viewBox="0 0 260 150" font-size="7" stroke="none">
+<rect x="80" y="3" width="100" height="29" rx="3" fill="#08427b"/><text class="w" x="130" y="15" text-anchor="middle" font-weight="700">Customer</text><text class="w" x="130" y="25" text-anchor="middle" font-size="6">[Person]</text>
+<rect x="70" y="62" width="120" height="34" rx="3" fill="#1168bd"/><text class="w" x="130" y="76" text-anchor="middle" font-weight="700">Online Store</text><text class="w" x="130" y="86" text-anchor="middle" font-size="6">[Software System · in scope]</text>
+<rect x="2" y="116" width="100" height="30" rx="3" fill="#8a8a8a"/><text class="w" x="52" y="129" text-anchor="middle" font-weight="700">Bank System</text><text class="w" x="52" y="139" text-anchor="middle" font-size="6">[External system]</text>
+<rect x="158" y="116" width="100" height="30" rx="3" fill="#8a8a8a"/><text class="w" x="208" y="129" text-anchor="middle" font-weight="700">Courier Website</text><text class="w" x="208" y="139" text-anchor="middle" font-size="6">[External system]</text>
+<g stroke="#222" stroke-width=".9" fill="none"><line x1="130" y1="32" x2="130" y2="61" marker-end="url(#ar)"/><line x1="92" y1="96" x2="62" y2="115" marker-end="url(#ar)"/><line x1="168" y1="96" x2="198" y2="115" marker-end="url(#ar)"/></g>
+<text x="135" y="50" font-size="6.5">Places orders [web]</text>
+<text x="3" y="103" font-size="6.5">Requests payment</text><text x="3" y="111" font-size="6">[HTTPS/REST]</text>
+<text x="204" y="103" font-size="6.5">Books delivery</text><text x="204" y="111" font-size="6">[HTTPS/REST]</text>
+</svg>
+<p class="cap">One box = your system · every arrow labelled with <b>what + how</b> · persons dark blue, external systems grey · no databases or apps inside.</p></div></div>
+
 </div></section>
 
 <!-- ============================== PAGE 2 ============================== -->
-<section class="page">
+<section class="page p2">
 <div class="hd"><h1>IS210 BPAS · Exam cheat sheet · Page 2: analysis, solutioning, innovation, MCQ facts</h1><span>M12 = multiple choice / select only · static report formulas · dynamic techniques</span></div>
 <div class="cols">
 
@@ -205,6 +258,33 @@ html,body{margin:0;padding:0;background:#e8e8e8;color:#111;font-family:"Segoe UI
 <li><b>Porter primary:</b> inbound logistics · operations · outbound logistics · marketing &amp; sales · service. <b>Support:</b> firm infrastructure, HRM, technology development, procurement. Value = total revenue buyers will pay. Organisations have ~3–15 value chains.</li>
 <li><b>Process Executive Model:</b> functional units = columns, processes = rows, <b>levels 1–3, stops at level 3</b>; a bar spanning columns = several units involved. <b>Process Hierarchy Model:</b> tree under one level-3 process, <b>goes beyond level 3</b>.</li>
 <li>Frameworks: <b>eTOM</b> telecom · <b>SCOR</b> supply chain · <b>APQC PCF</b> cross-industry. Notations: Porter value chain, SAP Business Map. Faculty management = core, faculty services = support.</li></ul></div></div>
+
+<div class="box c2"><h2>RCI · WORKED ROWS (bed management)</h2><div class="b">
+<table><tr><th>Issue</th><th>Cause</th><th>Root cause · category</th><th>Metric</th></tr>
+<tr><td>1 Long wait from request to advice to patient</td><td>AO must email the BM</td><td>Lack of automation · <b>Process</b></td><td>Total process time</td></tr>
+<tr><td>↳ same issue</td><td>BAS slow, hard to search</td><td>Lack of system functionality · <b>System</b></td><td>Waiting time</td></tr>
+<tr><td>↳ same issue</td><td>AO has no access to BAS</td><td>Department policy · <b>Policy</b></td><td>Waiting time</td></tr>
+<tr><td>2 Allocation emails are time-consuming</td><td>BAS cannot notify automatically</td><td>Lack of system functionality · <b>System</b></td><td>Cost per case</td></tr></table>
+<p><b>5 Whys:</b> “Patients wait 40 min.” Why? pharmacists busy → why? retype prescriptions → why? they arrive on paper → <b>root cause:</b> clinic system does not send prescriptions electronically (<b>System</b>).</p>
+<p><b>Root cause → recommendation (RCR):</b></p>
+<table><tr><th>Root cause</th><th>Recommendation</th><th>Imp · Cx</th></tr>
+<tr><td>Paper-based process</td><td>Online portal / IT system captures the form</td><td>5 · 3</td></tr>
+<tr><td>Late exception check</td><td>Check eligibility before gathering requirements</td><td>4 · 4</td></tr>
+<tr><td>Lack of automation</td><td>Auto-send notification [email] from the system</td><td>4 · 4</td></tr>
+<tr><td>Department policy</td><td>Review policy so the role can access the system</td><td>3 · 2</td></tr></table>
+<p class="cap">Imp = impact (5 = very high) · Cx = complexity (5 = very easy). Pick high impact + easy first.</p></div></div>
+
+<div class="box c5"><h2>WORKED NUMBERS (copy the pattern)</h2><div class="b">
+<p><b>Workload (SUBWAY):</b> tasks 0.5 + 1 + 0.5 = 2 min · W = 2 ÷ 60 × 43,800 = <b>1,460 h</b> · R = 1,460 ÷ 720 = <b>2.03</b> · U = 2.03 ÷ 3 = <b>68%</b> (3 available).</p>
+<p><b>Path analysis:</b> 70% × $20 = 14 · 25% × $100 = 25 · 5% × $800 = 40 → average <b>$79</b>. Improve the <b>$40 path first</b> though only 5% take it.</p>
+<p><b>What-if:</b> 2 tellers 14.0 min/$30 ✗ · 3 tellers 9.5 min/$36 ✓ · 4 tellers 8.9 min/$44 ✓ (little gain) · 5 tellers $55 ✗. Goals ≤10 min, ≤$50 → <b>choose 3</b> (smallest that meets all goals).</p>
+<p><b>Bottleneck rank (bed process):</b> rank by <b>average delay</b> (search 55 min, email request 45 min …), not by execution time. A re-try ends the instance and triggers a <b>new</b> instance (counts in frequency).</p></div></div>
+
+<div class="box c5"><h2>IMPACT ANALYSIS (phase 3)</h2><div class="b">
+<table><tr><th></th><th>Hard (quantifiable)</th><th>Soft</th></tr>
+<tr><td><b>Internal</b></td><td>staff hours, training cost, job displacement</td><td>loss of control, resistance, learning curve, policy change</td></tr>
+<tr><td><b>External</b></td><td>partner/customer cost, data-sharing</td><td>image, trust, partner reliance</td></tr></table>
+<p>e.g. “Let AO access the BAS” = <b>internal only</b> (policy, training). “Cloud system shared with partner hospitals” = <b>external + internal</b>. Best To-Be may be rejected if impact on people/partners is too high.</p></div></div>
 
 <div class="box c6"><h2>MCQ TRAPS · QUICK CHECK</h2><div class="b">
 <ul><li>Interactive activity = <b>human’s</b> lane. Manual = no use case. Business rules ≠ gateway. Complexity 5 = Very <b>Easy</b>.</li>
