@@ -1100,7 +1100,7 @@ html[data-theme=light] .btn.go{color:#fff}
 @media(max-width:860px){#scrim.on{z-index:25}.theory-nav{z-index:30}}
 .tab-view.active{animation:none!important}
 @media(max-width:600px){
-.t-mini-table th,.t-mini-table td{padding:8px 9px;font-size:13.5px;overflow-wrap:anywhere;hyphens:auto}
+.t-mini-table th,.t-mini-table td{padding:8px 9px;font-size:13.5px;overflow-wrap:break-word;hyphens:manual}
 .t-mini-table th{font-size:12px}
 }
 .t-mini-table th,.t-mini-table td{overflow-wrap:break-word}

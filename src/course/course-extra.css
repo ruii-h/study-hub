@@ -230,7 +230,8 @@ pre.mermaid.swim[data-rendered]::after{content:"swipe sideways · tap to enlarge
 @layer legacy{.hit{animation:hit 2.6s ease-out;border-radius:6px}@keyframes hit{0%,35%{box-shadow:0 0 0 3px var(--ye,#e0af68);background:color-mix(in srgb,var(--ye,#e0af68) 16%,transparent)}100%{box-shadow:0 0 0 0 transparent;background:transparent}}}
 
 /* Long inline code (file paths, URLs, identifiers) and any text may wrap instead of poking out of its box, in every course */
-.theory-content :not(pre)>code,.theory-content .fp,.theory-content .ft,.theory-content td,.theory-content th,.theory-content li,.theory-content p,.theory-content .t-callout{overflow-wrap:anywhere;word-break:normal}
+.theory-content :not(pre)>code,.theory-content .fp,.theory-content .ft,.theory-content li,.theory-content p,.theory-content .t-callout{overflow-wrap:anywhere;word-break:normal}
+.theory-content td,.theory-content th{overflow-wrap:break-word;word-break:normal;hyphens:manual}
 .theory-content .t-code-header{min-width:0;flex-wrap:wrap}
 .theory-content .t-code-header .fp{white-space:normal}
 
@@ -243,7 +244,8 @@ pre.mermaid.swim[data-rendered]::after{content:"swipe sideways · tap to enlarge
 @layer legacy {
   :where(.tab-view) :where(div,section,article,header,footer,aside,nav,details,summary,figure,li,p,ul,ol,dl,dd,form,fieldset,label,blockquote,td,th,h1,h2,h3,h4,h5,h6){min-width:0}
   :where(.tab-view) :where(p,li,dd,td,th,h1,h2,h3,h4,h5,h6,summary,label,figcaption,blockquote,button,.pb){overflow-wrap:break-word}
-  :where(.tab-view) :where(code,kbd,samp,a){overflow-wrap:anywhere}
+  :where(.tab-view) :where(code,kbd,samp){overflow-wrap:anywhere}
+  :where(a){overflow-wrap:break-word}
   :where(.tab-view) :where(img,video,canvas,iframe,svg){max-width:100%}
   :where(.tab-view) :where(pre,.t-table-wrap,.mermaid,.t-code-body){max-width:100%;overflow-x:auto}
 }
