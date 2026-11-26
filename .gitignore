@@ -2,3 +2,6 @@ node_modules
 dist
 *.local
 .DS_Store
+
+# exam cheat sheet is local only (do not commit)
+exports/bpas-exam-cheatsheet.*
