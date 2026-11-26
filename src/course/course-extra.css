@@ -80,7 +80,7 @@ details.recall .ans,.model .ma{border-radius:10px}
 blockquote{border-radius:0 10px 10px 0}
 .figcap{border-radius:0 8px 8px 0}
 /* one consistent vertical rhythm inside lesson sections: the grid gap alone spaces the blocks (no stacked margins) */
-.t-section{row-gap:16px}
+.t-section{display:grid;grid-template-columns:minmax(0,1fr);row-gap:16px}
 .t-section>*{margin-top:0!important;margin-bottom:0!important}
 .t-section>.t-h2{margin-bottom:0!important}
 .t-section>ul,.t-section>ol{padding-top:0;padding-bottom:0}
