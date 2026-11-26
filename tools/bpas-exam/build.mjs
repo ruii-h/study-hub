@@ -20,7 +20,7 @@ const L = 'ABCDEFGHIJKL';
 const SECS = [[0, 'Business–IT alignment and business processes'], [6, 'Resource and workflow modelling'], [11, 'Process analysis: issues, static and dynamic reports'], [21, 'Requirements and use cases'], [27, 'Blueprint, C4 and risk']];
 const quizCards = quiz.map((q, i) => {
   const stem = q.q.replace(/\s+/g, ' ').trim();
-  const title = stem.length > 78 ? stem.slice(0, 75).replace(/\s+\S*$/, '') + '…' : stem;
+  const title = SECS.reduce((a, x) => (i >= x[0] ? x[1] : a), SECS[0][1]);
   const why = q.o.map((_, j) => (q.w?.[j] || '').replace(/^(True|False):\s*/, '') || null);
   return mcq(`PAST QUIZ · Q${i + 1}`, title, p(stem), q.o, q.a, q.e || '', why);
 });
