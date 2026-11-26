@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { CourseMeta } from '../courses/registry';
 import { EXTRA } from './config';
-import { GuideProvider, cardChap, scoreClass, useG, type Data } from './state';
+import { GuideProvider, cardChap, lessonNo, scoreClass, unitOf, useG, type Data } from './state';
 import Theory, { WikiLayer } from './Theory';
 import Practice from './Practice';
 import { Cards, Cheat } from './Cards';
@@ -52,19 +52,19 @@ export function SideList() {
   if (tab === 'mock') return <MockNav />;
   if (sc && sc.groups) return (<>
     <div className="theory-nav-header">{sc.label}{sc.x}</div>
-    {grp(sc.groups, (n) => { const l = L(n); return navItem(l.icon, l.dn ?? n, l.title, cur === n, () => g.openChapter(n), V[n] ? <span className="rd" title="Read" aria-label="read">●</span> : null); })}
+    {grp(sc.groups, (n) => { const l = L(n); return navItem(l.icon, lessonNo(g.meta, l), l.title, cur === n, () => g.openChapter(n), V[n] ? <span className="rd" title="Read" aria-label="read">●</span> : null); })}
   </>);
   if (tab === 'practice') return (<>
-    <div className="theory-nav-header">Chapter quizzes</div>
+    <div className="theory-nav-header">{unitOf(g.meta)} quizzes</div>
     {navItem('🔁', '', 'Review my mistakes', pqSel === 'mx', () => g.setPqSel('mx'), mCount ? <span className="tq sc lo">{mCount}</span> : null)}
-    {grp(pqg, (n) => { const l = L(n), s = S[n]; return navItem(l.icon, n, l.title, pqSel === n, () => g.setPqSel(n), s ? <span className={`tq sc ${scoreClass(s)}`}>{s.s}/{s.t}</span> : null); })}
+    {grp(pqg, (n) => { const l = L(n), s = S[n]; return navItem(l.icon, lessonNo(g.meta, l), l.title, pqSel === n, () => g.setPqSel(n), s ? <span className={`tq sc ${scoreClass(s)}`}>{s.s}/{s.t}</span> : null); })}
     {D.selfq ? navItem('📝', '', 'Self-check Q&amp;A', pqSel === 'sc', () => g.setPqSel('sc')) : null}
   </>);
   if (tab === 'cards' || tab === 'cheat') return (<>
-    <div className="theory-nav-header">{tab === 'cards' ? 'Flashcards by chapter' : 'Cheat-sheet by chapter'}</div>
-    {navItem('🗂️', '', `All chapters (${D.cards.length})`, !cch, () => g.setCch(0))}
+    <div className="theory-nav-header">{tab === 'cards' ? `Flashcards by ${unitOf(g.meta).toLowerCase()}` : `Cheat-sheet by ${unitOf(g.meta).toLowerCase()}`}</div>
+    {navItem('🗂️', '', `All ${unitOf(g.meta).toLowerCase()}s (${D.cards.length})`, !cch, () => g.setCch(0))}
     {grp(D.groups, (n) => { const l = L(n); if (!cnt[n]) return null; const kn = D.cards.reduce((a, c, i) => a + (cardChap(c) === n && K[i] ? 1 : 0), 0);
-      return navItem(l.icon, n, l.title, cch === n, () => g.setCch(n), tab === 'cards' ? <span className={`tq sc ${kn === cnt[n] ? 'ok' : 'mid'}`}>{kn}/{cnt[n]}</span> : <span className="tq sc mid">{cnt[n]}</span>); })}
+      return navItem(l.icon, lessonNo(g.meta, l), l.title, cch === n, () => g.setCch(n), tab === 'cards' ? <span className={`tq sc ${kn === cnt[n] ? 'ok' : 'mid'}`}>{kn}/{cnt[n]}</span> : <span className="tq sc mid">{cnt[n]}</span>); })}
   </>);
   if (tab === 'past' && D.secs) return (<>
     <div className="theory-nav-header">Past exam sections</div>
@@ -72,8 +72,8 @@ export function SideList() {
       return navItem('📝', k.length > 2 ? '' : k, label.replace(/^Section [A-E] · /, ''), pastSec === k, () => g.setPastSec(k), mc.length ? <span className={`tq sc ${ans === mc.length ? 'ok' : 'mid'}`}>{ans}/{mc.length}</span> : null); })}
   </>);
   return (<>
-    <div className="theory-nav-header">Chapters</div>
-    {grp(D.groups, (n) => { const l = L(n), s = S[n]; return navItem(l.icon, l.dn ?? n, l.title, cur === n, () => g.openChapter(n), <>{V[n] ? <span className="rd" title="Read" aria-label="read">●</span> : null}{s ? <span className="tq sc" data-c={scoreClass(s)} title="Quiz score">{s.s}/{s.t}</span> : null}</>); })}
+    <div className="theory-nav-header">{unitOf(g.meta)}s</div>
+    {grp(D.groups, (n) => { const l = L(n), s = S[n]; return navItem(l.icon, lessonNo(g.meta, l), l.title, cur === n, () => g.openChapter(n), <>{V[n] ? <span className="rd" title="Read" aria-label="read">●</span> : null}{s ? <span className="tq sc" data-c={scoreClass(s)} title="Quiz score">{s.s}/{s.t}</span> : null}</>); })}
   </>);
 }
 
@@ -115,7 +115,7 @@ function Help({ dlg }: { dlg: React.RefObject<HTMLDialogElement | null> }) {
     <dialog id="help" ref={dlg} aria-labelledby="helph" onClose={() => setArmed(false)}>
       <h2 id="helph">Help &amp; shortcuts</h2>
       <table className="keys"><tbody>
-        <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>Previous / next chapter</td></tr><tr><td><kbd>/</kbd></td><td>Search all notes</td></tr>
+        <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>Previous / next {unitOf(g.meta).toLowerCase()}</td></tr><tr><td><kbd>/</kbd></td><td>Search all notes</td></tr>
         <tr><td><kbd>t</kbd></td><td>Switch light / dark mode</td></tr><tr><td><kbd>1</kbd>–<kbd>{tabs.length}</kbd></td><td>Jump to a tab</td></tr>
         <tr><td><kbd>?</kbd></td><td>Open this help</td></tr><tr><td><kbd>Esc</kbd></td><td>Close search or this window</td></tr></tbody></table>
       <p className="hk">Key terms are shown in <b className="k-c">one colour</b> throughout, so bold coloured text always means “remember this term”.</p>
@@ -177,7 +177,7 @@ function Shell({ meta }: { meta: CourseMeta }) {
     <header className="top"><div className="topbar">
       <button id="menu" aria-label="Open menu" aria-expanded={g.navOpen} onClick={() => g.setNavOpen(!g.navOpen)}>☰</button>
       <a className="hubback" href="#/" aria-label="Back to all courses" title="All courses">⌂</a><div className="logo">{meta.code}<span>Study</span></div>
-      <div className="badge">{D.lessons.length} CHAPTERS</div><div className="course">{meta.code} {meta.title}</div>
+      <div className="badge">{D.lessons.length} {unitOf(meta).toUpperCase()}S</div><div className="course">{meta.code} {meta.title}</div>
       <Search />
       <div className="topbar-right">
         <button id="theme" onClick={toggleTheme} aria-label="Switch between light and dark mode">{theme === 'light' ? <><span className="ti">🌙</span><span className="tx"> Dark</span></> : <><span className="ti">☀️</span><span className="tx"> Light</span></>}</button>
@@ -185,7 +185,7 @@ function Shell({ meta }: { meta: CourseMeta }) {
         <div className="status-dot" aria-hidden="true" /><div className="status-text" id="stat" aria-live="polite">{nRead} / {D.lessons.length} read</div>
       </div>
     </div>
-    <div id="pbar" role="progressbar" aria-label="Chapters read" aria-valuemin={0} aria-valuemax={D.lessons.length} aria-valuenow={nRead}><i style={{ width: `${(nRead / D.lessons.length) * 100}%` }} /></div></header>
+    <div id="pbar" role="progressbar" aria-label={`${unitOf(meta)}s read`} aria-valuemin={0} aria-valuemax={D.lessons.length} aria-valuenow={nRead}><i style={{ width: `${(nRead / D.lessons.length) * 100}%` }} /></div></header>
     <nav className="tab-bar" aria-label="Study sections"><div className="tablist" role="tablist">
       {tabs.map((t) => (
         <button key={t} className={`tab ${tab === t ? 'active' : ''}`} role="tab" aria-selected={tab === t} data-t={t} onClick={() => g.setTab(t)}>

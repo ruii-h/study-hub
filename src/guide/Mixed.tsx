@@ -108,11 +108,11 @@ function Body({ n, title, qs, k }: { n: number; title: string; qs: any[]; k: str
     <AnimatePresence>{done === N && (
       <motion.div className="exq resultcard" aria-live="polite" {...pop} ref={(el) => { el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }}>
         <Ring p={p} /><div className="rt"><div style={{ fontWeight: 800, fontSize: 18 }}>{score} of {N} correct</div>
-          <div className="sub">{p >= 80 ? 'Strong. Move on to the next chapter. 🎉' : p >= 50 ? 'Decent. Revisit the explanations of the ones you missed, then retry.' : 'Re-read the chapter, then try again.'}{mCount ? <> Missed choice questions are saved in <b>Review my mistakes</b>.</> : null}</div>
+          <div className="sub">{p >= 80 ? `Strong. Move on to the next ${(g.meta.unit || 'chapter').toLowerCase()}. 🎉` : p >= 50 ? 'Decent. Revisit the explanations of the ones you missed, then retry.' : 'Re-read the chapter, then try again.'}{mCount ? <> Missed choice questions are saved in <b>Review my mistakes</b>.</> : null}</div>
           <div className="row">{p >= 80 ? <>
-            {nx ? <><button className="btn main" onClick={() => g.openChapter(nx.n)}>Continue to Chapter {nx.n}</button><button className="btn ghost" onClick={() => g.setPqSel(nx.n)}>Quiz me on Chapter {nx.n}</button></> : <button className="btn main" onClick={() => g.setTab('theory')}>Back to the notes</button>}
+            {nx ? <><button className="btn main" onClick={() => g.openChapter(nx.n)}>Continue to {g.meta.unit || 'Chapter'} {nx.n}</button><button className="btn ghost" onClick={() => g.setPqSel(nx.n)}>Quiz me on {g.meta.unit || 'Chapter'} {nx.n}</button></> : <button className="btn main" onClick={() => g.setTab('theory')}>Back to the notes</button>}
             <button className="btn lnk" onClick={restart}>Retry this quiz (reshuffled)</button></> : <>
-            <button className="btn main" onClick={restart}>Retry this quiz (reshuffled)</button><button className="btn ghost" onClick={() => g.openChapter(n, { back })}>Re-read Chapter {n}</button></>}</div></div>
+            <button className="btn main" onClick={restart}>Retry this quiz (reshuffled)</button><button className="btn ghost" onClick={() => g.openChapter(n, { back })}>Re-read {g.meta.unit || 'Chapter'} {n}</button></>}</div></div>
       </motion.div>)}</AnimatePresence>
   </>);
 }

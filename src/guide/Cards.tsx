@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { cardChap, shuffle, useG } from './state';
+import { cardChap, lessonNo, shuffle, useG } from './state';
 import { flipTiming } from './motion';
 import { breakAny } from './paragraphs';
 
@@ -8,10 +8,10 @@ import { breakAny } from './paragraphs';
 function ChapterSelect() {
   const g = useG();
   return (<>
-    <label className="sr" htmlFor="fch">Chapter</label>
+    <label className="sr" htmlFor="fch">{g.meta.unit || 'Chapter'}</label>
     <select id="fch" className="chsel" value={g.cch} onChange={(e) => g.setCch(+e.target.value)}>
-      <option value={0}>All chapters</option>
-      {g.D.lessons.filter((l) => g.D.cards.some((c) => cardChap(c) === l.n)).map((l) => <option key={l.n} value={l.n}>{l.n}. {l.title}</option>)}
+      <option value={0}>All {(g.meta.unit || 'chapter').toLowerCase()}s</option>
+      {g.D.lessons.filter((l) => g.D.cards.some((c) => cardChap(c) === l.n)).map((l) => <option key={l.n} value={l.n}>{lessonNo(g.meta, l)}. {l.title}</option>)}
     </select>
   </>);
 }
@@ -72,7 +72,7 @@ export function Cheat() {
   return (
     <div className="pane" id="cheatm" tabIndex={0}>
       <h1 className="t-h1" style={{ fontSize: 26 }}>Cheat-sheet</h1>
-      <div className="sub">{cs.length} key terms{g.cch ? ' from chapter ' + g.cch : ''} with the section where each lives.</div>
+      <div className="sub">{cs.length} key terms{g.cch ? ` from ${(g.meta.unit || 'chapter').toLowerCase()} ` + g.cch : ''} with the section where each lives.</div>
       <div className="fc-filter"><ChapterSelect /></div>
       <div className="t-table-wrap" tabIndex={0}><table className="ch"><thead><tr><th>Term</th><th>Definition</th><th>From</th></tr></thead><tbody>
         {cs.map((c, i) => <tr key={i}><td dangerouslySetInnerHTML={{ __html: c.t }} /><td dangerouslySetInnerHTML={{ __html: c.d }} /><td dangerouslySetInnerHTML={{ __html: g.wiki.wlRefHTML(c.f) }} /></tr>)}

@@ -136,20 +136,20 @@ export default function Theory() {
       <div className="theory-nav" id="nav" tabIndex={0} aria-label="Chapter list"><SideList /></div>
       <div ref={scroller} id="theory-content" className="theory-content" tabIndex={0} aria-label="Chapter content" onScroll={onScroll}>
         <motion.div key={cur} {...chapterSlide(dirRef.current)}>
-          <div className="t-hero"><div className={`t-tag ${lesson.tag}`}>Chapter {lesson.dn ?? cur} of {scope.length}</div><h1 className="t-h1" tabIndex={-1}>{lesson.title}</h1><div className="t-subtitle" dangerouslySetInnerHTML={{ __html: lesson.goal }} /><div className="meta">⏱ about {mins} min read{nq > 0 ? ` · ${nq} exam-style questions at the end` : ''}</div></div>
+          <div className="t-hero"><div className={`t-tag ${lesson.tag}`}>{meta.unit ? (lesson.dn ? `${meta.unit} ${lesson.dn} of ${D.lessons.filter((x) => x.dn).length}` : 'Course review') : `Chapter ${lesson.dn ?? cur} of ${scope.length}`}</div><h1 className="t-h1" tabIndex={-1}>{lesson.title}</h1><div className="t-subtitle" dangerouslySetInnerHTML={{ __html: lesson.goal }} /><div className="meta">⏱ about {mins} min read{nq > 0 ? ` · ${nq} exam-style questions at the end` : ''}</div></div>
           {toc.length > 0 && (
-            <nav className="toc" aria-label="Sections in this chapter">
+            <nav className="toc" aria-label={`Sections in this ${(meta.unit || 'chapter').toLowerCase()}`}>
               <div className="tocs">{toc.map((s) => <a key={s.id} href={'#' + s.id} className={active === s.id ? 'on' : ''} aria-current={active === s.id ? 'true' : undefined} title={s.t} onClick={(e) => { e.preventDefault(); scrollToId(s.id); }}>{s.num ? s.num + ' ' : ''}{s.t}</a>)}</div>
               <i className="rp" ref={rp} />
             </nav>)}
           {!finished && <ChapterLoader />}
           <div ref={body} className={finished ? '' : 'defer-hl'} onClick={onBodyClick} dangerouslySetInnerHTML={{ __html: ready ? htmlStr : '' }} />
           {slot && D.cmock ? createPortal(<MockExam qs={D.cmock} />, slot) : null}
-          {meta.tabs.includes('Practice') && (D.hard[cur]?.length || D.quiz[cur]?.length) ? <div className="endrow"><div className="endmsg">You have reached the end of Chapter {lesson.dn ?? cur}. <b>Next step:</b> test yourself while it is fresh.</div><div className="row"><button className="btn" onClick={() => g.goQuiz(cur)}>🧠 Take the Chapter {cur} quiz</button>{D.tuts?.some((t) => t.n === cur) ? <button className="btn ghost" onClick={() => g.openTut(cur)}>✏️ Tutorials &amp; exercises</button> : null}</div></div> : null}
+          {meta.tabs.includes('Practice') && (D.hard[cur]?.length || D.quiz[cur]?.length) ? <div className="endrow"><div className="endmsg">You have reached the end of {meta.unit ? (lesson.dn ? `${meta.unit} ${lesson.dn}` : 'the course review') : `Chapter ${lesson.dn ?? cur}`}. <b>Next step:</b> test yourself while it is fresh.</div><div className="row"><button className="btn" onClick={() => g.goQuiz(cur)}>🧠 Take the {meta.unit ? (lesson.dn ? `${meta.unit} ${lesson.dn}` : 'review') : `Chapter ${cur}`} quiz</button>{D.tuts?.some((t) => t.n === cur) ? <button className="btn ghost" onClick={() => g.openTut(cur)}>✏️ Tutorials &amp; exercises</button> : null}</div></div> : null}
           {!(meta.tabs.includes('Practice') && (D.hard[cur]?.length || D.quiz[cur]?.length)) && D.tuts?.some((t) => t.n === cur) ? <div className="endrow"><div className="endmsg">Ready to apply it? Work through the tutorial and in-class exercises for this chapter.</div><button className="btn" onClick={() => g.openTut(cur)}>✏️ Tutorials &amp; exercises</button></div> : null}
           <div className="t-nav-footer">
             {pv ? <button className="t-nav-btn" onClick={() => g.openChapter(pv.n)}><small>Previous</small>← {pv.title}</button> : <div />}
-            {nx ? <button className="t-nav-btn next" onClick={() => g.openChapter(nx.n)}><small>Next chapter</small>{nx.title} →</button> : meta.tabs.includes('Practice') && g.tabOf(cur) === 'theory' ? <button className="t-nav-btn next" onClick={() => g.setTab('practice')}><small>You finished the course notes</small>Go to the practice questions →</button> : <div />}
+            {nx ? <button className="t-nav-btn next" onClick={() => g.openChapter(nx.n)}><small>Next {(meta.unit || 'chapter').toLowerCase()}</small>{nx.title} →</button> : meta.tabs.includes('Practice') && g.tabOf(cur) === 'theory' ? <button className="t-nav-btn next" onClick={() => g.setTab('practice')}><small>You finished the course notes</small>Go to the practice questions →</button> : <div />}
           </div>
         </motion.div>
         <AnimatePresence>

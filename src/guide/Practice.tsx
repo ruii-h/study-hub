@@ -14,7 +14,7 @@ export function JumpBtn({ ch, text, back }: { ch: number; text: string; back: an
   const g = useG();
   const s = useMemo(() => g.wiki.bestSection(ch, text) as { title: string; id: string } | null, [g.wiki, ch, text]);
   const t = s ? (s.title.length > 44 ? s.title.slice(0, 42) + '…' : s.title) : '';
-  return <button className="btn ghost jump" onClick={() => g.openChapter(ch, { back, sec: s?.id || undefined })}>{s ? '📖 Review ' + t : '📖 Review Chapter ' + ch}</button>;
+  return <button className="btn ghost jump" onClick={() => g.openChapter(ch, { back, sec: s?.id || undefined })}>{s ? '📖 Review ' + t : '📖 Review ' + (g.meta.unit || 'Chapter') + ' ' + ch}</button>;
 }
 
 export const WhyRow = ({ ok, r }: { ok: boolean; r?: string | null }) => (r ? <div className={`why ${ok ? 'wy' : 'wn'}`}><b>{ok ? 'Why this is right' : 'Why this is wrong'}:</b> {r}</div> : null);
@@ -104,12 +104,12 @@ function MultiBody({ title, qs, qkey, pills, ch }: MQ) {
     <AnimatePresence>{done === N && (
       <motion.div className="exq resultcard" aria-live="polite" {...pop} ref={(el) => { el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }}>
         <Ring p={p} /><div className="rt"><div style={{ fontWeight: 800, fontSize: 18 }}>{score} of {N} fully correct</div>
-          <div className="sub">{p >= 80 ? 'Strong. Move on to the next chapter. 🎉' : p >= 50 ? 'Decent. Revisit the explanations of the ones you missed, then retry.' : 'Re-read the chapter, then try again. Partial credit does not exist in the exam either.'}{mCount && key !== 'mx' ? <> Missed questions are saved in <b>Review my mistakes</b> so they come back until you get them right.</> : null}</div>
+          <div className="sub">{p >= 80 ? `Strong. Move on to the next ${(g.meta.unit || 'chapter').toLowerCase()}. 🎉` : p >= 50 ? 'Decent. Revisit the explanations of the ones you missed, then retry.' : 'Re-read the chapter, then try again. Partial credit does not exist in the exam either.'}{mCount && key !== 'mx' ? <> Missed questions are saved in <b>Review my mistakes</b> so they come back until you get them right.</> : null}</div>
           <div className="row">
             {key === 'mx' ? <button className="btn main" onClick={() => g.setPqSel('mx')}>{mCount ? 'Review remaining mistakes' : 'Nothing left to review ✓'}</button> : p >= 80 ? <>
-              {nx ? <><button className="btn main" onClick={() => g.openChapter(nx.n)}>Continue to Chapter {nx.n}</button><button className="btn ghost" onClick={() => g.setPqSel(nx.n)}>Quiz me on Chapter {nx.n}</button></> : <button className="btn main" onClick={() => g.setTab('theory')}>Back to the notes</button>}
-              <button className="btn lnk" onClick={restart}>Retry this quiz (reshuffled)</button><button className="btn lnk" onClick={() => g.openChapter(n, { back: { tab: 'practice', sel: n, y: 0, label: 'Back to your quiz', up: null } })}>Re-read Chapter {n}</button></> : <>
-              <button className="btn main" onClick={restart}>Retry this quiz (reshuffled)</button><button className="btn ghost" onClick={() => g.openChapter(n, { back: { tab: 'practice', sel: n, y: 0, label: 'Back to your quiz', up: null } })}>Re-read Chapter {n}</button>{nx ? <button className="btn lnk" onClick={() => g.openChapter(nx.n)}>Skip ahead to Chapter {nx.n}</button> : null}</>}
+              {nx ? <><button className="btn main" onClick={() => g.openChapter(nx.n)}>Continue to {g.meta.unit || 'Chapter'} {nx.n}</button><button className="btn ghost" onClick={() => g.setPqSel(nx.n)}>Quiz me on {g.meta.unit || 'Chapter'} {nx.n}</button></> : <button className="btn main" onClick={() => g.setTab('theory')}>Back to the notes</button>}
+              <button className="btn lnk" onClick={restart}>Retry this quiz (reshuffled)</button><button className="btn lnk" onClick={() => g.openChapter(n, { back: { tab: 'practice', sel: n, y: 0, label: 'Back to your quiz', up: null } })}>Re-read {g.meta.unit || 'Chapter'} {n}</button></> : <>
+              <button className="btn main" onClick={restart}>Retry this quiz (reshuffled)</button><button className="btn ghost" onClick={() => g.openChapter(n, { back: { tab: 'practice', sel: n, y: 0, label: 'Back to your quiz', up: null } })}>Re-read {g.meta.unit || 'Chapter'} {n}</button>{nx ? <button className="btn lnk" onClick={() => g.openChapter(nx.n)}>Skip ahead to {g.meta.unit || 'Chapter'} {nx.n}</button> : null}</>}
           </div></div>
       </motion.div>)}</AnimatePresence>
     {ch ? null : null}
@@ -224,18 +224,18 @@ export default function Practice() {
     : <MultiQuiz key={'mx' + mxSnap.current.length} title={`Review my mistakes (${mxSnap.current.length})`} qs={mxSnap.current} qkey="mx" />;
   else if (l) {
     const pills = <Pills sel={l.n} />;
-    pane = (D as any).mixed ? <MixedQuiz key={'x' + l.n} n={l.n} title={`Chapter ${l.n} — ${l.title}`} />
+    pane = (D as any).mixed ? <MixedQuiz key={'x' + l.n} n={l.n} title={`${g.meta.unit || 'Chapter'} ${l.n} — ${l.title}`} />
       : pqMode === 'warm' || !(D.hard[l.n] || []).length
-      ? <SingleQuiz key={'w' + l.n} title={`Chapter ${l.n} — ${l.title} (warm-up)`} qs={D.quiz[l.n] || []} n={l.n} pills={pills} />
+      ? <SingleQuiz key={'w' + l.n} title={`${g.meta.unit || 'Chapter'} ${l.n} — ${l.title} (warm-up)`} qs={D.quiz[l.n] || []} n={l.n} pills={pills} />
       : <>
-        <MultiQuiz key={'h' + l.n} title={`Chapter ${l.n} — ${l.title}`} qkey={String(l.n)} pills={pills} qs={(D.hard[l.n] || []).map((q: any, i: number) => ({ ...q, id: 'h' + l.n + '-' + i, ch: l.n }))} />
+        <MultiQuiz key={'h' + l.n} title={`${g.meta.unit || 'Chapter'} ${l.n} — ${l.title}`} qkey={String(l.n)} pills={pills} qs={(D.hard[l.n] || []).map((q: any, i: number) => ({ ...q, id: 'h' + l.n + '-' + i, ch: l.n }))} />
         {D.fill?.[l.n]?.length ? <FillQuiz key={'f' + l.n} qkey={'f' + l.n} title="Type the answer" qs={D.fill[l.n]} /> : null}
       </>;
   }
   const item = (cls: string, key: string | number, on: boolean, onClick: () => void, children: React.ReactNode) => <button className={`pq-item ${on ? 'active' : ''}`} key={String(key)} aria-current={on ? 'true' : undefined} onClick={onClick}>{children}</button>;
   return (
     <div className="pq">
-      <div className="pq-list" id="pql" tabIndex={0} aria-label="Chapter quizzes">
+      <div className="pq-list" id="pql" tabIndex={0} aria-label={`${g.meta.unit || 'Chapter'} quizzes`}>
         <div className="pq-head">CHAPTER QUIZZES</div>
         {item('', 'mx', pqSel === 'mx', () => g.setPqSel('mx'), <><span className="tn">🔁</span><span className="tt">Review my mistakes</span>{mCount ? <span className="sc lo">{mCount}</span> : null}</>)}
         {pqg.map((grp, gi) => (<div key={gi}><div className="pq-head">{grp[0].toUpperCase()}</div>{grp[1].map((n) => { const x = D.lessons.find((y) => y.n === n)!; const s = S[n]; return item('', n, pqSel === n, () => g.setPqSel(n), <><span className="tn">{n}</span><span className="tt">{x.title}</span>{s ? <span className={`sc ${scoreClass(s)}`}>{s.s}/{s.t}</span> : null}</>); })}</div>))}

@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+const F = 'src/courses/bpas/data.json';
+const d = JSON.parse(fs.readFileSync(F, 'utf8'));
+const L5 = d.lessons.find((l) => l.n === 5);
+const desc = { 1: 'The application form is manually dispatched by the OD, which leads to increased waiting times', 2: "The customer's eligibility is checked by the MO at a later stage, which results in a high cost of rejection", 3: "The LM's role is critical, as he must approve all applications. This leads to longer waiting times for straightforward cases", 4: 'The CSO manually fills in the application form together with the applicant, which affects his productivity', 5: 'The MO first checks availability and then markets the rental spaces, which is time-consuming and inefficient' };
+const a = L5.html.indexOf('Worked RCI example'); const s = L5.html.indexOf('<tbody>', a), e = L5.html.indexOf('</tbody>', s);
+let seg = L5.html.slice(s, e), n = 0;
+seg = seg.replace(/<tr>(\s*)<td>(\d)( \(another\))?<\/td>/g, (m, ws, i, an) => { n++; return `<tr>${ws}<td>${i}${an || ''}</td><td>${an ? '(same)' : desc[i]}</td>`; });
+if (n !== 10) throw new Error('rows ' + n);
+L5.html = L5.html.slice(0, s) + seg + L5.html.slice(e);
+fs.writeFileSync(F, JSON.stringify(d)); console.log('ok', n);

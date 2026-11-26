@@ -13,6 +13,8 @@ export interface CourseMeta {
   /** per-course accent colour: [dark theme, light theme] */
   accent: [string, string];
   tabs: string[];
+  /** what the course calls its units in the UI; defaults to "Chapter" */
+  unit?: string;
 }
 
 export const COURSES: CourseMeta[] = [
@@ -31,7 +33,7 @@ export const COURSES: CourseMeta[] = [
   {
     id: 'bpas', code: 'IS210', short: 'IS210', title: 'Business Process Analysis & Solutioning',
     blurb: 'Business-IT alignment, BPMN, static and dynamic analysis, requirements, blueprints and process innovation.',
-    chapters: 14, cards: 84, storageKey: 'bpas2_', accent: ['#3fb950', '#1a7f37'],
+    chapters: 13, cards: 92, storageKey: 'bpas3_', unit: 'Module', accent: ['#3fb950', '#1a7f37'],
     tabs: ['Theory', 'Practice', 'Flashcards', 'Cheat-sheet'],
   },
   {

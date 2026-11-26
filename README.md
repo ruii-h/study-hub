@@ -152,5 +152,9 @@ These are the owner's standing preferences. Follow them for every change, in all
 `node tools/wad2/build.mjs` rebuilds `src/courses/wad2` from `tools/wad2/data.json`, which `tools/wad2/extract.mjs` pulled out of the standalone offline WAD2 page (theory, cheat sheets, live-playground lessons; Bootstrap 5.3 is bundled in `src/courses/wad2/bs.*`). The 104 theory topics are grouped into chapters by track, the 17 cheat sheets and 7 code-archive chapters get their own tabs (`D.tabs`, rendered by the Theory reader scoped to those chapters), and the 14 exercises feed the Live playground tab (`src/courses/wad2/Playground.tsx`). Chapters 1-3 are the start and exam-toolkit topics. Practice questions, past papers and the exam-question index are left out on purpose for now.
 
 ## Diagrams
-- Process workflows (BPAS ch. 6, 9, 12) are drawn as horizontal swimlanes by `src/guide/swimlane.ts`. Mark a `pre.mermaid` with the class `swim` and write its lanes as `subgraph` blocks; the source stays valid Mermaid. `node tools/bpas-swimlanes.mjs` is the one-off script that converted the existing ones.
+- Process workflows (BPAS M3, M4, M7, M8, M11) are drawn as horizontal swimlanes by `src/guide/swimlane.ts`. Mark a `pre.mermaid` with the class `swim` and write its lanes as `subgraph` blocks; the source stays valid Mermaid. `node tools/bpas-swimlanes.mjs` is the one-off script that converted the existing ones.
 - On phones, plain top-down hierarchies (org charts) become an indented tree (`treeChains`) and simple one-way chains become the numbered snake (`snakeChains`).
+
+## BPAS modules
+- BPAS (IS210) is numbered like the slides: M1-M12 plus a course review (R). `n` in `data.json` is the module number, `dn` is shown as "M<dn>", and the course registry sets `unit: 'Module'`. Section ids are `s<module>-<k>`.
+- M4 (modelling exercises) and M7 (bed management analysis) are new lessons built from the exercise slides; M1 holds the learning journey, M2 holds Discovery, M10 and M11 hold the class activities. The one-off build is `tools/bpas-modules/build.mjs` (from `data.before.json`, the 14-chapter version); `cov2.mjs` lists slide lines that the site does not cover.

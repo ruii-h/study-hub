@@ -5,6 +5,10 @@ import { makeWiki } from './wiki';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type TabDef = { key: string; ico: string; label: string; x: string; ns?: number[]; groups?: { t: string; ns: number[]; tag: string }[]; kind?: string };
 export type Lesson = { n: number; dn?: number; title: string; tag: string; icon: string; goal: string; html: string };
+/** "Chapter" or the course's own word (BPAS: "Module") */
+export const unitOf = (meta: CourseMeta) => meta.unit || 'Chapter';
+/** nav label of a lesson: M1..M12 for a course with modules (R for the review), otherwise the chapter number */
+export const lessonNo = (meta: CourseMeta, l: Lesson): string | number => (meta.unit ? (l.dn ? 'M' + l.dn : 'R') : l.dn ?? l.n);
 export interface Data {
   lessons: Lesson[]; groups: { t: string; ns: number[]; tag: string }[]; cards: { t: string; d: string; f: string }[];
   quiz: Record<string, any[]>; hard: Record<string, any[]>; fill?: Record<string, any[]>; exam: { mcq: any[]; wr: any[] };
