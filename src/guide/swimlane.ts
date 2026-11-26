@@ -87,25 +87,28 @@ export function swimlaneSvg(src: string): string | null {
     const ghost = /^\((from|to)\b/i.test(n.label);
     if (ghost) { n.kind = 'ghost'; n.label = n.label.replace(/^\(|\)$/g, ''); }
     if (n.kind === 'merge' || n.kind === 'and') { n.w = n.h = 38; n.lines = []; }
-    else if (n.kind === 'diamond') {
-      let L = wrap(n.label, 84, 12.5); let h = Math.max(84, L.length * 16 + 46);
-      const w = Math.min(CW, Math.max(128, Math.round(h * 1.55)));
-      if (L.length > 3) { L = wrap(n.label, w * 0.52, 12.5); h = Math.max(84, L.length * 16 + 46); }
-      n.lines = L; n.w = w; n.h = h;
-    } else {
-      const pad = n.kind === 'start' || n.kind === 'end' ? 30 : 22;
-      const maxW = (n.kind === 'start' || n.kind === 'end' ? 150 : CW) - pad;
+    else if (n.kind === 'diamond') { n.w = n.h = 40; n.lines = wrap(n.label, 120, 12); } // BPMN: a small X gateway, its question written beside it
+    else if (n.kind === 'start' || n.kind === 'end') { n.w = n.h = 28; n.lines = /^(start|end|process end)$/i.test(n.label.trim()) ? [] : wrap(n.label, 120, 12); }
+    else {
+      const pad = 22;
+      const maxW = CW - pad;
       n.lines = wrap(n.label, maxW, FS);
       const widest = Math.max(...n.lines.map((l) => tw(l, FS)));
-      n.w = Math.min(n.kind === 'start' || n.kind === 'end' ? 150 : CW, Math.ceil(widest + pad + 4));
+      n.w = Math.min(CW, Math.ceil(widest + pad + 4));
       n.w = Math.max(n.w, 96);
-      n.h = Math.max(n.kind === 'start' || n.kind === 'end' ? 40 : 46, n.lines.length * 17 + 20);
+      n.h = Math.max(46, n.lines.length * 17 + 20);
     }
   });
 
   // ---- columns: longest path over forward edges, then keep one node per (lane, column) ----
+  // loop-backs (edges into a node still being visited) are drawn around the diagram, they must not drive the column layout
+  const back = new Set<E>(); const vis = new Map<string, number>();
+  const dfs = (id: string) => { vis.set(id, 1); edges.filter((e) => e.a === id && !e.dotted).forEach((e) => { const st = vis.get(e.b) || 0; if (st === 1) back.add(e); else if (!st) dfs(e.b); }); vis.set(id, 2); };
+  const hasIn = new Set(edges.filter((e) => !e.dotted).map((e) => e.b));
+  order.filter((id) => !hasIn.has(id)).forEach((id) => { if (!vis.get(id)) dfs(id); });
+  order.forEach((id) => { if (!vis.get(id)) dfs(id); });
   const hasSolidIn = new Set(edges.filter((e) => !e.dotted).map((e) => e.b));
-  const fwd = edges.filter((e) => !e.dotted || !hasSolidIn.has(e.b));
+  const fwd = edges.filter((e) => !back.has(e) && (!e.dotted || !hasSolidIn.has(e.b)));
   const indeg = new Map<string, number>(); nodes.forEach((_, id) => indeg.set(id, 0));
   fwd.forEach((e) => indeg.set(e.b, (indeg.get(e.b) || 0) + 1));
   const queue = order.filter((id) => !indeg.get(id)); const topo: string[] = []; const seen = new Set<string>();
@@ -139,7 +142,7 @@ export function swimlaneSvg(src: string): string | null {
     n.cy = laneTop[n.lane] + rowH[n.lane] * (n.row + 0.5); n.y = n.cy - n.h / 2;
   });
   const chX = (col: number) => colX[col] + colW[col] + GAP / 2; // channel after column `col`
-  const W = LABW + PADX * 2 + colX[ncols - 1] + colW[ncols - 1] - LABW - PADX;
+  const W = LABW + PADX * 2 + colX[ncols - 1] + colW[ncols - 1] - LABW - PADX + 50;
 
   // ---- edge routing ----
   type P = [number, number];
@@ -177,6 +180,10 @@ export function swimlaneSvg(src: string): string | null {
     const yb = Math.max(A.y + A.h, B.y + B.h) + 16, yt = Math.min(A.y, B.y) - 16;
     cands.push({ pts: [port(A, 'b'), [A.cx, yb], [B.cx, yb], port(B, 'b')], side: 'b', bonus: 60 });
     cands.push({ pts: [port(A, 't'), [A.cx, yt], [B.cx, yt], port(B, 't')], side: 't', bonus: 60 });
+    // loop-backs: out over the top of the lanes, or under the bottom, where nothing else is drawn
+    const yTop = laneTop[Math.min(A.lane, B.lane)] + 12, yBot = laneTop[Math.max(A.lane, B.lane)] + laneH[Math.max(A.lane, B.lane)] - 12;
+    cands.push({ pts: [port(A, 't'), [A.cx, yTop], [B.cx, yTop], port(B, 't')], side: 't', bonus: back.has(e) ? 20 : 150 });
+    cands.push({ pts: [port(A, 'b'), [A.cx, yBot], [B.cx, yBot], port(B, 'b')], side: 'b', bonus: back.has(e) ? 25 : 150 });
     const x1 = chX(Math.max(A.col, B.col - 1));
     cands.push({ pts: [R, [x1, R[1]], [x1, yb], [chX(B.col - 1), yb], [chX(B.col - 1), L[1]], L], side: 'r', bonus: 120 });
     let best: P[] | null = null, bs = Infinity;
@@ -193,6 +200,8 @@ export function swimlaneSvg(src: string): string | null {
 
   // ---- edge labels: find a clear spot on one of the segments ----
   const placed: { x: number; y: number; w: number; h: number }[] = [];
+  // the question / event name written under a gateway or event is reserved space, edge labels keep clear of it
+  nodes.forEach((n) => { if (n.lines.length && (n.kind === 'diamond' || n.kind === 'start' || n.kind === 'end')) { const nw = Math.max(...n.lines.map((l) => tw(l, 12))) + 6; placed.push({ x: n.cx - nw / 2, y: n.y + n.h + 2, w: nw, h: n.lines.length * 14 + 6 }); } });
   const labelSvg: string[] = [];
   edges.forEach((e) => {
     if (!e.lines.length) return;
@@ -220,12 +229,15 @@ export function swimlaneSvg(src: string): string | null {
   const lineH = (n: N, size: number) => n.lines.length * size;
   const usesDec = [...nodes.values()].some((n) => n.kind === 'diamond'), usesAnd = [...nodes.values()].some((n) => n.kind === 'and'), usesMerge = [...nodes.values()].some((n) => n.kind === 'merge');
   const legend: string[] = [];
-  if (usesDec) legend.push('◇ decision (one exit is taken)');
-  if (usesAnd) legend.push('+ parallel split / join (all exits taken)');
-  if (usesMerge) legend.push('× merge (paths rejoin)');
+  if (usesDec) legend.push('X gateway: decision, one exit is taken');
+  if (usesAnd) legend.push('+ gateway: parallel split / join, all exits taken');
+  if (usesMerge) legend.push('X gateway with several entries: paths rejoin');
   const legH = legend.length ? 34 : 0;
   const H = bodyH + legH;
   let s = `<svg class="swim-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" font-family='${FONT}'>`;
+  s += '<style>.swim-svg .sw-task{fill:#fff8cc;stroke:#6b6b3a;stroke-width:1.3}.swim-svg .sw-tt{fill:#1f2328}.swim-svg .sw-g{fill:var(--surface);stroke:var(--text);stroke-width:1.6}.swim-svg .sw-gm{fill:none;stroke:var(--text);stroke-width:2.6}'
+    + '.swim-svg .sw-start{fill:var(--surface);stroke:var(--text);stroke-width:1.5}.swim-svg .sw-end{fill:var(--surface);stroke:var(--text);stroke-width:3.2}.swim-svg .sw-note{paint-order:stroke;stroke:var(--surface);stroke-width:3px;stroke-linejoin:round}'
+    + '.swim-svg .sw-e{stroke:var(--text);stroke-width:1.5}.swim-svg .sw-ah{fill:var(--text)}</style>';
   s += `<defs><marker id="${id}a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="sw-ah"/></marker></defs>`;
   lanes.forEach((t, i) => {
     s += `<rect class="sw-lane sw-l${i % 2}" x="0" y="${laneTop[i]}" width="${W}" height="${laneH[i]}"/>`;
@@ -237,20 +249,28 @@ export function swimlaneSvg(src: string): string | null {
     const d = e.pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
     s += `<path class="sw-e${e.dotted ? ' sw-dot' : ''}" d="${d}" marker-end="url(#${id}a)"/>`;
   });
+  const notes: string[] = [];
   nodes.forEach((n) => {
     const { x, y, w, h, cx, cy } = n;
-    if (n.kind === 'diamond') s += `<polygon class="sw-n sw-d" points="${cx},${y} ${x + w},${cy} ${cx},${y + h} ${x},${cy}"/>`;
-    else if (n.kind === 'merge' || n.kind === 'and') s += `<polygon class="sw-n sw-g" points="${cx},${y} ${x + w},${cy} ${cx},${y + h} ${x},${cy}"/><text class="sw-gx" x="${cx}" y="${cy + 7}" text-anchor="middle">${n.kind === 'and' ? '+' : '×'}</text>`;
-    else if (n.kind === 'start' || n.kind === 'end') s += `<rect class="sw-n sw-${n.kind}" x="${x}" y="${y}" width="${w}" height="${h}" rx="${h / 2}"/>`;
-    else s += `<rect class="sw-n${n.kind === 'ghost' ? ' sw-ghost' : ''}" x="${x}" y="${y}" width="${w}" height="${h}" rx="8"/>`;
-    if (n.lines.length) {
+    const gate = n.kind === 'diamond' || n.kind === 'merge' || n.kind === 'and';
+    if (gate) {
+      const k = n.kind === 'and' ? 9 : 7;
+      s += `<polygon class="sw-n sw-g" points="${cx},${y} ${x + w},${cy} ${cx},${y + h} ${x},${cy}"/>`
+        + (n.kind === 'and' ? `<path class="sw-gm" d="M${cx - k} ${cy}H${cx + k}M${cx} ${cy - k}V${cy + k}"/>` : `<path class="sw-gm" d="M${cx - k} ${cy - k}L${cx + k} ${cy + k}M${cx + k} ${cy - k}L${cx - k} ${cy + k}"/>`);
+    } else if (n.kind === 'start' || n.kind === 'end') s += `<circle class="sw-n sw-${n.kind}" cx="${cx}" cy="${cy}" r="${w / 2}"/>`;
+    else s += `<rect class="sw-n sw-task${n.kind === 'ghost' ? ' sw-ghost' : ''}" x="${x}" y="${y}" width="${w}" height="${h}" rx="8"/>`;
+    if (n.lines.length && (gate || n.kind === 'start' || n.kind === 'end')) {
+      // the question / event name is written under the symbol, with a halo so a line passing through stays readable
+      const top = y + h + 14;
+      notes.push(`<text class="sw-t sw-note" x="${cx}" y="${top}" text-anchor="middle" font-size="12">${n.lines.map((l, k) => `<tspan x="${cx}" dy="${k ? 14 : 0}">${esc(l)}</tspan>`).join('')}</text>`);
+    } else if (n.lines.length) {
       const size = n.kind === 'diamond' ? 12.5 : FS, lh2 = n.kind === 'diamond' ? 16 : 17;
       const top = cy - (n.lines.length - 1) * lh2 / 2 + size * 0.36;
-      s += `<text class="sw-t" x="${cx}" y="${top.toFixed(1)}" text-anchor="middle" font-size="${size}">${n.lines.map((l, k) => `<tspan x="${cx}" dy="${k ? lh2 : 0}">${esc(l)}</tspan>`).join('')}</text>`;
+      s += `<text class="sw-t${n.kind === 'ghost' ? '' : ' sw-tt'}" x="${cx}" y="${top.toFixed(1)}" text-anchor="middle" font-size="${size}">${n.lines.map((l, k) => `<tspan x="${cx}" dy="${k ? lh2 : 0}">${esc(l)}</tspan>`).join('')}</text>`;
     }
     void lineH;
   });
-  s += labelSvg.join('');
+  s += labelSvg.join('') + notes.join('');
   if (legend.length) s += `<text class="sw-lg" x="${LABW + 8}" y="${bodyH + 22}" font-size="12">${esc(legend.join('     '))}</text>`;
   return s + '</svg>';
 }
