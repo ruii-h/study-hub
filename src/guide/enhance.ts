@@ -230,23 +230,3 @@ export function transposeTables(root: HTMLElement) {
     tb.innerHTML = h + '</tbody>'; tb.dataset.flipped = '1';
   });
 }
-
-/** Blank cells under a filled cell in the same column become one merged (rowspan) cell, so grouped rows read as a group. */
-export function mergeCells(root: HTMLElement) {
-  root.querySelectorAll<HTMLTableElement>('table:not([data-flipped]):not([data-merged])').forEach((tb) => {
-    if (tb.closest('.stack')) return;
-    const rows = [...(tb.tBodies[0]?.rows || [])]; if (rows.length < 2) return;
-    const n = Math.max(...rows.map((r) => r.cells.length));
-    if (rows.some((r) => r.cells.length !== n)) return;
-    const blank = (c: HTMLElement) => /^\s*$/.test(c.textContent || '') && !c.querySelector('img,svg,input');
-    let did = false;
-    for (let j = 0; j < n - 1; j++) {
-      let top: HTMLTableCellElement | null = null;
-      for (const r of rows) {
-        const c = r.cells[j] as HTMLTableCellElement | undefined; if (!c) continue;
-        if (blank(c) && top) { top.rowSpan += 1; c.remove(); did = true; } else top = blank(c) ? null : c;
-      }
-    }
-    if (did) { tb.dataset.merged = '1'; tb.classList.add('has-merge'); }
-  });
-}

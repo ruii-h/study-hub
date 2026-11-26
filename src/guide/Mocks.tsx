@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { SideList } from './Guide';
 import { useG } from './state';
 import { breakText } from './paragraphs';
-import { mergeCells, reveal, runMermaid, stackTables, transposeTables } from './enhance';
+import { reveal, runMermaid, stackTables, transposeTables } from './enhance';
 import { paintAll, wireMcq } from './mcq';
 import SolToggle, { useSolutions } from './SolToggle';
 
@@ -67,7 +67,7 @@ export default function Mocks() {
   useLayoutEffect(() => {
     const b = body.current, sc = scroller.current; if (!b || !sc) return;
     sc.scrollTop = 0;
-    transposeTables(b); stackTables(b); mergeCells(b);
+    transposeTables(b); stackTables(b);
     const stop = reveal(b, sc);
     const secEls = [...b.querySelectorAll<HTMLElement>('.t-section')]; secEls.forEach((s, k) => { s.id = 'msec' + k; });
     const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) setActive(e.target.id); }), { root: sc, rootMargin: '-10% 0px -75% 0px' });

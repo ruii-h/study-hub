@@ -7,7 +7,7 @@ import { ChapterLoader } from './Loader';
 import { highlightChunked } from '../course/highlight';
 import { useG } from './state';
 import { breakText } from './paragraphs';
-import { balanceUnits, mergeCells, transposeTables, reveal, runMermaid, snakeChains, stackTables, treeChains } from './enhance';
+import { balanceUnits, transposeTables, reveal, runMermaid, snakeChains, stackTables, treeChains } from './enhance';
 import { chapterSlide, ease, flipTiming, floatUp } from './motion';
 
 export function scrollToId(id: string, instant = false) {
@@ -92,7 +92,7 @@ export default function Theory() {
     const b = body.current, sc = scroller.current; if (!b || !sc || !ready) return;
     const p = g.pendingScroll.current; g.pendingScroll.current = null;
     sc.scrollTop = 0;
-    transposeTables(b); stackTables(b); mergeCells(b); snakeChains(b); treeChains(b); g.wiki.autolink(sc, cur); balanceUnits(b); g.wiki.fillRows(sc);
+    transposeTables(b); stackTables(b); snakeChains(b); treeChains(b); g.wiki.autolink(sc, cur); balanceUnits(b); g.wiki.fillRows(sc);
     const stop = reveal(b, sc);
     const list = [...b.querySelectorAll<HTMLElement>('.t-section[id]')].map((s) => { const n = s.querySelector('.t-num'); const t = s.querySelector('.t-h2')!.textContent!.replace(n ? n.textContent! : '', '').trim(); return { id: s.id, num: n ? n.textContent! : '', t }; });
     setToc(list.length >= 2 ? list : []); setActive(''); setSlot(b.querySelector<HTMLElement>('#cmock-slot'));
