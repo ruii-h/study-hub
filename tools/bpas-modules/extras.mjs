@@ -6,15 +6,15 @@ export const m1Extra = [];
 export const m10Extra = [
   ['Class Activities: Apple, Grab and Lulu.com', [
     h3('Activity 10.1: Apple and Grab'),
-    p(`${k('Apple')} was the first computer company to include music distribution as a process. It linked distribution to the development of the iPod hardware and software and to a continued relationship with customers. The activity asks you to watch the video, create the ${k('Grab Business Model Canvas')}, and compare the traditional taxi model with the Grab model.`),
-    p('The comparison table uses the four letters of the business model. Choose two or three key differences for each category:'),
+    p(`${k('Apple')} was the first computer company to include music distribution as a process. It linked distribution to the development of the iPod hardware and software and to a continued relationship with customers. The class activity compares the ${k('Grab Business Model Canvas')}, and compare the traditional taxi model with the Grab model.`),
+    p('The comparison uses the four letters of the business model:'),
     table(['Category', 'Question', 'Old (traditional taxi)', 'New (Grab)'], [
-      ['A', 'What? Value proposition', 'To fill in', 'To fill in'],
-      ['B', 'Who? Customer segment', 'To fill in', 'To fill in'],
-      ['C', 'How? Business process', 'To fill in', 'To fill in'],
-      ['D', 'Value? Revenue model', 'To fill in', 'To fill in'],
+      ['A', 'What? Value proposition', "A ride in a licensed taxi, hailed on the street or booked by phone", "A ride booked in an app, with a fare shown up front, a tracked driver and cashless payment; the same platform also offers food and parcel delivery"],
+      ['B', 'Who? Customer segment', "Passengers near a taxi stand or in the taxi company’s area; drivers work for one taxi company", "Passengers anywhere with a smartphone; many independent drivers; merchants and delivery customers"],
+      ['C', 'How? Business process', "The passenger hails or phones a dispatcher, who assigns a taxi; the meter sets the fare; payment is cash or card in the car", "The app matches the nearest driver, tracks the trip by GPS, calculates the fare and takes payment in the app; the passenger rates the driver"],
+      ['D', 'Value? Revenue model', "The driver or company keeps the metered fare; the company earns rental and fleet fees from drivers", "The platform earns a commission on each trip, plus fees and advertising on its other services"],
     ]),
-    callout('info', `The slides give only the template for Grab. Fill it in with your own analysis and cite any LLM or web source you use.`),
+    callout('info', `Grab changes the value proposition, the process and the revenue model together, so it is ${k('business model innovation')}, not just a better taxi.`),
     h3('Activity 10.2: Lulu.com'),
     p(`Analyse the models from ${k('Lulu.com')} with the same template. The slide answers:`),
     table(['Old', 'New'], [
