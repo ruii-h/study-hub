@@ -7,7 +7,7 @@ const SRC = process.argv[2];
 if (!SRC) throw new Error('pass the folder that holds w10/ and w11/');
 const J = 'tools/wad2/data.json';
 const W = JSON.parse(fs.readFileSync(J, 'utf8'));
-W.THEORY = W.THEORY.filter((t) => !/^(w1[01]|sx(1[2-9]|2[01]))$|^w1[01]/.test(t.id));
+W.THEORY = W.THEORY.filter((t) => !/^(w1[01]|sx(1[2-9]|2[0-2]))$|^w1[01]/.test(t.id));
 
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const rd = (p) => fs.readFileSync(path.join(SRC, p), 'utf8').replace(/\r/g, '').replace(/\s+$/, '');
@@ -512,7 +512,7 @@ add('w11j', 'Vue routing & guards', 'Week 11 exercises and model solutions', 'De
     ['<strong>3</strong> Login persistence', 'stay logged in after a refresh', '<code>stores/auth.js</code> save/restore/clear; <code>LoginView</code> redirects if already logged in'],
     ['<strong>4</strong> Orders', 'checkout creates an order; past orders at the protected <code>/orders</code>', '(A) <code>CartView.checkout()</code> posts to <code>/orders</code>; (B) new <code>stores/orders.js</code> with <code>fetchOrders()</code> sending <code>Authorization: Bearer ${token}</code>; (C) new <code>OrdersView.vue</code>; (D) <code>/orders</code> route with <code>meta.requiresAuth</code>; (E) an Orders link in <code>NavBar</code>'],
   ]) +
-  `<p>All the model solutions are in the ${link('sx21', 'code archive')}.</p>` +
+  `<p>All the model solutions are in the ${link('sx21', 'code archive')}. An optional extension adds roles and an admin route: ${link('w11l', 'role-based authorisation')}.</p>` +
   co('gap', '(added context) In the archive’s <code>orders.js</code> the action starts with <code>this.loading = true</code>. That style belongs to Options-API stores. In a <strong>setup store</strong> use the refs directly: <code>loading.value = true</code>. The rest of the action (<code>loading.value = false</code> in <code>finally</code>) already does this, so rewrite the first two lines to match.') +
   `<p>The solution <code>auth.js</code> also adds <code>role</code> and an <code>isAdmin</code> getter (<code>user.value?.role === &quot;admin&quot;</code>) for an optional role-based Exercise 5, and a <code>clearError()</code> action.</p>`);
 
@@ -525,6 +525,39 @@ add('w11k', 'Vue routing & guards', 'Week 11 recap', 'Take-away messages',
     ['show a different component per URL', 'Vue Router'],
     ['block or redirect a route', 'a navigation guard with <code>meta</code>'],
   ]));
+
+
+add('w10r', 'E2E testing with Playwright', 'Playwright in VS Code: Test Explorer, run, debug', 'The extension workflow',
+  `<p>The <strong>Playwright Test for VS Code</strong> extension (published by Microsoft) lets you run, record and debug tests without typing commands ${src('Wk10c slides, Ex3 setup')}.</p>` +
+  ol(['Open <strong>Extensions</strong> (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd>), search for “Playwright Test for VS Code” and install it. Restart VS Code if needed.', 'A <strong>Testing</strong> icon (a laboratory flask) appears on the Activity Bar. It opens <strong>Test Explorer</strong>. If it says “No tests have been found in this workspace yet”, open the folder where you installed Playwright.', 'Expand <code>tests</code> to see <code>example.spec.js</code>. Right-click it and choose <strong>Go To Test</strong> to open the source.', 'Click the <strong>play</strong> icon beside a file, a single test or the <code>tests</code> folder to run it. Results appear in the <strong>Test Results</strong> tab of the Panel (View → Appearance → Panel if it is hidden).', 'Use the <strong>Debug</strong> icon instead of play to set breakpoints, step over a failure and inspect variables.', 'Use <strong>Record new</strong> to open a browser (with a pink page background) and generate a spec file as you click.']) +
+  tbl(['Task', 'Where'], [
+    ['run all tests', 'play icon on the <code>tests</code> folder, or <code>pnpm playwright test</code>'],
+    ['run one test or file', 'play icon beside it'],
+    ['see why a test failed', 'Test Results tab, or the HTML report (<code>pnpm exec playwright show-report</code>)'],
+    ['step through a failing test', 'Debug icon'],
+  ]) +
+  co('tip', `The tests themselves are explained in ${link('w10p', 'Reading a recorded test')}.`));
+
+add('w11l', 'Vue routing & guards', 'Role-based authorisation: an admin-only route', 'Authentication vs authorisation',
+  `<p><strong>Authentication</strong> asks “who are you?” (logged in or not). <strong>Authorisation</strong> asks “what may you do?” (your role). The extended Week 11 exercise guide adds a role to the login and an <code>/admin</code> route that only an admin may open ${src('Wk11 exercise guide (temp.js), Exercise 4')}.</p>` +
+  ol(['<strong>Backend</strong>: the login response includes a role, e.g. <code>username === &quot;admin&quot; ? &quot;admin&quot; : &quot;user&quot;</code>.', '<strong>Store</strong>: keep <code>user.role</code> and add a getter <code>isAdmin = computed(() =&gt; user.value?.role === &quot;admin&quot;)</code>. Persist the role with the rest of the login.', '<strong>Route</strong>: add <code>meta: { requiresAuth: true, requiresRole: &quot;admin&quot; }</code> to <code>/admin</code>.', '<strong>Guard</strong>: first check login, then check the role.']) +
+  code(`router.beforeEach((to) => {
+  const auth = useAuthStore()
+
+  // 1) authentication
+  if (to.meta.requiresAuth && !auth.isLoggedIn) {
+    return { path: "/login", query: { redirect: to.fullPath } }
+  }
+
+  // 2) authorisation (role)
+  if (to.meta.requiresRole && auth.user?.role !== to.meta.requiresRole) {
+    return { path: "/products" }          // wrong role: send them somewhere safe
+  }
+  return true
+})`) +
+  `<p>Test flow: log in as <code>student</code>, who can open <code>/cart</code> but not <code>/admin</code>; log in as <code>admin</code>, who can open <code>/admin</code> too. The archive version shows an <code>alert(&quot;Access denied: admin only&quot;)</code>; a toast component is nicer in a real app.</p>` +
+  co('mistake', 'This is <strong>UI control only</strong>. Hiding <code>/admin</code> in the browser does not protect admin data: the Express API must check the token and the role on every admin request. See ' + link('w11i', 'Navigation guards') + '.') +
+  `<p>Files: ${link('sx22', 'extended exercise guide in the code archive')}.</p>`);
 
 // =====================================================================================
 // CODE ARCHIVE
@@ -614,6 +647,80 @@ add('sx21', 'Code · Week 11 Pinia & routing', 'MiniShop exercise solutions (Ex1
   file('Ex4: checkout posts to /orders', 'src/views/CartView.vue', code(rd(`${S}/src/views/CartView.vue`))) +
   file('Ex4: orders page', 'src/views/OrdersView.vue', code(rd(`${S}/src/views/OrdersView.vue`))) +
   file('Ex4: navbar with an Orders link', 'src/components/NavBar.vue', code(rd(`${S}/src/components/NavBar.vue`))));
+
+
+add('sx22', 'Code · Week 11 Pinia & routing', 'Extended exercise guide: role-based admin route', 'From the course notes file temp.js',
+  note('The Week 11 archive also holds a longer markdown guide (<code>src/stores/temp.js</code>, not real JavaScript) with five exercises: cart persistence, product details, auth persistence, <strong>role-based authorisation with an admin route</strong>, and order history. Exercises 1, 2, 3 and 5 match the model solutions in S8 (the slides number the orders exercise 4). The extra material is the admin route below. Theory: ' + link('w11l', 'role-based authorisation') + '.') +
+  file('backend: login returns a role', 'server/products/server.js (replace /login)', code(`app.post("/login", (req, res) => {
+  const { username } = req.body || {};
+  if (!username) return res.status(400).json({ error: "username required" });
+
+  const role = username === "admin" ? "admin" : "user";
+  res.json({ token: "fake-token-123", username, role });
+});`)) +
+  file('admin page', 'src/views/AdminView.vue', code(`<script setup>
+import { useAuthStore } from "../stores/auth";
+const auth = useAuthStore();
+</script>
+
+<template>
+  <div style="padding:16px;">
+    <h2>Admin Dashboard</h2>
+    <p><strong>User:</strong> {{ auth.user?.username }}</p>
+    <p><strong>Role:</strong> {{ auth.user?.role }}</p>
+    <p>This page is only accessible to users with role <code>admin</code>.</p>
+  </div>
+</template>`)) +
+  file('routes with requiresRole and a two-step guard', 'src/router/index.js', code(`import { createRouter, createWebHistory } from "vue-router";
+
+import ProductsView from "../views/ProductsView.vue";
+import CartView from "../views/CartView.vue";
+import LoginView from "../views/LoginView.vue";
+import ProductDetailView from "../views/ProductDetailView.vue";
+import AdminView from "../views/AdminView.vue";
+
+import { useAuthStore } from "../stores/auth";
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [
+    { path: "/", redirect: "/products" },
+    { path: "/products", component: ProductsView },
+    { path: "/products/:id", component: ProductDetailView },
+    { path: "/login", component: LoginView },
+
+    { path: "/cart", component: CartView, meta: { requiresAuth: true } },
+
+    { path: "/admin", component: AdminView, meta: { requiresAuth: true, requiresRole: "admin" } }
+  ]
+});
+
+router.beforeEach((to) => {
+  const auth = useAuthStore();
+
+  // 1) Auth check
+  if (to.meta.requiresAuth && !auth.isLoggedIn) {
+    return { path: "/login", query: { redirect: to.fullPath } };
+  }
+
+  // 2) Role check
+  if (to.meta.requiresRole) {
+    const required = to.meta.requiresRole; // "admin"
+    const userRole = auth.user?.role;
+
+    if (userRole !== required) {
+      // optionally show an alert; better practice is use a toast component
+      alert("Access denied: admin only");
+      return { path: "/products" };
+    }
+  }
+
+  return true;
+});
+
+export default router;`)) +
+  note('Test flow from the guide: run the backend (<code>node server.js</code>) and the frontend (<code>npm run dev</code>); open <code>/products</code> and add items; <code>/cart</code> redirects to login when logged out; log in as <code>student</code> to reach the cart but not <code>/admin</code>; log in as <code>admin</code> to reach <code>/admin</code>; checkout creates an order and <code>/orders</code> lists it.') +
+  file('a small extra store from the archive', 'src/stores/counter.js', code(rd(`${S}/src/stores/counter.js`))));
 
 W.THEORY.push(...T);
 
