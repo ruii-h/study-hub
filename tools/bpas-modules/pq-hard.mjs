@@ -106,32 +106,6 @@ export const hard = {
       F('The input factor of T is 120%', 'Adding 70% and 50% is wrong. A probability cannot exceed 100%.'),
     ], 'Multiply probabilities along the path to get the input factor.'),
   ],
-  4: [
-    H('In the expense report scenario (an employee submits expenses, the Workday Cloud System records them, the Office Administrator and Bank System are involved), which resource classifications are justified?', [
-      T('The Workday Cloud System is an external technology resource', 'It is a third-party cloud system.'),
-      F('The Bank System is an internal technology resource', 'The bank is an outside party, so its system is external.'),
-      T('The Office Administrator is an internal human resource', 'An employee of the organisation.'),
-      T('The Employee is an internal human resource', 'An employee of the organisation.'),
-    ], 'Classify each resource by who owns it and whether it is a person or a system.'),
-    H('A team models the expense report workflow. Which statements about a good solution are justified?', [
-      T('Work products (documents) may be left out of the solution diagram', 'The official solution leaves them out.'),
-      T('Each distinct outcome, such as approved or rejected, has its own end event', 'Every path must finish.'),
-      F('The Manager lane is where the employee is paid', 'Paying the employee is not a Manager activity in the official solution.'),
-      F('The mismatch rejection path leads back to the Financial Officer', 'The official solution does not route it that way.'),
-    ], 'Keep the diagram clear: every path ends, and the right participant does each activity.'),
-    H('For the SMU book reservation exercise, which statements are justified?', [
-      T('The lanes are Faculty, Admin and Librarian', 'These are the participants who perform activities.'),
-      F('The finance approval is drawn as a full sub-flow in the official solution', 'It is shown at a high level.'),
-      T('The solution has more than one end event', 'There is one end per outcome.'),
-      T('The LMS being slow and hard to search is an issue worth stating', 'It is a real issue with the current process.'),
-    ], 'Model the participants and outcomes from the scenario, and state the issues you can see.'),
-    H('A student uses GenAI to draft a BPMN model for the book reservation process. Which statements show good practice?', [
-      T('Import the output into a modelling tool to check that it opens', 'A file that does not open is not a usable model.'),
-      F('The model is correct if it opens without errors', 'Opening is not the same as correct. Check it against the scenario.'),
-      T('Improve the prompt to improve the model', 'Clearer prompts give better models.'),
-      T('Each gateway still needs labelled exits and each path an end event', 'Check the structure yourself.'),
-    ], 'GenAI helps with drafts. You must still check the model.'),
-  ],
   5: [
     H('A hospital wants to understand why discharge takes long. It has As-Is models and interview notes but no time to run experiments. Which statements about its choice are correct?', [
       T('Static analysis examines the process without executing it', 'It uses documents and models that already exist.'),
@@ -387,4 +361,4 @@ export const hard = {
 };
 
 /** warm-up questions that tested trivia (counts, which lane, which time standard): removed */
-export const dropQuiz = { 2: [6], 3: [6, 8], 4: [0, 1], 6: [2], 12: [1] };
+export const dropQuiz = { 2: [6], 3: [6, 8], 6: [2], 12: [1] };
