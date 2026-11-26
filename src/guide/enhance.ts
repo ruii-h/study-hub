@@ -1,4 +1,5 @@
 /* DOM post-processing of lesson HTML: table stacking, snake layout for chains, Mermaid, reveal-on-scroll. */
+import { swimlaneSvg } from './swimlane';
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] as string));
 
 export function stackTables(c: HTMLElement) {
@@ -39,9 +40,41 @@ export function snakeChains(root: HTMLElement) {
     const d = document.createElement('div'); d.className = 'snake'; d.style.setProperty('--cols', String(cols));
     d.innerHTML = order.map((id, i) => {
       const r = Math.floor(i / cols), k = i % cols, col = r % 2 ? cols - k : k + 1, last = i === order.length - 1, arrow = last ? '' : k === cols - 1 ? '↓' : r % 2 ? '←' : '→';
-      const t = esc(lab[id] || id).replace(/^\d+\.\s*/, '').replace(/&lt;br\s*\/?&gt;/g, '<br>');
+      const t = esc(lab[id] || id).replace(/^\d+\.\s*/, '').replace(/&lt;br\s*\/?&gt;/g, '<br>').replace(/&lt;(\/?)(i|b|em|strong)&gt;/g, '<$1$2>');
       return `<div class="sn" style="grid-row:${r + 1};grid-column:${col}" data-a="${arrow}"><b>${i + 1}</b><span>${t}</span></div>`;
     }).join('');
+    pre.replaceWith(d);
+  });
+}
+
+/** On phones a top-down hierarchy (org chart, region tree) is shown as an indented tree instead of a wide diagram that scrolls sideways. */
+export function treeChains(root: HTMLElement) {
+  root.querySelectorAll<HTMLElement>('pre.mermaid:not([data-processed])').forEach((pre) => {
+    const w = pre.parentElement?.clientWidth || 600; if (w > 640) return;
+    const src = pre.textContent || '';
+    if (!/^\s*(%%.*\n)?\s*(flowchart|graph)\s+(TD|TB)/m.test(src) || /subgraph|-\.|==>|\|/.test(src) || pre.classList.contains('swim')) return;
+    const lab: Record<string, string> = {}, kids: Record<string, string[]> = {}, parent: Record<string, string> = {};
+    const nodeRe = /([A-Za-z_]\w*)\s*(?:\["([^"]*)"\]|\(\["([^"]*)"\]\)|\("([^"]*)"\))/g; let m;
+    while ((m = nodeRe.exec(src))) lab[m[1]] = (m[2] || m[3] || m[4] || '').trim();
+    let ok = true;
+    src.replace(nodeRe, '$1').split('\n').forEach((l) => {
+      const p = l.split('-->').map((x) => x.trim()); if (p.length < 2) return;
+      for (let i = 0; i < p.length - 1; i++) {
+        const a = p[i].match(/^[A-Za-z_]\w*$/), b = p[i + 1].match(/^[A-Za-z_]\w*$/);
+        if (!a || !b) { ok = false; return; }
+        if (parent[b[0]]) ok = false;
+        parent[b[0]] = a[0]; (kids[a[0]] ||= []).push(b[0]);
+      }
+    });
+    const ids = Object.keys(lab); const roots = ids.filter((i) => !parent[i]);
+    if (!ok || ids.length < 4 || roots.length !== 1 || ids.some((i) => !lab[i])) return;
+    const seen = new Set<string>();
+    const draw = (id: string): string => {
+      if (seen.has(id)) return ''; seen.add(id); const k = kids[id] || [];
+      return `<div class="mt-n">${esc(lab[id]).replace(/&lt;br\s*\/?&gt;/g, '<br>')}</div>` + (k.length ? `<div class="mt-c">${k.map((c) => `<div class="mt-i">${draw(c)}</div>`).join('')}</div>` : '');
+    };
+    const d = document.createElement('div'); d.className = 'mtree'; d.innerHTML = draw(roots[0]);
+    if (seen.size !== ids.length) return;
     pre.replaceWith(d);
   });
 }
@@ -69,7 +102,7 @@ export function runMermaid(root: HTMLElement, load: () => Promise<MermaidLike>, 
     mermaid.initialize({
       startOnLoad: false, securityLevel: 'loose', theme: 'base',
       themeVariables: { fontSize: '16px', fontFamily: FONT, ...P },
-      flowchart: { htmlLabels: true, curve: 'basis', nodeSpacing: 36, rankSpacing: 46, padding: 14, wrappingWidth: 230, useMaxWidth: true },
+      flowchart: { htmlLabels: true, curve: 'basis', nodeSpacing: 36, rankSpacing: 46, padding: 22, wrappingWidth: 230, useMaxWidth: true },
       sequence: { useMaxWidth: true, actorMargin: 60, messageFontSize: 15, noteFontSize: 15, actorFontSize: 15 },
       mindmap: { useMaxWidth: true, padding: 14 },
     });
@@ -77,6 +110,11 @@ export function runMermaid(root: HTMLElement, load: () => Promise<MermaidLike>, 
       if (!el.isConnected) continue;
       const src = el.dataset.src ?? (el.dataset.src = (el.textContent || '').trim());
       const avail = el.parentElement?.clientWidth || el.clientWidth || 720;
+      if (el.classList.contains('swim')) {
+        let sw: string | null = null;
+        try { sw = swimlaneSvg(src); } catch (err) { console.warn('swimlane failed', err); }
+        if (sw) { el.innerHTML = sw; el.dataset.rendered = theme; el.dataset.processed = 'true'; el.classList.add('mm-scroll'); continue; }
+      }
       try {
         let { svg } = await mermaid.render('mmd' + ++mid, src);
         let w = vbWidth(svg);
@@ -103,7 +141,7 @@ function openDiagram(el: HTMLElement) {
   const view = document.createElement('div'); view.className = 'dg-view';
   const c = svg.cloneNode(true) as SVGSVGElement; c.removeAttribute('style'); c.removeAttribute('width'); c.removeAttribute('height'); c.classList.add('dg-svg');
   view.appendChild(c);
-  let z = Math.min(1.4, Math.max(0.3, (innerWidth - 24) / W));
+  let z = Math.min(1.4, Math.max(el.classList.contains('swim') ? 0.7 : 0.3, (innerWidth - 24) / W));
   const apply = () => { c.style.width = Math.round(W * z) + 'px'; c.style.height = Math.round(H * z) + 'px'; label.textContent = Math.round(z * 100) + '%'; };
   const mk = (t: string, f: () => void, cls = '') => { const b = document.createElement('button'); b.type = 'button'; b.textContent = t; b.className = cls; b.onclick = f; bar.appendChild(b); return b; };
   const label = document.createElement('span');
