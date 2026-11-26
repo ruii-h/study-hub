@@ -23,6 +23,9 @@ Read `README.md` first. Its "House rules" section is how the user wants everythi
 
 - Jumps must land on the exact information, not the top of a chapter: use `g.jumpTo(chapter, text, back)` (picks the best section, then the best paragraph/row/card, and highlights it with `.hit`) or `openChapter(n,{sec,q})`. Search results, key-term links, Review buttons and Revise buttons all go through `scrollToId(id, instant, q)` in `Theory.tsx`.
 
+- Deploy (`npm ci` on the Linux runner) fails with "Missing: @emnapi/core@2.0.0-beta.2 from lock file" whenever a Windows `npm install` rewrites `package-lock.json`. After any lockfile change run `node tools/fix-lock-emnapi.mjs` and check `npm ci --dry-run`.
+- BPAS module 8 use case drawings are static SVG from `ucSvg` (`tools/bpas-exam/lib.mjs`), patched into `lessons[7]` by `tools/bpas-exam/patch-m8-usecases.mjs` and `patch-m8-notation.mjs` (re-runnable).
+
 ## Workflow
 - Mobile first: Samsung S24 Ultra, Chrome (~412x915). Also check 360x780.
 - Check UI changes in the browser preview before reporting them done.

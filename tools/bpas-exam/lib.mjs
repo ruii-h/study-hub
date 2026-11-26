@@ -71,17 +71,17 @@ export function ucSvg({ boundaries, left = [], right = [], label = 'Use case dia
   });
   const H = y + 4;
   const place = (acts, side) => {
-    let lines = '', figs = ''; let lastY = -999;
+    let lines = '', figs = ''; let lastY = -999; let maxY = 0;
     acts.map((a) => ({ a, y: a.to.reduce((s, id) => s + pos[id].y, 0) / a.to.length })).sort((m, n) => m.y - n.y).forEach(({ a, y: ay }) => {
-      let yy = Math.max(ay, lastY + 78); lastY = yy;
+      let yy = Math.max(ay, lastY + 78); lastY = yy; maxY = Math.max(maxY, yy);
       const ax = side === 'L' ? 70 : W - 70;
       a.to.forEach((id) => { const o = pos[id]; if (!o) throw new Error('uc id ' + id); lines += `<line x1="${ax + (side === 'L' ? 14 : -14)}" y1="${yy - 6}" x2="${o.x + (side === 'L' ? -OW / 2 : OW / 2)}" y2="${o.y}" stroke="currentColor" stroke-width="1" opacity=".75"/>`; });
       figs += stick(ax, yy, a.name);
     });
-    return { lines, figs };
+    return { lines, figs, maxY };
   };
   const l = place(left, 'L'), r = place(right, 'R');
-  const H2 = Math.max(H, 40 + 78 * Math.max(left.length, right.length));
+  const H2 = Math.max(H, l.maxY + 54, r.maxY + 54);
   return svgWrap(W, H2, `${boxes}${l.lines}${r.lines}${ovals}${l.figs}${r.figs}`, label);
 }
 

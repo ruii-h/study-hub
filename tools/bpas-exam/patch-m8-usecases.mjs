@@ -1,6 +1,6 @@
 // One-off patch: Module 8 (lessons[7]) drew its use case models as Mermaid flowcharts (actors as boxes).
 // Replace the four of them with real UML use case diagrams (stick-figure actors, ovals, system boundaries) built by ucSvg.
-// Run once: node tools/bpas-exam/patch-m8-usecases.mjs   (idempotent: it matches the Mermaid sources, which are gone after the first run)
+// Re-runnable: node tools/bpas-exam/patch-m8-usecases.mjs  (matches the old Mermaid sources or an earlier drawing with the same aria-label)
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -49,6 +49,13 @@ let done = 0;
 h = h.replace(/<pre class="mermaid[^>]*>([\s\S]*?)<\/pre>/g, (all, src) => {
   const s = decode(src);
   const hit = diagrams.find((x) => s.includes(x.start) && /--- /.test(s) && /\(\[/.test(s));
+  if (!hit) return all;
+  done++;
+  return hit.svg;
+});
+// a drawing made by an earlier run: redraw it
+h = h.replace(/<div class="t-table-wrap" tabindex="0"><svg[^>]*aria-label="([^"]*)"[\s\S]*?<\/svg><\/div>/g, (all, label) => {
+  const hit = diagrams.find((x) => x.svg.includes('aria-label="' + label + '"'));
   if (!hit) return all;
   done++;
   return hit.svg;
