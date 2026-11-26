@@ -82,7 +82,7 @@ export function swimlaneSvg(src: string): string | null {
   nodes.forEach((n) => { if (n.lane < 0) n.lane = lanes.length - 1; });
 
   // ---- node sizes ----
-  const CW = 164, GAP = 58, LABW = 44, PADX = 26, FS = 13;
+  const CW = 118, GAP = 30, LABW = 40, PADX = 16, FS = 12;
   nodes.forEach((n) => {
     const ghost = /^\((from|to)\b/i.test(n.label);
     if (ghost) { n.kind = 'ghost'; n.label = n.label.replace(/^\(|\)$/g, ''); }
@@ -95,7 +95,7 @@ export function swimlaneSvg(src: string): string | null {
       n.lines = wrap(n.label, maxW, FS);
       const widest = Math.max(...n.lines.map((l) => tw(l, FS)));
       n.w = Math.min(CW, Math.ceil(widest + pad + 4));
-      n.w = Math.max(n.w, 96);
+      n.w = Math.max(n.w, 84);
       n.h = Math.max(46, n.lines.length * 17 + 20);
     }
   });
@@ -132,7 +132,7 @@ export function swimlaneSvg(src: string): string | null {
   for (let c = 0; c < ncols; c++) colX[c] = c ? colX[c - 1] + colW[c - 1] + GAP : LABW + PADX;
 
   // ---- lanes ----
-  const rowH = lanes.map((_, i) => Math.max(108, Math.max(0, ...[...nodes.values()].filter((n) => n.lane === i).map((n) => n.h)) + 50));
+  const rowH = lanes.map((_, i) => Math.max(92, Math.max(0, ...[...nodes.values()].filter((n) => n.lane === i).map((n) => n.h)) + 50));
   const laneRows = lanes.map((_, i) => Math.max(1, ...[...nodes.values()].filter((n) => n.lane === i).map((n) => n.row + 1)));
   const laneH = lanes.map((_, i) => rowH[i] * laneRows[i]);
   const laneTop: number[] = []; let y = 0; laneH.forEach((h, i) => { laneTop[i] = y; y += h; });
@@ -235,9 +235,9 @@ export function swimlaneSvg(src: string): string | null {
   const legH = legend.length ? 34 : 0;
   const H = bodyH + legH;
   let s = `<svg class="swim-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" font-family='${FONT}'>`;
-  s += '<style>.swim-svg .sw-task{fill:#fff8cc;stroke:#6b6b3a;stroke-width:1.3}.swim-svg .sw-tt{fill:#1f2328}.swim-svg .sw-g{fill:var(--surface);stroke:var(--text);stroke-width:1.6}.swim-svg .sw-gm{fill:none;stroke:var(--text);stroke-width:2.6}'
-    + '.swim-svg .sw-start{fill:var(--surface);stroke:var(--text);stroke-width:1.5}.swim-svg .sw-end{fill:var(--surface);stroke:var(--text);stroke-width:3.2}.swim-svg .sw-note{paint-order:stroke;stroke:var(--surface);stroke-width:3px;stroke-linejoin:round}'
-    + '.swim-svg .sw-e{stroke:var(--text);stroke-width:1.5}.swim-svg .sw-ah{fill:var(--text)}</style>';
+  s += `<style>pre.mermaid.swim .swim-svg{max-width:100%!important;height:auto!important;min-width:${Math.min(W, Math.max(820, Math.round(W * 0.62)))}px}.swim-svg .sw-task{fill:#fff8cc;stroke:#6b6b3a;stroke-width:1.3}.swim-svg .sw-tt{fill:#1f2328}.swim-svg .sw-g{fill:var(--surface);stroke:var(--text);stroke-width:1.6}.swim-svg .sw-gm{fill:none;stroke:var(--text);stroke-width:2.6}`
+    + `.swim-svg .sw-start{fill:var(--surface);stroke:var(--text);stroke-width:1.5}.swim-svg .sw-end{fill:var(--surface);stroke:var(--text);stroke-width:3.2}.swim-svg .sw-note{paint-order:stroke;stroke:var(--surface);stroke-width:3px;stroke-linejoin:round}`
+    + `.swim-svg .sw-e{stroke:var(--text);stroke-width:1.5}.swim-svg .sw-ah{fill:var(--text)}</style>`;
   s += `<defs><marker id="${id}a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="sw-ah"/></marker></defs>`;
   lanes.forEach((t, i) => {
     s += `<rect class="sw-lane sw-l${i % 2}" x="0" y="${laneTop[i]}" width="${W}" height="${laneH[i]}"/>`;
