@@ -149,6 +149,16 @@ function fitLabels(root: HTMLElement) {
     const lg = fo.parentElement as SVGGElement | null, m = /translate\(\s*(-?[\d.]+)[ ,]+(-?[\d.]+)\s*\)/.exec(lg?.getAttribute('transform') || '');
     if (lg && m) lg.setAttribute('transform', `translate(${-(Math.ceil(lab.scrollWidth) + 2) / 2}, ${m[2]})`);
   });
+  // widened boxes can reach past the original viewBox: grow it to the real content so nothing is cut off
+  const svg = root.querySelector<SVGSVGElement>('svg'), content = svg?.querySelector<SVGGElement>(':scope > g');
+  if (svg && content && svg.viewBox.baseVal.width) {
+    const b = content.getBBox(), vb = svg.viewBox.baseVal, pad = 12;
+    const x0 = Math.min(vb.x, b.x - pad), y0 = Math.min(vb.y, b.y - pad), x1 = Math.max(vb.x + vb.width, b.x + b.width + pad), y1 = Math.max(vb.y + vb.height, b.y + b.height + pad);
+    if (x1 - x0 > vb.width + 1 || y1 - y0 > vb.height + 1 || x0 < vb.x - 1) {
+      svg.setAttribute('viewBox', `${x0} ${y0} ${x1 - x0} ${y1 - y0}`);
+      if (svg.style.maxWidth) svg.style.maxWidth = Math.round(x1 - x0) + 'px';
+    }
+  }
 }
 
 /** Full-screen diagram viewer: scrollable both ways with zoom buttons, so even the widest diagram can be read at full size. */
