@@ -5,6 +5,10 @@ import { EXTRA } from './config';
 import { scoreClass, shuffle, useG } from './state';
 import { fade, pop, rise, slideX } from './motion';
 import MixedQuiz from './Mixed';
+import SolToggle from './SolToggle';
+import { Options, WhyRow } from './Choice';
+
+export { WhyRow };
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const L5 = 'ABCDEF';
@@ -17,7 +21,6 @@ export function JumpBtn({ ch, text, back }: { ch: number; text: string; back: an
   return <button className="btn ghost jump" onClick={() => g.openChapter(ch, { back, sec: s?.id || undefined })}>{s ? '📖 Review ' + t : '📖 Review ' + (g.meta.unit || 'Chapter') + ' ' + ch}</button>;
 }
 
-export const WhyRow = ({ ok, r }: { ok: boolean; r?: string | null }) => (r ? <div className={`why ${ok ? 'wy' : 'wn'}`}><b>{ok ? 'Why this is right' : 'Why this is wrong'}:</b> {r}</div> : null);
 
 export function Ring({ p }: { p: number }) { return <div className="ring" style={{ ['--p' as any]: p }}><span>{p}%</span></div>; }
 
@@ -51,7 +54,7 @@ function MultiQuiz(props: MQ) {
 }
 function MultiBody({ title, qs, qkey, pills, ch }: MQ) {
   const g = useG();
-  const { QP, patch } = g;
+  const { QP, patch } = g; const sol = !!g.ST.qsol;
   const st = QP[qkey];
   const by: Record<string, any> = {}; qs.forEach((q) => (by[q.id] = q));
   const prep = st.ord.map((rec: any) => { const q = by[rec.id]; const ans = q.a.split('').map((l: string) => L5.indexOf(l)); return { src: q, rec, o: rec.perm.map((i: number) => q.o[i]), w: rec.perm.map((i: number) => (q.w ? q.w[i] : null)), a: rec.perm.map((old: number, pos: number) => (ans.includes(old) ? pos : -1)).filter((p: number) => p >= 0) }; });
@@ -82,17 +85,9 @@ function MultiBody({ title, qs, qkey, pills, ch }: MQ) {
           <motion.div className="exq" key={q.rec.id} id={'mq' + i} {...rise(i)}>
             <div className="qh"><h2 className="qn">Question {i + 1}</h2><span className="ms">{q.a.length === 1 ? 'CHOOSE ONE' : 'SELECT ALL THAT APPLY'}</span></div>
             <div className="qt" dangerouslySetInnerHTML={{ __html: breakAny(q.src.q) }} />
-            <div role="group" aria-label={`Options for question ${i + 1}`}>
-              {q.o.map((x: string, j: number) => {
-                const isA = q.a.includes(j), isS = sel.includes(j);
-                const cls = `eo ${!chk && isS ? 'sel' : ''} ${chk ? (isA && isS ? 'right' : isS ? 'wrong' : isA ? 'miss' : '') : ''}`;
-                return (<div key={j}>
-                  <label className={cls}><input type="checkbox" checked={isS} disabled={chk} onChange={(e) => setRec(q.rec.id, (r) => ({ ...r, sel: e.target.checked ? [...r.sel, j] : r.sel.filter((v: number) => v !== j) }))} /><i>{L5[j]}.</i><span dangerouslySetInnerHTML={{ __html: x }} /></label>
-                  <AnimatePresence>{chk && q.w[j] && <motion.div {...fade}><WhyRow ok={isA} r={q.w[j]} /></motion.div>}</AnimatePresence>
-                </div>);
-              })}
-            </div>
-            <div className="row"><button className="btn" disabled={chk || !sel.length} onClick={() => check(q)}>Check answer</button></div>
+            <Options o={q.o} a={q.a} sel={sel} w={q.w} mode={chk ? 'checked' : sol ? 'sol' : 'open'} label={`Options for question ${i + 1}`} onChange={(j, on) => setRec(q.rec.id, (r) => ({ ...r, sel: on ? [...r.sel, j] : r.sel.filter((v: number) => v !== j) }))} />
+            {sol && !chk ? null : <div className="row"><button className="btn" disabled={chk || !sel.length} onClick={() => check(q)}>Check answer</button></div>}
+            {sol && !chk ? <div className="vd"><div className="verdict ok"><b>Solution:</b> <b>{q.a.map((x: number) => L5[x]).join(', ')}</b>. <span dangerouslySetInnerHTML={{ __html: breakAny(q.src.e) }} /></div></div> : null}
             <AnimatePresence>{chk && (
               <motion.div className="vd" aria-live="polite" {...fade}>
                 <div className={`verdict ${ok ? 'ok' : 'no'}`}><b>{ok ? '✅ Fully correct.' : '❌ Not quite.'}</b> Correct: <b>{q.a.map((x: number) => L5[x]).join(', ')}</b>. <span dangerouslySetInnerHTML={{ __html: breakAny(q.src.e) }} />
@@ -128,7 +123,7 @@ function SingleQuiz(props: SQ) {
   return valid ? <SingleBody {...props} /> : null;
 }
 function SingleBody({ title, qs, n, pills }: SQ) {
-  const g = useG();
+  const g = useG(); const sol = !!g.ST.qsol;
   const key = 'w' + n; const { QP, patch } = g;
   const items = qs.map((q, i) => ({ ...q, id: key + '-' + i }));
   const st = QP[key];
@@ -146,7 +141,8 @@ function SingleBody({ title, qs, n, pills }: SQ) {
     {prep.map((q: any, i: number) => (
       <motion.div className="qq" key={q.rec.id} {...rise(i)}>
         <div className="t"><span>{i + 1}. </span><span dangerouslySetInnerHTML={{ __html: breakAny(q.q) }} /></div>
-        {q.o.map((o: string, j: number) => <button key={j} className={`opt ${q.rec.chk ? (j === q.c ? 'ok' : j === q.rec.sel ? 'bad' : '') : ''}`} disabled={!!q.rec.chk} onClick={() => pick(q.rec.id, j)} dangerouslySetInnerHTML={{ __html: o }} />)}
+        {q.o.map((o: string, j: number) => <button key={j} className={`opt ${q.rec.chk ? (j === q.c ? 'ok' : j === q.rec.sel ? 'bad' : '') : sol && j === q.c ? 'ok' : ''}`} disabled={!!q.rec.chk || sol} onClick={() => pick(q.rec.id, j)} dangerouslySetInnerHTML={{ __html: o }} />)}
+        {sol && !q.rec.chk ? <div className="exp"><b>Solution: <span dangerouslySetInnerHTML={{ __html: q.o[q.c] }} />.</b> <span dangerouslySetInnerHTML={{ __html: breakAny(q.e) }} /></div> : null}
         <AnimatePresence>{q.rec.chk ? (
           <motion.div className="exp" role="status" {...fade}>
             {q.rec.sel === q.c ? <>✅ <b>Correct.</b> <span dangerouslySetInnerHTML={{ __html: breakAny(q.e) }} /></> : <>❌ <b>Not quite.</b>
@@ -173,7 +169,7 @@ const norm = (s: string, kind: string, ci: boolean) => {
 export const fillOK = (q: any, v: string) => { const k = q.kind || 'out', u = norm(v, k, q.ci); if (!u) return false; return q.a.some((a: string) => (a.startsWith('re:') ? new RegExp(a.slice(3), 'i').test(u) : norm(a, k, q.ci) === u)); };
 
 function FillQuiz({ qs, qkey, title }: { qs: any[]; qkey: string; title: string }) {
-  const g = useG(); const { QP, patch } = g;
+  const g = useG(); const { QP, patch } = g; const sol = !!g.ST.qsol;
   const r: Record<number, any> = QP[qkey]?.r || {};
   const set = (i: number, v: any) => patch('QP', (o) => ({ ...o, [qkey]: { ...o[qkey], r: { ...(o[qkey]?.r || {}), [i]: v } } }));
   const d = Object.values(r).filter((x: any) => x.done).length, c = Object.values(r).filter((x: any) => x.ok).length;
@@ -191,6 +187,7 @@ function FillQuiz({ qs, qkey, title }: { qs: any[]; qkey: string; title: string 
           <div className="qt" dangerouslySetInnerHTML={{ __html: breakAny(q.q) }} />
           {multi ? <textarea rows={4} {...inputProps} onChange={(e) => set(i, { ...rec, v: e.target.value })} /> : <input type="text" {...inputProps} className={rec.ok ? 'ok' : ''} onChange={(e) => set(i, { ...rec, v: e.target.value })} onKeyDown={(e) => { if (e.key === 'Enter') set(i, { v: rec.v, done: 1, ok: fillOK(q, rec.v || '') ? 1 : 0 }); }} />}
           <div className="row"><button className="btn" onClick={() => set(i, { v: rec.v, done: 1, ok: fillOK(q, rec.v || '') ? 1 : 0 })}>Check answer</button><button className="btn ghost" onClick={() => set(i, { v: rec.v, done: 1, ok: 0, shown: 1 })}>Show answer</button></div>
+          {sol && !rec.done ? <div className="vd"><div className="verdict ok"><b>Solution:</b> {shown.map((a: string, k: number) => <span key={k}>{k ? ' or ' : ''}<code>{a}</code></span>)} <span dangerouslySetInnerHTML={{ __html: breakAny(q.e || '') }} /></div></div> : null}
           <AnimatePresence>{rec.done ? (
             <motion.div className="vd" aria-live="polite" {...fade}><div className={`verdict ${rec.ok ? 'ok' : 'no'}`}><b>{rec.ok ? '✅ Correct.' : rec.shown ? 'Answer revealed.' : '❌ Not quite.'}</b> <span dangerouslySetInnerHTML={{ __html: breakAny(q.e || '') }} />
               {rec.ok ? null : <div className="why wy"><b>Accepted answer:</b> {shown.map((a: string, k: number) => <span key={k}>{k ? ' or ' : ''}<code>{a}</code></span>)}</div>}</div></motion.div>) : null}</AnimatePresence>
@@ -243,7 +240,7 @@ export default function Practice() {
         {D.selfq ? item('', 'sc', pqSel === 'sc', () => g.setPqSel('sc'), <><span className="tn">📝</span><span className="tt">Self-check Q&amp;A ({D.selfn || ''})</span></>) : null}
       </div>
       <div className="pane" id="pqm" tabIndex={0}>
-        <AnimatePresence mode="wait" initial={false}><motion.div key={String(pqSel) + pqMode} {...slideX}>{pane}</motion.div></AnimatePresence>
+        <AnimatePresence mode="wait" initial={false}><motion.div key={String(pqSel) + pqMode} {...slideX}>{pqSel !== 'sc' && pane ? <SolToggle k="qsol" label="Show solutions" /> : null}{pane}</motion.div></AnimatePresence>
       </div>
     </div>
   );

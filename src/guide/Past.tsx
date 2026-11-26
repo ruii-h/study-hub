@@ -4,6 +4,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { EXTRA } from './config';
 import { useG } from './state';
 import { JumpBtn } from './Practice';
+import { Options } from './Choice';
+import SolToggle from './SolToggle';
 import { fade, riseSwap } from './motion';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -28,16 +30,7 @@ function Mcq({ q, sec }: { q: any; sec: string }) {
     <div className="exq" id={'pq' + q.n}>
       <div className="qh"><h2 className="qn">Question {label}</h2><span className="ms">{D.pastSingle ? 'CHOOSE THE BEST ANSWER' : 'SELECT ALL THAT APPLY'}</span></div>
       <div className="qt" dangerouslySetInnerHTML={{ __html: breakAny(q.q) }} />
-      <div role="group" aria-label={`Options for question ${label}`}>
-        {q.o.map((o: string, i: number) => {
-          const v = L5[i], isA = ans.includes(v), isS = sel.includes(v);
-          const cls = `eo ${!done && isS ? 'sel' : ''} ${sol ? (isA ? 'right' : '') : checked ? (isA && isS ? 'right' : isS ? 'wrong' : isA ? 'miss' : '') : ''}`;
-          return (<div key={i}>
-            <label className={cls}><input type="checkbox" value={v} checked={sol ? isA : isS} disabled={done} onChange={(e) => setSel((s) => (e.target.checked ? [...s, v] : s.filter((x) => x !== v)))} /><i>{v}.</i><span dangerouslySetInnerHTML={{ __html: o }} /></label>
-            {done && q.w?.[i] ? <div className={`why ${isA ? 'wy' : 'wn'}`}><b>{isA ? 'Why this is right' : 'Why this is wrong'}:</b> {q.w[i]}</div> : null}
-          </div>);
-        })}
-      </div>
+      <Options o={q.o} a={ans.map((l: string) => L5.indexOf(l))} sel={sel.map((l) => L5.indexOf(l))} w={q.w} mode={sol ? 'sol' : checked ? 'checked' : 'open'} label={`Options for question ${label}`} onChange={(j, on) => setSel((c) => (on ? [...c, L5[j]] : c.filter((x) => x !== L5[j])))} />
       {!sol && <div className="row"><button className="btn" disabled={checked || !sel.length} onClick={check}>Check answer</button>
         <button className="btn ghost" onClick={() => g.openChapter(q.ch, { back: { tab: 'past', sel: sec, sec, q: q.n, y: 0, label: 'Back to Past Exam Q' + label, up: null } })}>📖 Revise chapter {q.ch}</button></div>}
       <AnimatePresence>{done && (
@@ -72,7 +65,7 @@ export default function Past() {
   return (
     <div className="pane" id="pastm" tabIndex={0}>
       <h1 className="t-h1" style={{ fontSize: 26, margin: '0 0 6px' }}>Past exam questions</h1>
-      <div className="solbar"><label className="switch"><span>Show solutions</span><input type="checkbox" role="switch" checked={!!ST.psol} onChange={(e) => g.patch('ST', (o) => ({ ...o, psol: e.target.checked ? 1 : 0 }))} /><i /></label></div>
+      <SolToggle k="psol" label="Show solutions" />
       <div className="warnbox"><b>{ex?.pastLabel || 'Important:'}</b> <span dangerouslySetInnerHTML={{ __html: D.pastNote || '' }} /></div>
       <div className="pills" role="group" aria-label="Exam sections">
         {keys.map((k) => <button key={k} className={k === sec ? 'on' : ''} aria-pressed={k === sec} onClick={() => g.setPastSec(k)}>{secs[k][2].split(' · ')[0]} · {secs[k][3] || `Q${secs[k][0]}–${secs[k][1]}`}</button>)}

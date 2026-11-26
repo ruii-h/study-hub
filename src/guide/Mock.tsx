@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useG } from './state';
 import { breakAny } from './paragraphs';
+import { Options } from './Choice';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const L5 = 'ABCDE';
@@ -54,16 +55,7 @@ export default function MockExam({ qs }: { qs: any[] }) {
           <div className="exq" id={'cm' + q.n} key={q.n}>
             <div className="qh"><h2 className="qn">Question {label}</h2><span className="ms">SELECT ALL THAT APPLY</span>{sub && <span className={`cm-badge ${right ? 'ok' : 'no'}`}>{right ? '✓ correct' : mine ? '✗ wrong' : '✗ not answered'}</span>}</div>
             <div className="qt" dangerouslySetInnerHTML={{ __html: breakAny(q.q) }} />
-            <div role="group" aria-label={`Options for question ${label}`}>
-              {q.o.map((o: string, i: number) => {
-                const v = L5[i], isA = ans.includes(v), isS = mine.includes(v);
-                const cls = `eo ${!sub && isS ? 'sel' : ''} ${sub ? (isA && isS ? 'right' : isS ? 'wrong' : isA ? 'miss' : '') : ''}`;
-                return (<div key={i}>
-                  <label className={cls}><input type="checkbox" value={v} checked={isS} disabled={sub} onChange={() => toggle(q.n, v)} /><i>{v}.</i><span dangerouslySetInnerHTML={{ __html: o }} /></label>
-                  {sub && q.w?.[i] ? <div className={`why ${isA ? 'wy' : 'wn'}`}><b>{isA ? (isS ? '✓ You ticked it, and it is correct' : '✓ Correct option you did not tick') : (isS ? '✗ You ticked it, but it is wrong' : '✓ Rightly left blank')}:</b> {q.w[i]}</div> : null}
-                </div>);
-              })}
-            </div>
+            <Options o={q.o} a={ans.map((l: string) => L5.indexOf(l))} sel={mine.split('').map((l: string) => L5.indexOf(l))} w={q.w} mode={sub ? 'checked' : 'open'} label={`Options for question ${label}`} onChange={(j) => toggle(q.n, L5[j])} head={(isA, isS) => (isA ? (isS ? '✓ You ticked it, and it is correct' : '✓ Correct option you did not tick') : (isS ? '✗ You ticked it, but it is wrong' : '✓ Rightly left blank'))} />
             {sub && <div className={`verdict ${right ? 'ok' : 'no'}`}><b>{right ? '✅ Correct.' : '❌ Not quite.'}</b> Key: <b>{ans.join(', ')}</b>{mine ? <> · you chose <b>{mine.split('').join(', ')}</b></> : null}.{q.e ? <> <span dangerouslySetInnerHTML={{ __html: breakAny(q.e) }} /></> : null}
               <div className="row"><button className="btn ghost" onClick={() => g.openChapter(q.ch)}>📖 Revise chapter {q.ch}</button></div></div>}
           </div>);

@@ -1,7 +1,8 @@
 import { useEffect, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { shuffle, useG } from './state';
-import { JumpBtn, Ring, WhyRow, fillOK } from './Practice';
+import { JumpBtn, Ring, fillOK } from './Practice';
+import { Options } from './Choice';
 import { breakAny } from './paragraphs';
 import { fade, pop, rise } from './motion';
 
@@ -31,7 +32,7 @@ export default function MixedQuiz({ n, title }: { n: number; title: string }) {
 }
 
 function Body({ n, title, qs, k }: { n: number; title: string; qs: any[]; k: string }) {
-  const g = useG(); const { QP, patch } = g;
+  const g = useG(); const { QP, patch } = g; const sol = !!g.ST.qsol;
   const by: Record<string, any> = {}; qs.forEach((q) => (by[q.id] = q));
   const prep = QP[k].ord.map((rec: any) => {
     const q = by[rec.id];
@@ -72,17 +73,7 @@ function Body({ n, title, qs, k }: { n: number; title: string; qs: any[]; k: str
               long ? <textarea rows={4} id={'fa' + i} spellCheck={false} disabled={chk} value={rec.v || ''} aria-label={`Your answer to question ${i + 1}`} style={{ width: '100%', font: '14px/1.5 ui-monospace,Consolas,monospace' }} onChange={(e) => setRec(rec.id, (r) => ({ ...r, v: e.target.value }))} />
                 : <input type="text" id={'fa' + i} spellCheck={false} autoComplete="off" autoCapitalize="off" disabled={chk} className={chk && ok ? 'ok' : ''} value={rec.v || ''} aria-label={`Your answer to question ${i + 1}`} style={{ width: '100%', font: '14px/1.5 ui-monospace,Consolas,monospace' }} onChange={(e) => setRec(rec.id, (r) => ({ ...r, v: e.target.value }))} onKeyDown={(e) => { if (e.key === 'Enter' && !chk && (rec.v || '').trim()) check(); }} />
             ) : (
-              <div role="group" aria-label={`Options for question ${i + 1}`}>
-                {q.o.map((x: string, j: number) => {
-                  const isA = q.a.includes(j), isS = sel.includes(j);
-                  const cls = `eo ${!chk && isS ? 'sel' : ''} ${chk ? (isA && isS ? 'right' : isS ? 'wrong' : isA ? 'miss' : '') : ''}`;
-                  const flip = (on: boolean) => setRec(rec.id, (r) => ({ ...r, sel: multi ? (on ? [...r.sel, j] : r.sel.filter((v: number) => v !== j)) : [j] }));
-                  return (<div key={j}>
-                    <label className={cls}><input type={multi ? 'checkbox' : 'radio'} name={rec.id} checked={isS} disabled={chk} onChange={(e) => flip(e.target.checked)} /><i>{L5[j]}.</i><span dangerouslySetInnerHTML={{ __html: x }} /></label>
-                    <AnimatePresence>{chk && q.w[j] && <motion.div {...fade}><WhyRow ok={isA} r={q.w[j]} /></motion.div>}</AnimatePresence>
-                  </div>);
-                })}
-              </div>)}
+              <Options o={q.o} a={q.a} sel={sel} w={q.w} multi={multi} name={rec.id} mode={chk ? 'checked' : sol ? 'sol' : 'open'} label={`Options for question ${i + 1}`} onChange={(j, on) => setRec(rec.id, (r) => ({ ...r, sel: multi ? (on ? [...r.sel, j] : r.sel.filter((v: number) => v !== j)) : [j] }))} />)}
             {t === 'w' ? (<>
               {!chk && !rec.rev ? <div className="row"><button className="btn" onClick={() => setRec(rec.id, (r) => ({ ...r, rev: 1 }))}>Show model answer</button></div> : null}
               <AnimatePresence>{!chk && rec.rev ? (
