@@ -21,7 +21,7 @@ export const swim = (src) => `<pre class="mermaid swim">${esc(src.trim())}</pre>
 
 /** one written question with a "Show answer" fold */
 export function written(chip, title, q, a, label = 'Show answer') {
-  return `<div class="exr reveal"><div class="exr-head"><span class="cf-tag">${esc(chip)}</span><h4>${inl(title)}</h4></div><div class="exr-q"><div>${q}</div></div><details class="model"><summary>${label}</summary><div class="ma">${a}</div></details></div>`;
+  return `<div class="exr reveal"><div class="exr-head">${chip ? `<span class="cf-tag">${esc(chip)}</span>` : ""}<h4>${inl(title)}</h4></div><div class="exr-q"><div>${q}</div></div><details class="model"><summary>${label}</summary><div class="ma">${a}</div></details></div>`;
 }
 
 /** one multiple-choice question: options o (raw text), answers like 'AC', why[] = one reason per option */
@@ -37,7 +37,7 @@ export function mcq(chip, title, stem, o, ans, expl, why, multi = true) {
     + `<div role="group" aria-label="Answer options">${opts}</div>`
     + `<div class="row"><button type="button" class="btn mcq-check" disabled>Check answer</button></div>`
     + `<div class="verdict mcq-verdict" hidden><div class="mcq-head"></div><div class="mcq-expl">${expl ? inl(expl) : ''}</div><div class="row"><button type="button" class="btn ghost mcq-retry">↺ Try again</button></div></div></div>`;
-  return `<div class="exr reveal"><div class="exr-head"><span class="cf-tag">${esc(chip)}</span><h4>${inl(title)}</h4></div><div class="exr-q"><div>${body}</div></div></div>`;
+  return `<div class="exr reveal"><div class="exr-head">${chip ? `<span class="cf-tag">${esc(chip)}</span>` : ""}<h4>${inl(title)}</h4></div><div class="exr-q"><div>${body}</div></div></div>`;
 }
 
 let secN = 0;

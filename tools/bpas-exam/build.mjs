@@ -22,7 +22,7 @@ const quizCards = quiz.map((q, i) => {
   const stem = q.q.replace(/\s+/g, ' ').trim();
   const title = `Q${i + 1}`;
   const why = q.o.map((_, j) => (q.w?.[j] || '').replace(/^(True|False):\s*/, '') || null);
-  return mcq('PAST QUIZ', title, p(stem), q.o, q.a, q.e || '', why);
+  return mcq('', title, p(stem), q.o, q.a, q.e || '', why);
 });
 const quizHtml = SECS.map(([from, title], k) => section(`${title} (Q${from + 1}–Q${(SECS[k + 1]?.[0] ?? quiz.length)})`, quizCards.slice(from, SECS[k + 1]?.[0] ?? quiz.length))).join('');
 const quizzes = { title: 'Past Quizzes 1–3', grp: 'Past Quizzes 1–3', ico: '🧩', sub: 'The 31 questions from quizzes 1 to 3, moved here from the Practice tab. Tick every option you think is right (one or more), check, and read the reason under each option.', html: quizHtml };
