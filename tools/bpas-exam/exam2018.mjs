@@ -1,6 +1,7 @@
 // AY2018-19 Term 1 sample exam paper (IS210) with the official sample solution, as Exam Practice cards.
 // Question text comes from the paper; answers follow the official solution PDF (checked page by page).
 import { p, ul, ol, table, note, swim, written, mcq, section, ucSvg, gzSvg, inl } from './lib.mjs';
+import { hdbAltFlow, hdbOfficialFlow } from './hdb-flow.mjs';
 
 const C = (q, pts) => `2018 SAMPLE · ${q}${pts ? ' · ' + pts : ''}`;
 
@@ -105,83 +106,9 @@ const q3steps = ol([
   'Both buyer & seller will meet the HDB officer with his given appointment. This is the only required manual appointment, which triggers the subsequent process, "Transaction Management".']);
 const q3note = p('Note: SingPass has existing web services that provide authentication & personal data retrieval for government applications to call. STS has an existing web service that allows government applications to call for retrieval of personal income information.');
 
-const q3flow1 = swim(`flowchart LR
-    subgraph B["Buyer"]
-        S(["Start"])
-        B1["Submit Registration Details (HDB-RP)"]
-        MB(("merge"))
-        B2["Update Application Form and select flat (HDB-RP)"]
-        B3["Appointment with HDB Officer (manual; the seller is also a participant)"]
-        EB(["End"])
-    end
-    subgraph H["HDB-RP"]
-        H1["Retrieve Buyer Personal Data (SingPass Service)"]
-        H2["Retrieve Buyer's income data (STS)"]
-        H3["Validate Buyers Eligibility"]
-        H4["Notify Buyer's eligibility"]
-        GE{"Eligible?"}
-        EN(["End (non-eligible)"])
-        H5["eMail Application Form and flats list"]
-        H6["Notify Seller on the Buyer proposal"]
-        H7["Notify Rejection to Buyer"]
-        PS(("AND split"))
-        H8["Send appointment with HDB officer to the seller"]
-        H9["Send appointment with HDB officer to the buyer"]
-        PJ(("AND join"))
-    end
-    subgraph SL["Seller"]
-        SE1["Review Offer (HDB-RP)"]
-        GO{"Offer decision?"}
-    end
-    S --> B1 --> H1 --> H2 --> H3 --> H4 --> GE
-    GE -->|Non-eligible| EN
-    GE -->|Eligible| H5 --> MB
-    MB --> B2 --> H6 --> SE1 --> GO
-    GO -->|Offer Rejected| H7 --> MB
-    GO -->|Offer Accepted| PS
-    PS --> H8 --> PJ
-    PS --> H9 --> PJ
-    PJ --> B3 --> EB`);
+const q3flow1 = hdbOfficialFlow();
 
-const q3flow2 = swim(`flowchart LR
-    subgraph B["Buyer"]
-        S(["Start"])
-        B1["Submit Registration details & SingPass access (SingPass Service, HDB-RP)"]
-        B2["Review & Update Application Form (HDB-RP)"]
-        MB(("merge"))
-        B3["Select flat from resale pool list with proposed price (HDB-RP)"]
-        B4["Appointment with HDB Officer"]
-    end
-    subgraph H["HDB-RP"]
-        H1["Retrieve Buyer Personal Data (SingPass Service)"]
-        H2["Retrieve Buyer's income data (STS)"]
-        H3["Validate Buyers Eligibility"]
-        GE{"Eligibility status"}
-        H4["Notify Buyer of application failure"]
-        EN(["End (non-eligible)"])
-        H5["Generate Application Form and flats list"]
-        H6["Email Application Form and flats list to buyer & application success"]
-        H7["Notify Seller on the Buyer proposal"]
-        H8["Notify Rejection to Buyer"]
-        H9["Notify both buyer and seller of offer acceptance & appointment date with HDB officer"]
-        PS(("AND split"))
-        PJ(("AND join"))
-        EF(["End"])
-    end
-    subgraph SL["Seller"]
-        S1["Review Offer & choose to accept or reject offer (HDB-RP)"]
-        GO{"Offer Status"}
-        S2["Appointment with HDB Officer"]
-    end
-    S --> B1 --> H1 --> H2 --> H3 --> GE
-    GE -->|Non-eligible| H4 --> EN
-    GE -->|Eligible| H5 --> H6 --> B2 --> MB
-    MB --> B3 --> H7 --> S1 --> GO
-    GO -->|Offer Rejected| H8 --> MB
-    GO -->|Offer Accepted| H9 --> PS
-    PS --> B4 --> PJ
-    PS --> S2 --> PJ
-    PJ --> EF`);
+const q3flow2 = hdbAltFlow();
 
 const q3 = written(C('Q3'), 'Business Process Modeling: HDB resale (draw the workflow model)',
   p(q3text) + q3steps + q3note + p('As a member of the BPE team, you are required to develop the **Workflow Model**. Assumptions (only if needed): ______'),
