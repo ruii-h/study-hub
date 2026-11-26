@@ -30,7 +30,7 @@ export default function CourseApp() {
     const style = document.createElement('style');
     style.dataset.course = meta.id;
     // legacy CSS lives in a low-priority layer so Tailwind utilities used inside the guide (e.g. the ALGO demos) can win
-    style.textContent = '@layer legacy {\n' + baseCss + '\n' + ready.css + '\n}\n' + extraCss;
+    style.textContent = '@layer legacy {\n' + (meta.id === 'bpas' ? '' : baseCss) + '\n' + ready.css + '\n}\n' + extraCss;
     document.head.appendChild(style);
     document.documentElement.dataset.course = meta.id;
     const prevTitle = document.title;
