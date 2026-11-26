@@ -148,5 +148,6 @@ const D = { fill: {}, ice: '', hard: {}, lessons, groups, quiz: {}, cards: [], s
   ] };
 fs.mkdirSync(out, { recursive: true });
 fs.writeFileSync(out + '/data.json', JSON.stringify(D));
-fs.writeFileSync(out + '/style.css', fs.readFileSync('src/courses/idp/style.css', 'utf8') + '\n' + fs.readFileSync('tools/newcourse/exr.css', 'utf8') + '\n' + fs.readFileSync('tools/wad2/wad2.css', 'utf8'));
+fs.writeFileSync(out + '/style.css', fs.readFileSync('tools/newcourse/exr.css', 'utf8') + '
+' + fs.readFileSync('tools/wad2/wad2.css', 'utf8')); // shared rules live in src/course/guide-base.css
 console.log('wad2 chapters', lessons.length, 'theory', dnCount.theory, 'cheat', dnCount.cheat, 'code', dnCount.code, 'play', play.length, 'html KB', Math.round(lessons.reduce((a, l) => a + l.html.length, 0) / 1024));

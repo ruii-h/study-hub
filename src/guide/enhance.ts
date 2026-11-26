@@ -11,8 +11,10 @@ export function stackTables(c: HTMLElement) {
     t.replaceWith(w); w.appendChild(t);
   });
   c.querySelectorAll<HTMLElement>('.t-table-wrap').forEach((w) => {
-    if (w.scrollWidth <= w.clientWidth + 1) return;
-    const tb = w.querySelector('table'); if (!tb || (tb.tHead == null && !tb.querySelector('th'))) return;
+    const tb = w.querySelector('table'); if (!tb) return;
+    // a table that clips itself (overflow:hidden for rounded corners) never makes the wrapper overflow, so measure the table too
+    if (Math.max(w.scrollWidth, tb.scrollWidth) <= w.clientWidth + 1) return;
+    if (tb.tHead == null && !tb.querySelector('th')) return;
     const hs = [...tb.rows[0].cells].map((x) => x.textContent!.trim());
     tb.querySelectorAll('tr').forEach((r, i) => { if (i === 0) return; [...(r as HTMLTableRowElement).cells].forEach((cell, j) => { if (hs[j] && j > 0) cell.setAttribute('data-l', hs[j]); }); });
     w.classList.add('stack');
@@ -67,7 +69,7 @@ export function treeChains(root: HTMLElement) {
       }
     });
     const ids = Object.keys(lab); const roots = ids.filter((i) => !parent[i]);
-    if (!ok || ids.length < 4 || roots.length !== 1 || ids.some((i) => !lab[i])) return;
+    if (!ok || ids.length < 4 || roots.length !== 1 || ids.some((i) => !lab[i]) || Object.keys(parent).some((i) => !lab[i]) || Object.keys(kids).some((i) => !lab[i])) return;
     const seen = new Set<string>();
     const draw = (id: string): string => {
       if (seen.has(id)) return ''; seen.add(id); const k = kids[id] || [];
@@ -90,6 +92,12 @@ const vbWidth = (svg: string) => { const m = /viewBox="[-\d.]+ [-\d.]+ ([\d.]+) 
  */
 export function runMermaid(root: HTMLElement, load: () => Promise<MermaidLike>, theme: string): Promise<void> {
   if (!root.dataset.dgClick) { root.dataset.dgClick = '1'; root.addEventListener('click', (e) => { const p = (e.target as HTMLElement).closest?.('pre.mermaid') as HTMLElement | null; if (p && p.querySelector('svg')) openDiagram(p); }); }
+  // swimlane workflows are drawn by our own code: do them at once instead of waiting for the Mermaid library to download
+  root.querySelectorAll<HTMLElement>('pre.mermaid.swim').forEach((el) => {
+    if (el.dataset.rendered === theme) return;
+    const src = el.dataset.src ?? (el.dataset.src = (el.textContent || '').trim());
+    try { const sw = swimlaneSvg(src); if (sw) { el.innerHTML = sw; el.dataset.rendered = theme; el.dataset.processed = 'true'; el.classList.add('mm-scroll'); } } catch (err) { console.warn('swimlane failed', err); }
+  });
   const all = [...root.querySelectorAll<HTMLElement>('pre.mermaid')].filter((x) => x.dataset.rendered !== theme);
   if (!all.length) return Promise.resolve();
   return load().then(async (mermaid) => {

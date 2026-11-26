@@ -8,6 +8,7 @@ Read `README.md` first. Its "House rules" section is how the user wants everythi
 - Deployed to https://ruii-h.github.io/study-hub/ from `main` of `ruii-h/study-hub`.
 
 ## Gotchas
+- **One stylesheet for everything shared.** Layout, spacing, margins, overflow and component styles live in `src/course/guide-base.css` (loaded for every course) and `src/course/course-extra.css`. `src/courses/<id>/style.css` holds ONLY what is specific to that course. Never fix a shared look in one course file: it would reappear broken in the others. Run `node tools/check-css-shared.mjs` after CSS edits; it fails if a rule is duplicated across courses. Any fix to behaviour or look must be checked in all six courses (cf, algo, bpas, idp, ctp, wad2).
 - There are no per-course engines any more. Put behaviour in `src/guide/*` and shared CSS in `src/course/course-extra.css`; the old generator is stale.
 - Phone overflow is the top rule: nothing may spill out of its container (tables stack via `stackTables`; lesson columns need `min-width:0`). Readability first: short paragraphs, grouped content, highlighted keywords.
 - Course CSS lives in `@layer legacy`. State rules must outrank `:hover` rules, and all `:hover` rules sit inside `@media (hover:hover)`.

@@ -33,6 +33,10 @@ Behaviour lives in the shared React guide (`src/guide/*`), not per-course engine
 
 These are the owner's standing preferences. Follow them for every change, in all three courses, unless told otherwise.
 
+## One system for all courses
+- Every course renders through the same guide (`src/guide/*`) and the same stylesheet (`src/course/guide-base.css` + `course-extra.css`). A course stylesheet only holds course-specific rules (accent colours, unique components). A fix made for one course must therefore land in all of them; if you find yourself editing one course's CSS to fix spacing, alignment or overflow, move the fix to the shared files. `node tools/check-css-shared.mjs` enforces this.
+- Spacing, gaps, margins, alignment and overflow rules are the same everywhere: one scale, no per-course values.
+
 ## Readability and containment (most important)
 - **Nothing may spill out of its container on a phone.** No horizontal page scroll, no text, table, image, diagram or code running past a card edge. Check at 360, 390 and 412px. Wide tables **stack** into one card per row with the column name above each value (done by `stackTables` in `src/guide/enhance.ts`, which also wraps tables inside "At a glance" cards); code blocks and diagrams scroll inside their own box. Lesson columns and flex children carry `min-width: 0` so one wide child can never stretch the page.
 - **Readability beats density.** Break text into short paragraphs and lists with a blank line between ideas; one idea per paragraph, about three sentences at most. Never pack many facts into a single block or a single table cell.

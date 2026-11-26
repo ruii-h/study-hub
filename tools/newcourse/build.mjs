@@ -112,4 +112,4 @@ console.log(id, 'chapters', D.lessons.length, 'cards', D.cards.length, 'hard', O
 
 // ---------- style: the shared guide stylesheet (the guide UI itself is the React app in src/guide)
 const idp = path.join(root, 'src', 'courses', 'idp');
-fs.writeFileSync(path.join(out, 'style.css'), fs.readFileSync(path.join(idp, 'style.css'), 'utf8') + String.fromCharCode(10) + fs.readFileSync(path.join(root, 'tools', 'newcourse', 'exr.css'), 'utf8'));
+fs.writeFileSync(path.join(out, 'style.css'), fs.readFileSync(path.join(root, 'tools', 'newcourse', 'exr.css'), 'utf8')); // shared rules live in src/course/guide-base.css
