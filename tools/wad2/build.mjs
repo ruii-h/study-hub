@@ -20,6 +20,12 @@ const BLURB = {
   'Vue directives': 'v-if, v-bind, v-on, v-model and v-for.',
   'Vue logic & state': 'computed, watch, lifecycle hooks and localStorage.',
   'Vue components & routing': 'Props, slots, emits, Vue Router and the Options API.',
+  'Vue composables & Pinia': 'Week 11: composables, why a store, Pinia state/getters/actions, the MiniShop example and persistence.',
+  'Vue routing & guards': 'Week 11: route params, redirects, router.push, navigation guards, the exercises and a recap.',
+  'Testing concepts': 'Week 10: verification vs validation, regression, TDD, load testing and the three test types.',
+  'Unit testing with Vitest': 'describe, it, expect, running Vitest, matchers and choosing test cases.',
+  'Component & integration testing': 'Vue component tests, stubs, fragile vs robust tests, integration tests and emitted events.',
+  'E2E testing with Playwright': 'The tool landscape, installing and recording tests, reading a test and testing a Vue form.',
   'Axios concepts': 'Promises, the four methods, the response object and JSON shape.',
   'Axios CRUD': 'GET, POST, PUT and DELETE with worked code.',
   'Axios patterns': 'Headers, .env keys, CORS, the full CRUD skeleton and a mini project.',
@@ -32,17 +38,20 @@ const BLURB = {
   'Code · Week 4 Vue basics': 'Full source of the Week 4 Vue examples and solutions.',
   'Code · Week 5 Lists & Axios': 'Full source of the Week 5 examples and solutions.',
   'Code · Week 6 Components': 'Full source of the Week 6 views, components and solutions.',
+  'Code · Week 10 Testing': 'Full source of the Week 10 Vitest and Playwright exercises and solutions.',
+  'Code · Week 11 Pinia & routing': 'Full source of the Week 11 composable, MiniShop backend, stores, views and exercise solutions.',
   'Appendix': 'Pinia, router guards, and what each file in the course archive was used for.',
 };
 const PLAN = [
   ['🧭 Start & exam toolkit', 'yellow', [['Start here', '🧭'], ['Debugging & mistakes', '🐞'], ['Tooling & exam rules', '📋']]],
   ['🌐 Web foundations', 'blue', [['HTML', '🏷️'], ['JavaScript & web APIs', '⚙️']]],
   ['🎨 Styling', 'orange', [['CSS core', '🎯'], ['CSS layout', '📐'], ['CSS components & extras', '🧩'], ['Bootstrap: grid & utilities', '🧱'], ['Bootstrap: components & workflow', '🪟']]],
-  ['💚 Vue', 'green', [['Vue basics', '🌱'], ['Vue directives', '🔀'], ['Vue logic & state', '🧠'], ['Vue components & routing', '🧭']]],
+  ['💚 Vue', 'green', [['Vue basics', '🌱'], ['Vue directives', '🔀'], ['Vue logic & state', '🧠'], ['Vue components & routing', '🧭'], ['Vue composables & Pinia', '🍍'], ['Vue routing & guards', '🚦']]],
   ['🗄️ Data & servers', 'purple', [['Axios concepts', '📡'], ['Axios CRUD', '🔁'], ['Axios patterns', '🧰'], ['Express & MongoDB', '🍃']]],
+  ['🧪 Testing', 'red', [['Testing concepts', '📖'], ['Unit testing with Vitest', '🔬'], ['Component & integration testing', '🧩'], ['E2E testing with Playwright', '🎭']]],
 ];
 const CHEAT_GROUPS = [['1 · CSS', '🎨', 'CSS'], ['2 · Bootstrap', '🧱', 'Bootstrap'], ['3 · Vue', '💚', 'Vue'], ['4 · Axios & backend', '📡', 'Axios & backend'], ['5 · Debugging & exam day', '🐞', 'Debugging & exam day']];
-const CODE = [['Code · Index', '🗂️'], ['Code · Week 2 CSS', '🎨'], ['Code · Week 3 Bootstrap', '🧱'], ['Code · Week 4 Vue basics', '🌱'], ['Code · Week 5 Lists & Axios', '📡'], ['Code · Week 6 Components', '🧩'], ['Appendix', '📎']];
+const CODE = [['Code · Index', '🗂️'], ['Code · Week 2 CSS', '🎨'], ['Code · Week 3 Bootstrap', '🧱'], ['Code · Week 4 Vue basics', '🌱'], ['Code · Week 5 Lists & Axios', '📡'], ['Code · Week 6 Components', '🧩'], ['Code · Week 10 Testing', '🧪'], ['Code · Week 11 Pinia & routing', '🍍'], ['Appendix', '📎']];
 
 // ---- code language detection
 function lang(t, hint) {
@@ -75,7 +84,7 @@ for (const [tt, tag, gs] of PLAN) {
   groups.push({ t: tt, ns, tag });
 }
 const cheatNs = CHEAT_GROUPS.map(([g, icon, nm]) => addChap({ title: nm, icon, tag: 'orange', blurb: 'Scenario-to-code lookups for ' + nm + '. The basics live in the theory chapters.', secs: byGroup(W.CHEAT, g).map(topicSec) }, 'cheat'));
-const codeGroups = [['📂 Index', ['Code · Index']], ['📝 Weekly code', ['Code · Week 2 CSS', 'Code · Week 3 Bootstrap', 'Code · Week 4 Vue basics', 'Code · Week 5 Lists & Axios', 'Code · Week 6 Components']], ['📎 Appendix', ['Appendix']]];
+const codeGroups = [['📂 Index', ['Code · Index']], ['📝 Weekly code', ['Code · Week 2 CSS', 'Code · Week 3 Bootstrap', 'Code · Week 4 Vue basics', 'Code · Week 5 Lists & Axios', 'Code · Week 6 Components', 'Code · Week 10 Testing', 'Code · Week 11 Pinia & routing']], ['📎 Appendix', ['Appendix']]];
 const codeNs = [], codeGrp = [];
 for (const [t, gl] of codeGroups) { const ns = gl.map((g) => addChap({ title: g.replace(/^Code · /, ''), icon: CODE.find((c) => c[0] === g)[1], tag: 'purple', blurb: BLURB[g], secs: byGroup(W.THEORY, g).map(topicSec) }, 'code')); codeNs.push(...ns); codeGrp.push({ t, ns, tag: 'purple' }); }
 const play = W.LESSONS.map((l, i) => ({ id: 'p' + (i + 1), g: l.g, title: l.title, desc: l.desc, code: l.code }));
