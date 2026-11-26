@@ -20,4 +20,4 @@ Read `README.md` first. Its "House rules" section is how the user wants everythi
 ## Workflow
 - Mobile first: Samsung S24 Ultra, Chrome (~412x915). Also check 360x780.
 - Check UI changes in the browser preview before reporting them done.
-- Commit and push to `main` only when asked.
+- Always commit and push to `main` after finishing a change (the user asked for this standing rule).

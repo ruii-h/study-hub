@@ -57,7 +57,7 @@ export function SideList() {
   if (tab === 'practice') return (<>
     <div className="theory-nav-header">{unitOf(g.meta)} quizzes</div>
     {navItem('🔁', '', 'Review my mistakes', pqSel === 'mx', () => g.setPqSel('mx'), mCount ? <span className="tq sc lo">{mCount}</span> : null)}
-    {grp(pqg, (n) => { const l = L(n), s = S[n]; return navItem(l.icon, lessonNo(g.meta, l), l.title, pqSel === n, () => g.setPqSel(n), s ? <span className={`tq sc ${scoreClass(s)}`}>{s.s}/{s.t}</span> : null); })}
+    {grp(pqg, (n) => { const qo = (D as any).qonly?.find((x: any) => x.n === n), l = qo ? null : L(n), s = S[n]; return navItem(qo ? '📝' : l!.icon, qo ? 'Q' : lessonNo(g.meta, l!), qo ? qo.title : l!.title, pqSel === n, () => g.setPqSel(n), s ? <span className={`tq sc ${scoreClass(s)}`}>{s.s}/{s.t}</span> : null); })}
     {D.selfq ? navItem('📝', '', 'Self-check Q&amp;A', pqSel === 'sc', () => g.setPqSel('sc')) : null}
   </>);
   if (tab === 'cards' || tab === 'cheat') return (<>

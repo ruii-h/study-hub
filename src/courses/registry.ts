@@ -33,7 +33,7 @@ export const COURSES: CourseMeta[] = [
   {
     id: 'bpas', code: 'IS210', short: 'IS210', title: 'Business Process Analysis & Solutioning',
     blurb: 'Business-IT alignment, BPMN, static and dynamic analysis, requirements, blueprints and process innovation.',
-    chapters: 13, cards: 92, storageKey: 'bpas3_', unit: 'Module', accent: ['#3fb950', '#1a7f37'],
+    chapters: 13, cards: 92, storageKey: 'bpas4_', unit: 'Module', accent: ['#3fb950', '#1a7f37'],
     tabs: ['Theory', 'Practice', 'Flashcards', 'Cheat-sheet'],
   },
   {

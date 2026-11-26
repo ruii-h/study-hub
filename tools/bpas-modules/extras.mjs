@@ -1,25 +1,7 @@
 // Slide content that the guide did not yet cover, appended as extra sections to M1, M10 and M11.
 import { k, p, ul, callout, figcap, h3, swim, table, tableP } from './new-lessons.mjs';
 
-export const m1Extra = [
-  ['Learning Journey and BPAS After This Course', [
-    p(`The course is taught as ${k('four main chapters')} (the four phases), spread over the term, and each phase uses the modules you are reading here:`),
-    table(['Phase', 'Weeks', 'Modules', 'What you produce'], [
-      ['Model', '1–3', 'M1–M4', 'As-Is business process models'],
-      ['Analyse', '4–6', 'M5–M7', 'Issues, root causes, recommendations and the To-Be choice'],
-      ['Solve', '7–9', 'M8–M9', 'Functional requirements and the concept solution blueprint'],
-      ['Innovate', '10–13', 'M10–M12', 'Innovation ideas, technology options and the process architecture'],
-    ]),
-    p(`${k('BPAS after this course.')} The next courses build on this one:`),
-    ul([
-      `${k('IS213')} Enterprise Solution Development`,
-      `${k('IS214')} Enterprise Solution Management`,
-      `${k('IS215')} Digital Business Technologies and Transformation`,
-      `${k('IS483')} IS Project Experience Applications`,
-    ]),
-    callout('info', `Digitalisation and digital transformation need a clear view of the problem space: ${k('why')} the transformation is required and ${k('what')} it entails. BPAS gives you the foundation for that analysis, so your digital solutions have clear business value.`),
-  ]],
-];
+export const m1Extra = [];
 
 export const m10Extra = [
   ['Class Activities: Apple, Grab and Lulu.com', [

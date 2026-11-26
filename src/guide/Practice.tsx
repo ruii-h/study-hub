@@ -67,7 +67,8 @@ function MultiBody({ title, qs, qkey, pills, ch }: MQ) {
   };
   const key = qkey; const n = /^\d+$/.test(key) ? +key : 0;
   useEffect(() => { if (done === N && n) patch('S', (s) => (s[n]?.s === score && s[n]?.t === N ? s : { ...s, [n]: { s: score, t: N } })); }, [done, score]); // eslint-disable-line
-  const nx = n ? g.D.lessons[g.D.lessons.findIndex((l) => l.n === n) + 1] : null;
+  const isPast = n > 0 && !g.D.lessons.some((l) => l.n === n); // the past-quiz section has no theory chapter
+  const nx = n && !isPast ? g.D.lessons[g.D.lessons.findIndex((l) => l.n === n) + 1] : null;
   const restart = () => patch('QP', (o) => { const x = { ...o }; delete x[qkey]; return x; });
   const p = Math.round((score / N) * 100); const mCount = Object.keys(g.M).length;
   return (<>
@@ -79,7 +80,7 @@ function MultiBody({ title, qs, qkey, pills, ch }: MQ) {
         const sel: number[] = q.rec.sel, chk = !!q.rec.chk, ok = chk && isOk(q);
         return (
           <motion.div className="exq" key={q.rec.id} id={'mq' + i} {...rise(i)}>
-            <div className="qh"><h2 className="qn">Question {i + 1}</h2><span className="ms">SELECT ALL THAT APPLY</span></div>
+            <div className="qh"><h2 className="qn">Question {i + 1}</h2><span className="ms">{q.a.length === 1 ? 'CHOOSE ONE' : 'SELECT ALL THAT APPLY'}</span></div>
             <div className="qt" dangerouslySetInnerHTML={{ __html: breakAny(q.src.q) }} />
             <div role="group" aria-label={`Options for question ${i + 1}`}>
               {q.o.map((x: string, j: number) => {
@@ -108,8 +109,8 @@ function MultiBody({ title, qs, qkey, pills, ch }: MQ) {
           <div className="row">
             {key === 'mx' ? <button className="btn main" onClick={() => g.setPqSel('mx')}>{mCount ? 'Review remaining mistakes' : 'Nothing left to review ✓'}</button> : p >= 80 ? <>
               {nx ? <><button className="btn main" onClick={() => g.openChapter(nx.n)}>Continue to {g.meta.unit || 'Chapter'} {nx.n}</button><button className="btn ghost" onClick={() => g.setPqSel(nx.n)}>Quiz me on {g.meta.unit || 'Chapter'} {nx.n}</button></> : <button className="btn main" onClick={() => g.setTab('theory')}>Back to the notes</button>}
-              <button className="btn lnk" onClick={restart}>Retry this quiz (reshuffled)</button><button className="btn lnk" onClick={() => g.openChapter(n, { back: { tab: 'practice', sel: n, y: 0, label: 'Back to your quiz', up: null } })}>Re-read {g.meta.unit || 'Chapter'} {n}</button></> : <>
-              <button className="btn main" onClick={restart}>Retry this quiz (reshuffled)</button><button className="btn ghost" onClick={() => g.openChapter(n, { back: { tab: 'practice', sel: n, y: 0, label: 'Back to your quiz', up: null } })}>Re-read {g.meta.unit || 'Chapter'} {n}</button>{nx ? <button className="btn lnk" onClick={() => g.openChapter(nx.n)}>Skip ahead to {g.meta.unit || 'Chapter'} {nx.n}</button> : null}</>}
+              <button className="btn lnk" onClick={restart}>Retry this quiz (reshuffled)</button>{isPast ? null : <button className="btn lnk" onClick={() => g.openChapter(n, { back: { tab: 'practice', sel: n, y: 0, label: 'Back to your quiz', up: null } })}>Re-read {g.meta.unit || 'Chapter'} {n}</button>}</> : <>
+              <button className="btn main" onClick={restart}>Retry this quiz (reshuffled)</button>{isPast ? null : <button className="btn ghost" onClick={() => g.openChapter(n, { back: { tab: 'practice', sel: n, y: 0, label: 'Back to your quiz', up: null } })}>Re-read {g.meta.unit || 'Chapter'} {n}</button>}{nx ? <button className="btn lnk" onClick={() => g.openChapter(nx.n)}>Skip ahead to {g.meta.unit || 'Chapter'} {nx.n}</button> : null}</>}
           </div></div>
       </motion.div>)}</AnimatePresence>
     {ch ? null : null}
@@ -204,7 +205,7 @@ function Pills({ sel }: { sel: number }) {
   return (
     <div className="pills" role="group" aria-label="Question style">
       <button className={g.pqMode === 'hard' ? 'on' : ''} aria-pressed={g.pqMode === 'hard'} onClick={() => g.setPqMode('hard')}>Exam-style (harder) · {nh}</button>
-      <button className={g.pqMode === 'warm' ? 'on' : ''} aria-pressed={g.pqMode === 'warm'} onClick={() => g.setPqMode('warm')}>Warm-up (easier) · {nw}</button>
+      {nw ? <button className={g.pqMode === 'warm' ? 'on' : ''} aria-pressed={g.pqMode === 'warm'} onClick={() => g.setPqMode('warm')}>Warm-up (easier) · {nw}</button> : null}
     </div>);
 }
 
@@ -216,7 +217,7 @@ export default function Practice() {
   const mxSnap = useRef<any[]>([]); const mxKey = useRef(0);
   if (pqSel === 'mx' && mxKey.current !== -1) { mxSnap.current = Object.values(M); mxKey.current = -1; }
   if (pqSel !== 'mx') mxKey.current = 0;
-  const l = typeof pqSel === 'number' ? D.lessons.find((x) => x.n === pqSel) : null;
+  const l = typeof pqSel === 'number' ? (D.lessons.find((x) => x.n === pqSel) || (D as any).qonly?.find((x: any) => x.n === pqSel)) : null;
   let pane: React.ReactNode = null;
   if (pqSel === 'sc') pane = <><h1 className="t-h1" style={{ fontSize: 26, marginBottom: 6 }}>Self-check Q&amp;A</h1><div className="sub">Think first, then open the answer.</div><div className="t-section" dangerouslySetInnerHTML={{ __html: breakAny(D.selfq || '') }} /></>;
   else if (pqSel === 'mx') pane = !mxSnap.current.length
@@ -228,7 +229,7 @@ export default function Practice() {
       : pqMode === 'warm' || !(D.hard[l.n] || []).length
       ? <SingleQuiz key={'w' + l.n} title={`${g.meta.unit || 'Chapter'} ${l.n} — ${l.title} (warm-up)`} qs={D.quiz[l.n] || []} n={l.n} pills={pills} />
       : <>
-        <MultiQuiz key={'h' + l.n} title={`${g.meta.unit || 'Chapter'} ${l.n} — ${l.title}`} qkey={String(l.n)} pills={pills} qs={(D.hard[l.n] || []).map((q: any, i: number) => ({ ...q, id: 'h' + l.n + '-' + i, ch: l.n }))} />
+        <MultiQuiz key={'h' + l.n} title={D.lessons.some((x) => x.n === l.n) ? `${g.meta.unit || 'Chapter'} ${l.n} — ${l.title}` : l.title} qkey={String(l.n)} pills={pills} qs={(D.hard[l.n] || []).map((q: any, i: number) => ({ ...q, id: 'h' + l.n + '-' + i, ch: D.lessons.some((x) => x.n === l.n) ? l.n : undefined }))} />
         {D.fill?.[l.n]?.length ? <FillQuiz key={'f' + l.n} qkey={'f' + l.n} title="Type the answer" qs={D.fill[l.n]} /> : null}
       </>;
   }
@@ -238,7 +239,7 @@ export default function Practice() {
       <div className="pq-list" id="pql" tabIndex={0} aria-label={`${g.meta.unit || 'Chapter'} quizzes`}>
         <div className="pq-head">CHAPTER QUIZZES</div>
         {item('', 'mx', pqSel === 'mx', () => g.setPqSel('mx'), <><span className="tn">🔁</span><span className="tt">Review my mistakes</span>{mCount ? <span className="sc lo">{mCount}</span> : null}</>)}
-        {pqg.map((grp, gi) => (<div key={gi}><div className="pq-head">{grp[0].toUpperCase()}</div>{grp[1].map((n) => { const x = D.lessons.find((y) => y.n === n)!; const s = S[n]; return item('', n, pqSel === n, () => g.setPqSel(n), <><span className="tn">{n}</span><span className="tt">{x.title}</span>{s ? <span className={`sc ${scoreClass(s)}`}>{s.s}/{s.t}</span> : null}</>); })}</div>))}
+        {pqg.map((grp, gi) => (<div key={gi}><div className="pq-head">{grp[0].toUpperCase()}</div>{grp[1].map((n) => { const x = (D.lessons.find((y) => y.n === n) || (D as any).qonly?.find((y: any) => y.n === n))!; const s = S[n]; return item('', n, pqSel === n, () => g.setPqSel(n), <><span className="tn">{n}</span><span className="tt">{x.title}</span>{s ? <span className={`sc ${scoreClass(s)}`}>{s.s}/{s.t}</span> : null}</>); })}</div>))}
         {D.selfq ? item('', 'sc', pqSel === 'sc', () => g.setPqSel('sc'), <><span className="tn">📝</span><span className="tt">Self-check Q&amp;A ({D.selfn || ''})</span></>) : null}
       </div>
       <div className="pane" id="pqm" tabIndex={0}>

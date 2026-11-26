@@ -125,11 +125,30 @@ export function runMermaid(root: HTMLElement, load: () => Promise<MermaidLike>, 
         }
         if (!el.isConnected) continue;
         el.innerHTML = svg; el.dataset.rendered = theme; el.dataset.processed = 'true';
+        fitLabels(el);
         const s = el.querySelector('svg');
         if (s && w && avail / w < 0.78) { s.style.minWidth = Math.round(w * 0.78) + 'px'; el.classList.add('mm-scroll'); } else el.classList.remove('mm-scroll');
       } catch (err) { console.warn('mermaid render failed', err); }
     }
   }).catch((err) => console.warn('mermaid load failed', err));
+}
+
+/** Mermaid sizes a node from a text measurement that can differ from the real font, so a long label may run past its box.
+ *  Widen any rectangular node whose label is wider than the box (box, label and its offset together). */
+function fitLabels(root: HTMLElement) {
+  root.querySelectorAll<SVGGElement>('g.node').forEach((g) => {
+    const rect = g.querySelector<SVGRectElement>(':scope > rect.basic, :scope > rect');
+    const fo = g.querySelector<SVGForeignObjectElement>('foreignObject');
+    const lab = fo?.firstElementChild as HTMLElement | null;
+    if (!rect || !fo || !lab) return;
+    const need = Math.ceil(lab.scrollWidth) + 24, have = rect.width.baseVal.value;
+    if (have < 20 || need <= have + 1) return;
+    const d = need - have;
+    rect.setAttribute('width', String(need)); rect.setAttribute('x', String(rect.x.baseVal.value - d / 2));
+    fo.setAttribute('width', String(Math.ceil(lab.scrollWidth) + 2));
+    const lg = fo.parentElement as SVGGElement | null, m = /translate\(\s*(-?[\d.]+)[ ,]+(-?[\d.]+)\s*\)/.exec(lg?.getAttribute('transform') || '');
+    if (lg && m) lg.setAttribute('transform', `translate(${-(Math.ceil(lab.scrollWidth) + 2) / 2}, ${m[2]})`);
+  });
 }
 
 /** Full-screen diagram viewer: scrollable both ways with zoom buttons, so even the widest diagram can be read at full size. */
