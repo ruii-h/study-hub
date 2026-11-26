@@ -99,7 +99,7 @@ function Search() {
       <div id="sr" role="listbox" hidden={!(open && q.trim().length >= 2)}
         onKeyDown={(e) => { const it = [...document.querySelectorAll<HTMLElement>('#sr .sri')]; const k = it.indexOf(document.activeElement as HTMLElement); if (e.key === 'ArrowDown') { e.preventDefault(); it[(k + 1) % it.length]?.focus(); } if (e.key === 'ArrowUp') { e.preventDefault(); if (k <= 0) document.getElementById('q')?.focus(); else it[k - 1].focus(); } }}>
         {res.length ? res.map((r, i) => (
-          <button key={i} role="option" className="sri" onClick={() => { setOpen(false); setQ(''); g.openChapter(r.e.n, { sec: r.e.id || undefined }); }}>
+          <button key={i} role="option" className="sri" onClick={() => { setOpen(false); setQ(''); g.openChapter(r.e.n, { sec: r.e.id || undefined, q: r.e.term ? r.e.title + ' ' + r.e.text : q }); }}>
             <span className="srt">{r.e.term ? '🃏 ' : ''}{r.e.title}</span><span className="src">Ch {r.e.n} · {r.e.term ? 'key term' : r.e.ch}</span><span className="srs" dangerouslySetInnerHTML={{ __html: snippet(r.e) }} />
           </button>)) : <div className="srn">No matches. Try a different word, or part of a word.</div>}
       </div>

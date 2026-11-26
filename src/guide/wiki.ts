@@ -18,7 +18,7 @@ function buildIdx(){if(IDX)return;IDX=[];const t=document.createElement('div');
   const h=s.querySelector('.t-h2,h3,.gt');const nm=s.querySelector('.t-num');let title=(h?h.textContent:'').replace(/\s+/g,' ').trim();if(nm)title=title.replace(nm.textContent,'').trim();
   const text=s.textContent.replace(/\s+/g,' ').trim();if(!title)title='Overview';
   IDX.push({n:l.n,ch:l.title,id:s.id||'',title:(nm?nm.textContent+' ':'')+title,text,lead:((s.querySelector(':scope>p')||{}).textContent||'').replace(/\s+/g,' ').trim()})})});
- D.cards.forEach(c=>{const m=/(\d+)\./.exec(c.f);IDX.push({n:m?+m[1]:1,ch:'Key term',id:'',title:c.t,text:c.d,term:1})})}
+ D.cards.forEach(c=>{const m=/(\d+)(?:\.(\d+))?/.exec(c.f||'');const n=m?+m[1]:1;let id=m&&m[2]&&IDX.some(e=>!e.term&&e.id==='s'+n+'-'+m[2])?'s'+n+'-'+m[2]:'';if(!id){const b=bestSection(n,c.t+' '+c.d);if(b)id=b.id}IDX.push({n,ch:'Key term',id,title:c.t,text:c.d,term:1})})}
   var WL=null,WLRE=null,WLMAP=null,WLTIP=null;
   function wlNorm(s){return s.toLowerCase().replace(/[\s\u00a0\u2010-\u2015-]+/g,' ').replace(/[\u2019]/g,"'").trim()}
   function wlRx(a){return a.replace(/[.*+?^$()|[\]\\{}]/g,'\\$&').replace(/[\s\u00a0\u2010-\u2015-]+/g,'[\\s\\u00a0\\u2010-\\u2015-]+').replace(/['\u2019]/g,"['\\u2019]")+(/[A-Za-z]$/.test(a)?'s?':'')}
@@ -26,7 +26,7 @@ function buildIdx(){if(IDX)return;IDX=[];const t=document.createElement('div');
    const secs=IDX.filter(e=>!e.term&&e.id);
    const STOPW=new Set(['algorithm','constant','linear','state','contract','merge','root','leaf','height','cycle','frontier','solve','discover','activity','actor','heuristic','reduction','push','process','context','design','model','function','experience','scenario','customer','interval','ratio','nominal','ordinal']);
    const T=[],cand=[];
-   D.cards.forEach(c=>{const m=/(\d+)(?:\.(\d+))?/.exec(c.f||'');let n=m?+m[1]:0;if(!n)return;let id=m[2]&&secs.some(e=>e.id==='s'+n+'-'+m[2])?'s'+n+'-'+m[2]:'';
+   D.cards.forEach(c=>{const m=/(\d+)(?:\.(\d+))?/.exec(c.f||'');let n=m?+m[1]:0;if(!n)return;let id=m[2]&&secs.some(e=>e.id==='s'+n+'-'+m[2])?'s'+n+'-'+m[2]:'';if(!id){const b=bestSection(n,c.t+' '+c.d);if(b)id=b.id}
     if(c.t==='Gestalt principles'&&secs.some(e=>e.id==='s11-5')){n=11;id='s11-5'}
     const raw=c.t.replace(/<[^>]+>/g,'').trim();const ti=T.length;T.push({t:c.t,d:c.d,f:c.f,n,id});
     const add=a=>{a=a.trim();if(a.length>=4&&!(a.split(/\s+/).length==1&&STOPW.has(a.toLowerCase().replace(/s$/,''))))cand.push({a,ti})};
@@ -55,8 +55,10 @@ function buildIdx(){if(IDX)return;IDX=[];const t=document.createElement('div');
    const src=sec.lead&&sec.lead.length>50?sec.lead:body;const clean=src.replace(/§\s?(\d+)(?:\.(\d+))?/g,(m,a,b)=>{const q=IDX.find(e=>!e.term&&e.id===(b?'s'+a+'-'+b:''));const ll=D.lessons.find(x=>x.n==+a);return q?q.title.replace(/^[^A-Za-z]+/,'').replace(/\s*[(:—–?].*$/,''):(ll?wlChap(ll):'')});
    return {n,id,title,chapter:wlChap(l),excerpt:clean.slice(0,170).replace(/\s+\S*$/,'')+'…'}}
   function wlAnchor(info,text){const a=document.createElement('a');a.className='wl wl-ref';a.href='#'+(info.id||'ch'+info.n);a.dataset.n=info.n;a.dataset.id=info.id;a.textContent=text;return a}
-  function wlRefHTML(f){const i=wlRefInfo(f);if(!i)return esc(f||'');return '<a class="wl wl-ref" href="#'+(i.id||'ch'+i.n)+'" data-n="'+i.n+'" data-id="'+i.id+'">'+esc(i.title)+'</a>'}
-  function wlRefLabel(f){const i=wlRefInfo(f);return i?i.title:(f||'')}
+  /* a card that only names a chapter points at the section that best matches the card itself */
+  function wlCardF(f,c){if(!c||/\d+\.\d+/.test(f||''))return f;const m=/(\d+)/.exec(f||'');if(!m)return f;buildIdx();const b=bestSection(+m[1],c.t+' '+c.d);const k=b&&/^s(\d+)-(\d+)$/.exec(b.id);return k?k[1]+'.'+k[2]:f}
+  function wlRefHTML(f,c){f=wlCardF(f,c);const i=wlRefInfo(f);if(!i)return esc(f||'');return '<a class="wl wl-ref" href="#'+(i.id||'ch'+i.n)+'" data-n="'+i.n+'" data-id="'+i.id+'">'+esc(i.title)+'</a>'}
+  function wlRefLabel(f,c){f=wlCardF(f,c);const i=wlRefInfo(f);return i?i.title:(f||'')}
   function autoref(c,n){buildIdx();
    const RE=/(\(\s*)?(?:§\s?(\d+)(?:\.(\d+))?|\b(?:Chapter|Lecture)\s+(\d+)\b)(\s*\))?/g;
    const SKIP='a,button,h1,h2,h3,h4,h5,h6,.t-h1,.t-h2,.t-h3,.t-num,.gt,th,summary,pre,code,svg,.mermaid,.demo,.demo-slot,input,select,textarea,label,script,style,.backbar,.t-nav-footer,.endrow,.toc,.chip,.meta,.t-tag,.t-subtitle';

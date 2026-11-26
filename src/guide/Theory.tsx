@@ -10,13 +10,34 @@ import { breakText } from './paragraphs';
 import { balanceUnits, transposeTables, reveal, runMermaid, snakeChains, stackTables, treeChains } from './enhance';
 import { chapterSlide, ease, flipTiming, floatUp } from './motion';
 
-export function scrollToId(id: string, instant = false) {
+const FOCUS_STOP = new Set('the and for with that this these those from not are was were which what how why when where than then into out has have had its their there about each only also does being between should would could will can all any one two use used using more most other such like they them you your our but'.split(' '));
+const focusTok = (s: string) => new Set((s.toLowerCase().match(/[a-z0-9][a-z0-9'-]{2,}/g) || []).filter((w) => !FOCUS_STOP.has(w)));
+
+/** Scrolls to a section and then to the paragraph, list item, table row or card inside it that best matches `q`, so a jump lands on the exact information. */
+export function scrollToId(id: string, instant = false, q?: string) {
   const c = document.getElementById('theory-content'), t = document.getElementById(id);
   if (!c || !t) return;
   t.classList.add('in');
   const toc = c.querySelector<HTMLElement>('.toc');
-  c.scrollTo({ top: t.offsetTop - ((toc ? toc.offsetHeight : 0) + 32), behavior: instant ? 'instant' : 'smooth' });
+  const off = (toc ? toc.offsetHeight : 0) + 32;
+  const behavior = instant ? 'instant' : 'smooth';
+  c.scrollTo({ top: t.offsetTop - off, behavior });
   t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash');
+  const want = q ? focusTok(q) : null;
+  if (!want || want.size < 2) return;
+  let best: HTMLElement | null = null, bs = 0;
+  t.querySelectorAll<HTMLElement>('p,li,tr,dd,.fcard,.t-callout,.teach>div').forEach((el) => {
+    if (el.closest('.mermaid,.toc,.fcards') && !el.matches('.fcard')) return;
+    if (el.querySelector('p,li,tr') && !el.matches('tr')) return; // use the innermost block
+    const words = focusTok(el.textContent || ''); if (words.size < 3) return;
+    let hit = 0; want.forEach((w) => { if (words.has(w)) hit++; });
+    const sc = hit >= 2 ? hit / Math.sqrt(words.size + 6) : 0;
+    if (sc > bs) { bs = sc; best = el; }
+  });
+  const el = best as HTMLElement | null; if (!el) return;
+  const top = el.getBoundingClientRect().top - c.getBoundingClientRect().top + c.scrollTop - off - 24;
+  c.scrollTo({ top: Math.max(top, t.offsetTop - off), behavior });
+  el.classList.remove('hit'); void el.offsetWidth; el.classList.add('hit');
 }
 
 /** Cross-link hover cards and click-to-jump with a "back" step, for every `a.wl` link in the guide. */
@@ -39,8 +60,8 @@ export function WikiLayer() {
         : !(G.tab === 'theory' || G.D.tabs?.some((x) => x.key === G.tab && x.ns))
         ? { tab: G.tab, sel: G.cur, y: 0, label: 'Back to the ' + (G.tab === 'cheat' ? 'cheat-sheet' : 'flashcards'), up: null }
         : { tab: 'theory', sel: G.cur, y: c?.scrollTop || 0, label: 'Back to ' + (l ? G.wiki.wlChap(l) : 'the previous page'), up: G.back };
-      if (n === G.cur && G.tab === G.tabOf(n)) { G.setBack(back); if (id) scrollToId(id); else c?.scrollTo({ top: 0, behavior: 'smooth' }); }
-      else G.openChapter(n, { back, sec: id || undefined });
+      if (n === G.cur && G.tab === G.tabOf(n)) { G.setBack(back); if (id) scrollToId(id, false, a.textContent || ''); else c?.scrollTo({ top: 0, behavior: 'smooth' }); }
+      else G.openChapter(n, { back, sec: id || undefined, q: a.textContent || '' });
     };
     document.addEventListener('mouseover', over); document.addEventListener('focusin', fin); document.addEventListener('focusout', fout);
     document.addEventListener('scroll', hide, true); document.addEventListener('keydown', key); document.addEventListener('click', click);
@@ -99,7 +120,7 @@ export default function Theory() {
     const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) setActive(e.target.id); }), { root: sc, rootMargin: '-10% 0px -75% 0px' });
     if (list.length >= 2) b.querySelectorAll('.t-section[id]').forEach((s) => io.observe(s));
     g.api?.mountDemos?.([...b.querySelectorAll('.demo-slot')]);
-    if (p?.sec) setTimeout(() => scrollToId(p.sec!, true), 30); else if (p?.y) setTimeout(() => { sc.scrollTop = p.y!; }, 30);
+    if (p?.sec) setTimeout(() => scrollToId(p.sec!, true, p.q), 30); else if (p?.y) setTimeout(() => { sc.scrollTop = p.y!; }, 30);
     else if (ST.yn === cur && ST.y > 50) setTimeout(() => { sc.scrollTop = ST.y; }, 350);
     (window as any).loadTheory = (n: number) => {
       const c = document.getElementById('theory-content');

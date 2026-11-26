@@ -32,7 +32,7 @@ function Mcq({ q, sec }: { q: any; sec: string }) {
       <div className="qt" dangerouslySetInnerHTML={{ __html: breakAny(q.q) }} />
       <Options o={q.o} a={ans.map((l: string) => L5.indexOf(l))} sel={sel.map((l) => L5.indexOf(l))} w={q.w} mode={sol ? 'sol' : checked ? 'checked' : 'open'} label={`Options for question ${label}`} onChange={(j, on) => setSel((c) => (on ? [...c, L5[j]] : c.filter((x) => x !== L5[j])))} />
       {!sol && <div className="row"><button className="btn" disabled={checked || !sel.length} onClick={check}>Check answer</button>
-        <button className="btn ghost" onClick={() => g.openChapter(q.ch, { back: { tab: 'past', sel: sec, sec, q: q.n, y: 0, label: 'Back to Past Exam Q' + label, up: null } })}>📖 Revise chapter {q.ch}</button></div>}
+        <button className="btn ghost" onClick={() => g.jumpTo(q.ch, q.q + ' ' + (q.e || ''), { tab: 'past', sel: sec, sec, q: q.n, y: 0, label: 'Back to Past Exam Q' + label, up: null })}>📖 Revise this topic</button></div>}
       <AnimatePresence>{done && (
         <motion.div {...fade}><div className={`verdict ${sol || ok ? 'ok' : 'no'}`}><b>{sol ? 'Solution:' : ok ? '✅ Correct.' : '❌ Not quite.'}</b> {sol ? '' : 'Answer: '}<b>{ans.join(', ')}</b>. <span dangerouslySetInnerHTML={{ __html: breakAny(q.e) }} />
           {!sol && <div className="row">{ok ? null : <JumpBtn ch={q.ch} text={q.q + ' ' + q.e} back={{ tab: 'past', sel: sec, sec, q: q.n, y: 0, label: 'Back to Past Exam Q' + label, up: null }} />}<button className="btn ghost" onClick={retry}>↺ Try again</button></div>}
@@ -49,7 +49,7 @@ function Written({ q, sec }: { q: any; sec: string }) {
       <div className="qt" dangerouslySetInnerHTML={{ __html: breakAny(q.q) }} />
       <label className="sr" htmlFor={'ta' + q.n}>Your answer</label>
       <textarea id={'ta' + q.n} placeholder="Write your own answer first (saved on this device)…" value={g.PW[q.n] || ''} onChange={(e) => g.patch('PW', (o) => ({ ...o, [q.n]: e.target.value }))} />
-      <div className="row"><button className="btn ghost" onClick={() => g.openChapter(q.ch, { back: { tab: 'past', sel: sec, sec, q: 0, y: 0, label: 'Back to Past Exam', up: null } })}>📖 Revise chapter {q.ch}</button></div>
+      <div className="row"><button className="btn ghost" onClick={() => g.jumpTo(q.ch, q.q + ' ' + (q.a || ''), { tab: 'past', sel: sec, sec, q: 0, y: 0, label: 'Back to Past Exam', up: null })}>📖 Revise this topic</button></div>
       <AnimatePresence initial={false}>{sol && <motion.details className="model" open {...fade}><summary>Model answer</summary><div className="ma" dangerouslySetInnerHTML={{ __html: breakText(q.a) }} /></motion.details>}</AnimatePresence>
     </div>
   );

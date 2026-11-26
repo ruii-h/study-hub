@@ -19,6 +19,8 @@ Read `README.md` first. Its "House rules" section is how the user wants everythi
 
 - Shared question pieces: `src/guide/Choice.tsx` (`Options`, `WhyRow`) is used by chapter quizzes, mixed banks, past exams and mock exams; `SolToggle.tsx` is the one "Show solutions" switch (`tsol` tutorials/mocks, `psol` past exam, `qsol` practice questions). Do not copy option markup into a new quiz type.
 
+- Jumps must land on the exact information, not the top of a chapter: use `g.jumpTo(chapter, text, back)` (picks the best section, then the best paragraph/row/card, and highlights it with `.hit`) or `openChapter(n,{sec,q})`. Search results, key-term links, Review buttons and Revise buttons all go through `scrollToId(id, instant, q)` in `Theory.tsx`.
+
 ## Workflow
 - Mobile first: Samsung S24 Ultra, Chrome (~412x915). Also check 360x780.
 - Check UI changes in the browser preview before reporting them done.

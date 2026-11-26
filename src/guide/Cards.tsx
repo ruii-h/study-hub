@@ -33,7 +33,7 @@ function Card({ c, i }: { c: { t: string; d: string; f: string }; i: number }) {
         <div className="fc-b" dangerouslySetInnerHTML={{ __html: breakAny(c.d) }} />
         <div style={{ padding: '0 16px 12px' }}><button className="btn ghost" onClick={(e) => { e.stopPropagation(); g.patch('K', (k) => ({ ...k, [i]: k[i] ? 0 : 1 })); }}>{known ? '✓ Known (undo)' : 'Mark as known'}</button></div>
       </>) : (<>
-        <div className="bp-card-header"><div className="bp-card-header-title" dangerouslySetInnerHTML={{ __html: c.t }} /><span className="bp-flip-badge">Term · {g.wiki.wlRefLabel(c.f)}</span></div>
+        <div className="bp-card-header"><div className="bp-card-header-title" dangerouslySetInnerHTML={{ __html: c.t }} /><span className="bp-flip-badge">Term · {g.wiki.wlRefLabel(c.f, c)}</span></div>
         <div className="fc-b" style={{ color: 'var(--muted)', fontStyle: 'italic' }}>Tap to reveal the definition…</div>
       </>)}
     </motion.div>
@@ -75,7 +75,7 @@ export function Cheat() {
       <div className="sub">{cs.length} key terms{g.cch ? ` from ${(g.meta.unit || 'chapter').toLowerCase()} ` + g.cch : ''} with the section where each lives.</div>
       <div className="fc-filter"><ChapterSelect /></div>
       <div className="t-table-wrap" tabIndex={0}><table className="ch"><thead><tr><th>Term</th><th>Definition</th><th>From</th></tr></thead><tbody>
-        {cs.map((c, i) => <tr key={i}><td dangerouslySetInnerHTML={{ __html: c.t }} /><td dangerouslySetInnerHTML={{ __html: c.d }} /><td dangerouslySetInnerHTML={{ __html: g.wiki.wlRefHTML(c.f) }} /></tr>)}
+        {cs.map((c, i) => <tr key={i}><td dangerouslySetInnerHTML={{ __html: c.t }} /><td dangerouslySetInnerHTML={{ __html: c.d }} /><td dangerouslySetInnerHTML={{ __html: g.wiki.wlRefHTML(c.f, c) }} /></tr>)}
       </tbody></table></div>
     </div>
   );

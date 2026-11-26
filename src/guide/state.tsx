@@ -30,8 +30,10 @@ export interface Ctx {
   patch: (name: 'S' | 'V' | 'K' | 'P' | 'ST' | 'M' | 'QP' | 'PS' | 'PW', fn: (o: Json) => Json) => void;
   resetAll: () => void;
   tab: string; setTab: (t: string) => void; tabOf: (n: number) => string; cur: number; back: Back; setBack: (b: Back) => void;
-  openChapter: (n: number, o?: { back?: Back; sec?: string; y?: number }) => void;
-  pendingScroll: React.MutableRefObject<{ sec?: string; y?: number } | null>;
+  openChapter: (n: number, o?: { back?: Back; sec?: string; y?: number; q?: string }) => void;
+  /** Opens the exact section (and the paragraph, row or card inside it) that best matches `text`, instead of the top of chapter `n`. */
+  jumpTo: (n: number, text: string, back?: Back) => void;
+  pendingScroll: React.MutableRefObject<{ sec?: string; y?: number; q?: string } | null>;
   pqSel: string | number; setPqSel: (s: string | number) => void; pqMode: string; setPqMode: (m: string) => void;
   tutSel: number; setTutSel: (n: number) => void; openTut: (n: number) => void;
   mockSel: number; setMockSel: (n: number) => void;
@@ -71,7 +73,7 @@ export function GuideProvider({ meta, D, api, children }: { meta: CourseMeta; D:
   const [pastSec, setPastSecRaw] = useState<string>(ST.psec && D.secs?.[ST.psec] ? ST.psec : Object.keys(D.secs || {})[0] || '');
   const [cch, setCchRaw] = useState<number>(ST.cch || 0);
   const [navOpen, setNavOpen] = useState(false);
-  const pendingScroll = useRef<{ sec?: string; y?: number } | null>(null);
+  const pendingScroll = useRef<{ sec?: string; y?: number; q?: string } | null>(null);
   const wiki = useMemo(() => makeWiki(D), [D]);
 
   const setTab = useCallback((t: string) => {
@@ -85,12 +87,16 @@ export function GuideProvider({ meta, D, api, children }: { meta: CourseMeta; D:
     patch('ST', (o) => ({ ...o, tab: t, ...(n !== null ? { last: n, ['last_' + t]: n } : {}) }));
     if (n !== null) patch('V', (v) => ({ ...v, [n as number]: 1 }));
   }, [patch, D, cur, tabOf]);
-  const openChapter = useCallback((n: number, o?: { back?: Back; sec?: string; y?: number }) => {
-    pendingScroll.current = o && (o.sec || o.y) ? { sec: o.sec, y: o.y } : null;
+  const openChapter = useCallback((n: number, o?: { back?: Back; sec?: string; y?: number; q?: string }) => {
+    pendingScroll.current = o && (o.sec || o.y) ? { sec: o.sec, y: o.y, q: o.q } : null;
     const t = tabOf(n);
     setCur(n); setBack(o?.back ?? null); setTabRaw(t); setNavOpen(false);
     patch('V', (v) => ({ ...v, [n]: 1 })); patch('ST', (s) => ({ ...s, last: n, tab: t, ['last_' + t]: n }));
   }, [patch, tabOf]);
+  const jumpTo = useCallback((n: number, text: string, back?: Back) => {
+    const s = wiki.bestSection(n, text) as { id: string } | null;
+    openChapter(n, { back, sec: s?.id || undefined, q: text });
+  }, [wiki, openChapter]);
   const setPqSel = useCallback((s: string | number) => { setPqSelRaw(s); patch('ST', (o) => ({ ...o, pq: s })); setNavOpen(false); }, [patch]);
   const setTutSel = useCallback((n: number) => { setTutSelRaw(n); patch('ST', (o) => ({ ...o, tut: n })); setNavOpen(false); }, [patch]);
   const openTut = useCallback((n: number) => { setTutSelRaw(n); setTabRaw('tut'); setNavOpen(false); patch('ST', (o) => ({ ...o, tut: n, tab: 'tut' })); }, [patch]);
@@ -111,7 +117,7 @@ export function GuideProvider({ meta, D, api, children }: { meta: CourseMeta; D:
     setSt((s) => { const next = { S: {}, V: {}, K: {}, P: {}, M: {}, QP: {}, PS: {}, PW: {}, ST: { theme: s.ST.theme, fs: s.ST.fs } }; stRef.current = next; persist(next); return next; });
   }, [persist]);
 
-  const value: Ctx = { D, meta, wiki, api, ...(st as any), patch, resetAll, tab, setTab, tabOf, cur, back, setBack, openChapter, pendingScroll, pqSel, setPqSel, pqMode, setPqMode, tutSel, setTutSel, openTut, mockSel, setMockSel, pastSec, setPastSec, cch, setCch, goQuiz, goBack, navOpen, setNavOpen };
+  const value: Ctx = { D, meta, wiki, api, ...(st as any), patch, resetAll, tab, setTab, tabOf, cur, back, setBack, openChapter, jumpTo, pendingScroll, pqSel, setPqSel, pqMode, setPqMode, tutSel, setTutSel, openTut, mockSel, setMockSel, pastSec, setPastSec, cch, setCch, goQuiz, goBack, navOpen, setNavOpen };
   return <C.Provider value={value}>{children}</C.Provider>;
 }
 

@@ -226,3 +226,5 @@ pre.mermaid .swim-svg{max-width:none!important;width:auto;height:auto;margin:0;d
 .mtree .mt-i>.mt-n{margin-top:0}
 pre.mermaid.swim[data-rendered]::after{content:"swipe sideways · tap to enlarge"}
 @media(max-width:700px){.cf-row{grid-template-columns:minmax(0,1fr)!important}.cf-row>*,.cf-row>*:not(b:first-child){grid-column:1!important}.cf-row b{padding-top:0}}
+/* the paragraph, row or card a jump lands on */
+@layer legacy{.hit{animation:hit 2.6s ease-out;border-radius:6px}@keyframes hit{0%,35%{box-shadow:0 0 0 3px var(--ye,#e0af68);background:color-mix(in srgb,var(--ye,#e0af68) 16%,transparent)}100%{box-shadow:0 0 0 0 transparent;background:transparent}}}

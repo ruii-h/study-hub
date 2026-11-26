@@ -18,7 +18,7 @@ export function JumpBtn({ ch, text, back }: { ch: number; text: string; back: an
   const g = useG();
   const s = useMemo(() => g.wiki.bestSection(ch, text) as { title: string; id: string } | null, [g.wiki, ch, text]);
   const t = s ? (s.title.length > 44 ? s.title.slice(0, 42) + '…' : s.title) : '';
-  return <button className="btn ghost jump" onClick={() => g.openChapter(ch, { back, sec: s?.id || undefined })}>{s ? '📖 Review ' + t : '📖 Review ' + (g.meta.unit || 'Chapter') + ' ' + ch}</button>;
+  return <button className="btn ghost jump" onClick={() => g.jumpTo(ch, text, back)}>{s ? '📖 Review ' + t : '📖 Review ' + (g.meta.unit || 'Chapter') + ' ' + ch}</button>;
 }
 
 

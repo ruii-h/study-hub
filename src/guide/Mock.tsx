@@ -57,7 +57,7 @@ export default function MockExam({ qs }: { qs: any[] }) {
             <div className="qt" dangerouslySetInnerHTML={{ __html: breakAny(q.q) }} />
             <Options o={q.o} a={ans.map((l: string) => L5.indexOf(l))} sel={mine.split('').map((l: string) => L5.indexOf(l))} w={q.w} mode={sub ? 'checked' : 'open'} label={`Options for question ${label}`} onChange={(j) => toggle(q.n, L5[j])} head={(isA, isS) => (isA ? (isS ? '✓ You ticked it, and it is correct' : '✓ Correct option you did not tick') : (isS ? '✗ You ticked it, but it is wrong' : '✓ Rightly left blank'))} />
             {sub && <div className={`verdict ${right ? 'ok' : 'no'}`}><b>{right ? '✅ Correct.' : '❌ Not quite.'}</b> Key: <b>{ans.join(', ')}</b>{mine ? <> · you chose <b>{mine.split('').join(', ')}</b></> : null}.{q.e ? <> <span dangerouslySetInnerHTML={{ __html: breakAny(q.e) }} /></> : null}
-              <div className="row"><button className="btn ghost" onClick={() => g.openChapter(q.ch)}>📖 Revise chapter {q.ch}</button></div></div>}
+              <div className="row"><button className="btn ghost" onClick={() => g.jumpTo(q.ch, q.q + ' ' + (q.e || ''))}>📖 Revise this topic</button></div></div>}
           </div>);
       })}
       {!sub && (
