@@ -3,11 +3,13 @@ import fs from 'node:fs';
 import { hard, dropQuiz } from './pq-hard.mjs';
 import { past } from './pq-past.mjs';
 import { hard4, quiz4 } from './pq-m4.mjs';
+import { patch as patchM5to7 } from './pq-m5-7.mjs';
 const f = 'src/courses/bpas/data.json';
 const d = JSON.parse(fs.readFileSync(f, 'utf8'));
 for (const n of Object.keys(hard)) d.hard[n] = hard[n];
 for (const [n, idx] of Object.entries(dropQuiz)) d.quiz[n] = d.quiz[n].filter((_, i) => !idx.includes(i));
 d.hard[4] = hard4; d.quiz[4] = quiz4; // module 4 questions live in pq-m4.mjs
+patchM5to7(d); // M5-M7 context fixes live in pq-m5-7.mjs
 d.hard[14] = past; d.quiz[14] = [];
 d.qonly = [{ n: 14, title: 'Past Quizzes 1–3', tn: 14 }];
 d.pqg = [...d.groups.map((g) => [g.t, g.ns]), ['Past quizzes', [14]]];
